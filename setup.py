@@ -7,6 +7,6 @@ setup(name='trading-api-wrappers',
       author='Felipe Aránguiz, Sebastian Aránguiz',
       authoremail='faranguiz575@gmail.com, sarang575@gmail.com',
       license='MIT',
-      packages=['surbtc'],
+      packages=['bitfinex', 'coindesk', 'surbtc'],
       install_requires=['requests'],
       zip_safe=True)

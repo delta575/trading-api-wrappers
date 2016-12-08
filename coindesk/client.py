@@ -1,5 +1,4 @@
 import requests
-import json
 
 PROTOCOL = "https"
 HOST = "api.coindesk.com"
@@ -12,7 +11,8 @@ PATH_HISTORICAL = 'bpi/historical/close.json?currency='
 TIMEOUT = 15.0
 
 
-class CDClient(object):
+class CoinDesk(object):
+
     def server(self):
         return "%s://%s/%s" % (PROTOCOL, HOST, VERSION)
 

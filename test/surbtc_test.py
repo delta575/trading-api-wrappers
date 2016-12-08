@@ -4,8 +4,8 @@ from decouple import config
 from surbtc import SURBTC
 
 TEST = config('TEST', cast=bool, default=False)
-API_KEY = config('API_KEY')
-API_SECRET = config('API_SECRET')
+API_KEY = config('SURBTC_API_KEY')
+API_SECRET = config('SURBTC_API_SECRET')
 MARKET_ID = 'btc-clp'
 
 

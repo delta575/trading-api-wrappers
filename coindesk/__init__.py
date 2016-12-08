@@ -1,1 +1,1 @@
-from coindesk.client import CDClient
+from coindesk.client import CoinDesk
