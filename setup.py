@@ -1,6 +1,6 @@
 from setuptools import setup
 
-setup(name='trading-api-wrappers',
+setup(name='trading_api_wrappers',
       version='0.1.0',
       description='Trading API wrappers for Python 3',
       url='https://github.com/delta575/trading-api-wrappers',
