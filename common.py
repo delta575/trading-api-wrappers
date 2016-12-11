@@ -63,7 +63,7 @@ def check_response(response):
 
 def build_parameters(parameters):
     if parameters:
-        p = {k: v for k, v in parameters.items() if v is not None}
+        p = clean_parameters(parameters)
         return urlencode(p, True)
     else:
         return None
@@ -75,6 +75,11 @@ def build_route(path, params=None):
         return '{0:s}?{1:s}'.format(path, built_params)
     else:
         return path
+
+
+def clean_parameters(parameters: dict):
+    if parameters:
+        return {k: v for k, v in parameters.items() if v is not None}
 
 
 def update_dictionary(old_dict: dict, new_dict: dict):

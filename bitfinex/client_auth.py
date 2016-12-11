@@ -3,7 +3,7 @@ import base64
 import hmac
 import hashlib
 # local
-from common import Client, check_keys, update_dictionary, gen_nonce
+from common import Client, clean_parameters, check_keys, update_dictionary, gen_nonce
 from bitfinex.constants import Server
 
 # API Paths
@@ -311,10 +311,12 @@ class BitfinexAuth(object):
 
     # Packs and sign the payload and send the request with GET.
     def _sign_and_get(self, url, payload):
-        signed_payload = self._sign_payload(payload=payload)
+        payload = clean_parameters(payload)
+        signed_payload = self._sign_payload(payload)
         return self.client.get(url, headers=signed_payload)
 
     # Packs and sign the payload and send the request with POST.
     def _sign_and_post(self, url, payload):
-        signed_payload = self._sign_payload(payload=payload)
+        payload = clean_parameters(payload)
+        signed_payload = self._sign_payload(payload)
         return self.client.post(url, headers=signed_payload, data=payload)
