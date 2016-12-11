@@ -242,7 +242,7 @@ class BitfinexAuth(object):
             'request': path,
             'nonce': gen_nonce(),
             'symbol': symbol,
-            'timestamp': timestamp,
+            'timestamp': str(timestamp),
             'until': until,
             'limit_trades': limit_trades,
             'reverse': reverse,

@@ -89,6 +89,10 @@ class BitfinexAuthTest(unittest.TestCase):
         response = self.client.balances()
         self.assertIn('amount', response[0].keys())
 
+    def test_past_trades_returns_data(self):
+        response = self.client.past_trades(SYMBOL, TIMESTAMP)
+        self.assertIn('amount', response[0].keys())
+
 
 class BitfinexAuthTestBadApi(unittest.TestCase):
 
