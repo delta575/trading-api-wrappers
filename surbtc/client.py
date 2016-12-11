@@ -103,7 +103,7 @@ class SURBTC(object):
         return self.client.get(url, headers=signed_payload)
 
     # Call with 'page' param return authentication error
-    def balance_events(self, currencies, event_names, page=None, per_page=None, relevant=True):
+    def balance_events(self, currencies, event_names, page=None, per_page=None, relevant=None):
         parameters = {
             'currencies[]': currencies,
             'event_names[]': event_names,
@@ -187,5 +187,5 @@ class SURBTC(object):
             'X-SBTC-APIKEY': self.KEY,
             'X-SBTC-NONCE': nonce,
             'X-SBTC-SIGNATURE': signature,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         }

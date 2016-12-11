@@ -1,9 +1,7 @@
-import datetime
-# local
 from common import Client
 from bitfinex.constants import Server
 
-# API paths
+# API Paths
 PATH_TICKER = 'pubticker/%s'
 PATH_STATS = 'stats/%s'
 PATH_TODAY = 'today/%s'

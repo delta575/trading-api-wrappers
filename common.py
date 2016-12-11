@@ -7,8 +7,11 @@ import requests
 
 class Client(object):
 
-    def __init__(self, protocol, host, version, timeout=30):
-        self.URL = '{0:s}://{1:s}/{2:s}'.format(protocol, host, version)
+    def __init__(self, protocol, host, version=None, timeout=30):
+        url = '{0:s}://{1:s}'.format(protocol, host)
+        if version:
+            url = '{0:s}/{1:s}'.format(url, version)
+        self.URL = url
         self.TIMEOUT = timeout
 
     def get(self, url, headers=None, params=None):

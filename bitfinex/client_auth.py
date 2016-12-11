@@ -6,7 +6,7 @@ import hashlib
 from common import Client, check_keys, update_dictionary, gen_nonce
 from bitfinex.constants import Server
 
-# API paths
+# API Paths
 # Info
 PATH_ACCOUNT_INFO = 'account_infos'
 PATH_SUMMARY = 'summary'
