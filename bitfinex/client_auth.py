@@ -237,7 +237,7 @@ class BitfinexAuth(object):
 
     # View your past trades.
     def past_trades(self, symbol, timestamp, until=None, limit_trades=None, reverse=None):
-        url, path = self.client.url_path_for(PATH_POSITION_CLAIM)
+        url, path = self.client.url_path_for(PATH_PAST_TRADES)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
