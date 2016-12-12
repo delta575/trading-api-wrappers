@@ -4,6 +4,7 @@ import hmac
 import hashlib
 # local
 from common import Client, clean_parameters, check_keys, update_dictionary, gen_nonce
+from bitfinex.client_public import BitfinexPublic
 from bitfinex.constants import Server
 
 # API Paths
@@ -37,9 +38,10 @@ PATH_OFFER_STATUS = 'offer/status'
 PATH_OFFERS = 'offers'
 
 
-class BitfinexAuth(object):
+class BitfinexAuth(BitfinexPublic):
     
     def __init__(self, key=False, secret=False, timeout=30):
+        BitfinexPublic.__init__(self, timeout)
         check_keys(key, secret)
         self.KEY = str(key)
         self.SECRET = str(secret)
