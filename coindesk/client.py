@@ -15,6 +15,13 @@ class CoinDesk(object):
     def __init__(self, timeout=15):
         self.client = Client(PROTOCOL, HOST, VERSION, timeout)    
 
+    def live(self):
+        try:
+            self.current_bpi('clp')
+            return True
+        except:
+            return False
+
     def current_bpi(self, currency):
         """Gets the Bitcoin Price Index (BPI) in real-time for the specified currency.
 

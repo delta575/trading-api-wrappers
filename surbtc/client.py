@@ -35,6 +35,13 @@ class SURBTC(object):
         self.SECRET = str(secret)
         self.client = Client(PROTOCOL, HOST if not test else TEST_HOST, VERSION, timeout)
 
+    def live(self):
+        try:
+            self.markets()
+            return True
+        except:
+            return False
+
     # MARKETS-----------------------------------------------------------------------------------------------------------   
     def markets(self):
         url, path = self.client.url_path_for(PATH_MARKETS)
