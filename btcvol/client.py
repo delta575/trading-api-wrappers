@@ -1,4 +1,4 @@
-from common import Client
+from base import Client, Server
 
 # API Server
 PROTOCOL = 'https'
@@ -9,10 +9,11 @@ PATH_LATEST = 'latest'
 PATH_ALL = 'all'
 
 
-class BtcVol(object):
+class BtcVol(Client):
     
     def __init__(self, timeout=30):
-        self.client = Client(PROTOCOL, HOST, version=None, timeout=timeout)
+        server = Server(PROTOCOL, HOST, version=None)
+        Client.__init__(self, server, timeout)
 
     def live(self):
         try:
@@ -22,9 +23,9 @@ class BtcVol(object):
             return False
 
     def latest(self):
-        url = self.client.url_for(PATH_LATEST)
-        return self.client.get(url)
+        url = self.url_for(PATH_LATEST)
+        return self.get(url)
 
     def all(self):
-        url = self.client.url_for(PATH_ALL)
-        return self.client.get(url)
+        url = self.url_for(PATH_ALL)
+        return self.get(url)

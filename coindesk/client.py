@@ -1,4 +1,4 @@
-from common import Client
+from base import Client, Server
 
 # API Server
 PROTOCOL = 'https'
@@ -10,10 +10,11 @@ PATH_BPI = 'bpi/currentprice/%s.json'
 PATH_HISTORICAL = 'bpi/historical/close.json'
 
 
-class CoinDesk(object):
+class CoinDesk(Client):
     
     def __init__(self, timeout=15):
-        self.client = Client(PROTOCOL, HOST, VERSION, timeout)    
+        server = Server(PROTOCOL, HOST, VERSION)
+        Client.__init__(self, server, timeout)
 
     def live(self):
         try:
@@ -58,8 +59,8 @@ class CoinDesk(object):
             }
 
         """
-        url = self.client.url_for(PATH_BPI, path_arg=currency)
-        return self.client.get(url)
+        url = self.url_for(PATH_BPI, path_arg=currency)
+        return self.get(url)
 
     def historical_bpi(self, index=None, currency=None, start=None, end=None, yesterday=None):
         """Gets the hstorical Bitcoin Price Index (BPI) for the specified currency.
@@ -111,5 +112,5 @@ class CoinDesk(object):
             'end': end,
             'for': 'yesterday' if yesterday else None,
         }
-        url = self.client.url_for(PATH_HISTORICAL)
-        return self.client.get(url, params=parameters)
+        url = self.url_for(PATH_HISTORICAL)
+        return self.get(url, params=parameters)

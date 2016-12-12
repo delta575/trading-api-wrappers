@@ -1,5 +1,5 @@
-from common import Client
-from bitfinex.constants import Server
+from base import Client
+from bitfinex.constants import BitfinexServer
 
 # API Paths
 PATH_TICKER = 'pubticker/%s'
@@ -13,10 +13,10 @@ PATH_SYMBOLS = 'symbols'
 PATH_SYMBOLS_DETAILS = 'symbols_details'
 
 
-class BitfinexPublic(object):
+class BitfinexPublic(Client):
 
     def __init__(self, timeout=30):
-        self.client = Client(Server.PROTOCOL, Server.HOST, Server.VERSION, timeout)
+        Client.__init__(self, BitfinexServer(), timeout)
 
     def live(self):
         try:
@@ -53,8 +53,8 @@ class BitfinexPublic(object):
             timestamp   [float as str]      The timestamp at which this information was valid
 
         """
-        url = self.client.url_for(PATH_TICKER, path_arg=symbol)
-        return self.client.get(url)
+        url = self.url_for(PATH_TICKER, path_arg=symbol)
+        return self.get(url)
 
     def stats(self, symbol):
         """Various statistics about the requested pair.
@@ -74,8 +74,8 @@ class BitfinexPublic(object):
             volume  [float as str]      Volume in the period
 
         """
-        url = self.client.url_for(PATH_STATS, path_arg=symbol)
-        return self.client.get(url)
+        url = self.url_for(PATH_STATS, path_arg=symbol)
+        return self.get(url)
 
     def today(self, symbol):
         """Today's low, high and volume.
@@ -96,8 +96,8 @@ class BitfinexPublic(object):
             low     [float as str]      Today's low price
 
         """
-        url = self.client.url_for(PATH_TODAY, path_arg=symbol)
-        return self.client.get(url)
+        url = self.url_for(PATH_TODAY, path_arg=symbol)
+        return self.get(url)
 
     def lend_book(self, currency, limit_bids=None, limit_asks=None):
         """Get the full margin funding book.
@@ -135,8 +135,8 @@ class BitfinexPublic(object):
             'limit_bids': limit_bids,
             'limit_asks': limit_asks,
         }
-        url = self.client.url_for(PATH_LEND_BOOK, path_arg=currency)
-        return self.client.get(url, params=parameters)
+        url = self.url_for(PATH_LEND_BOOK, path_arg=currency)
+        return self.get(url, params=parameters)
 
     def order_book(self, symbol, limit_bids=None, limit_asks=None, group=None):
         """Get the full order book.
@@ -177,8 +177,8 @@ class BitfinexPublic(object):
             'limit_asks': limit_asks,
             'group': group,
         }
-        url = self.client.url_for(PATH_ORDER_BOOK, path_arg=symbol)
-        return self.client.get(url, params=parameters)
+        url = self.url_for(PATH_ORDER_BOOK, path_arg=symbol)
+        return self.get(url, params=parameters)
 
     def trades(self, symbol, timestamp=None, limit_trades=None):
         """Get a list of the most recent trades for the given symbol.
@@ -212,8 +212,8 @@ class BitfinexPublic(object):
             'timestamp': timestamp,
             'limit_trades': limit_trades,
         }
-        url = self.client.url_for(PATH_TRADES, path_arg=symbol)
-        return self.client.get(url, params=parameters)
+        url = self.url_for(PATH_TRADES, path_arg=symbol)
+        return self.get(url, params=parameters)
 
     def lends(self, currency, timestamp=None, limit_lends=None):
         """Get a list of the most recent lending data for the given currency:
@@ -248,8 +248,8 @@ class BitfinexPublic(object):
             'timestamp': timestamp,
             'limit_lends': limit_lends,
         }
-        url = self.client.url_for(PATH_LENDS, path_arg=currency)
-        return self.client.get(url, params=parameters)
+        url = self.url_for(PATH_LENDS, path_arg=currency)
+        return self.get(url, params=parameters)
     
     def symbols(self):
         """Get a list of valid symbol IDs.
@@ -260,8 +260,8 @@ class BitfinexPublic(object):
             list: A list of symbol names as str.
 
         """
-        url = self.client.url_for(PATH_SYMBOLS)
-        return self.client.get(url)
+        url = self.url_for(PATH_SYMBOLS)
+        return self.get(url)
     
     def symbols_details(self):
         """Get a list of valid symbol IDs and the pair details.
@@ -280,5 +280,5 @@ class BitfinexPublic(object):
             expiration          [str]           Expiration date for limited contracts/pairs
 
         """
-        url = self.client.url_for(PATH_SYMBOLS_DETAILS)
-        return self.client.get(url)
+        url = self.url_for(PATH_SYMBOLS_DETAILS)
+        return self.get(url)

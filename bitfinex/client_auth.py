@@ -3,9 +3,8 @@ import base64
 import hmac
 import hashlib
 # local
-from common import Client, clean_parameters, check_keys, update_dictionary, gen_nonce
+from common import clean_parameters, check_keys, update_dictionary, gen_nonce
 from bitfinex.client_public import BitfinexPublic
-from bitfinex.constants import Server
 
 # API Paths
 # Info
@@ -45,12 +44,11 @@ class BitfinexAuth(BitfinexPublic):
         check_keys(key, secret)
         self.KEY = str(key)
         self.SECRET = str(secret)
-        self.client = Client(Server.PROTOCOL, Server.HOST, Server.VERSION, timeout)
 
     # INFO--------------------------------------------------------------------------------------------------------------
     # Return information about your account (trading fees).
     def account_info(self):
-        url, path = self.client.url_path_for(PATH_ACCOUNT_INFO)
+        url, path = self.url_path_for(PATH_ACCOUNT_INFO)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -59,7 +57,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # Return information about your account (trading fees).
     def summary(self):
-        url, path = self.client.url_path_for(PATH_SUMMARY)
+        url, path = self.url_path_for(PATH_SUMMARY)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -68,7 +66,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # Check the permissions of the key being used to generate this request.
     def key_info(self):
-        url, path = self.client.url_path_for(PATH_KEY_INFO)
+        url, path = self.url_path_for(PATH_KEY_INFO)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -77,7 +75,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # See your trading wallet information for margin trading.
     def margin_info(self):
-        url, path = self.client.url_path_for(PATH_MARGIN_INFO)
+        url, path = self.url_path_for(PATH_MARGIN_INFO)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -86,7 +84,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # See your balances.
     def balances(self):
-        url, path = self.client.url_path_for(PATH_BALANCES)
+        url, path = self.url_path_for(PATH_BALANCES)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -96,7 +94,7 @@ class BitfinexAuth(BitfinexPublic):
     # MOVEMENTS---------------------------------------------------------------------------------------------------------
     # Return your deposit address to make a new deposit.
     def new_deposit(self, method, wallet_name, renew=0):
-        url, path = self.client.url_path_for(PATH_DEPOSIT_NEW)
+        url, path = self.url_path_for(PATH_DEPOSIT_NEW)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -108,7 +106,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # Allow you to move available balances between your wallets.
     def transfer(self, amount, currency, wallet_from, wallet_to):
-        url, path = self.client.url_path_for(PATH_TRANSFER)
+        url, path = self.url_path_for(PATH_TRANSFER)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -121,7 +119,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # Allow you to request a withdrawal from one of your wallet.
     def withdraw(self, currency, wallet, amount, address):
-        url, path = self.client.url_path_for(PATH_WITHDRAW)
+        url, path = self.url_path_for(PATH_WITHDRAW)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -135,7 +133,7 @@ class BitfinexAuth(BitfinexPublic):
     # ORDERS------------------------------------------------------------------------------------------------------------
     # Submit a new order.
     def place_order(self, amount, price, side, ord_type, symbol, exchange, params=None):
-        url, path = self.client.url_path_for(PATH_ORDER_NEW)
+        url, path = self.url_path_for(PATH_ORDER_NEW)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -151,7 +149,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # Cancel an order.
     def delete_order(self, order_id):
-        url, path = self.client.url_path_for(PATH_ORDER_CANCEL)
+        url, path = self.url_path_for(PATH_ORDER_CANCEL)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -161,7 +159,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # Cancel all orders.
     def delete_all_order(self):
-        url, path = self.client.url_path_for(PATH_ORDER_CANCEL_ALL)
+        url, path = self.url_path_for(PATH_ORDER_CANCEL_ALL)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -170,7 +168,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # Get the status of an order. Is it active? Was it cancelled? To what extent has it been executed? etc.
     def status_order(self, order_id):
-        url, path = self.client.url_path_for(PATH_ORDER_STATUS)
+        url, path = self.url_path_for(PATH_ORDER_STATUS)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -180,7 +178,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # View your active orders.
     def active_orders(self):
-        url, path = self.client.url_path_for(PATH_ORDERS)
+        url, path = self.url_path_for(PATH_ORDERS)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -191,7 +189,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # View your active positions.
     def active_positions(self):
-        url, path = self.client.url_path_for(PATH_POSITIONS)
+        url, path = self.url_path_for(PATH_POSITIONS)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -200,7 +198,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # Claim a position.
     def claim_position(self, position_id):
-        url, path = self.client.url_path_for(PATH_POSITION_CLAIM)
+        url, path = self.url_path_for(PATH_POSITION_CLAIM)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -211,7 +209,7 @@ class BitfinexAuth(BitfinexPublic):
     # HISTORICAL DATA--------------------------------------------------------------------------------------------------
     # View your past deposits/withdrawals.
     def balance_history(self, currency, since=None, until=None, limit=None, wallet=None):
-        url, path = self.client.url_path_for(PATH_HISTORY)
+        url, path = self.url_path_for(PATH_HISTORY)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -225,7 +223,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # View your past deposits/withdrawals.
     def movements(self, currency, method=None, since=None, until=None, limit=None):
-        url, path = self.client.url_path_for(PATH_HISTORY_MOVEMENTS)
+        url, path = self.url_path_for(PATH_HISTORY_MOVEMENTS)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -239,7 +237,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # View your past trades.
     def past_trades(self, symbol, timestamp, until=None, limit_trades=None, reverse=None):
-        url, path = self.client.url_path_for(PATH_PAST_TRADES)
+        url, path = self.url_path_for(PATH_PAST_TRADES)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -254,7 +252,7 @@ class BitfinexAuth(BitfinexPublic):
     # MARGIN FUNDING----------------------------------------------------------------------------------------------------
     # Submit a new Offer.
     def place_offer(self, currency, amount, rate, period, direction):
-        url, path = self.client.url_path_for(PATH_OFFER_NEW)
+        url, path = self.url_path_for(PATH_OFFER_NEW)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -268,7 +266,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # Cancel an offer.
     def cancel_offer(self, offer_id):
-        url, path = self.client.url_path_for(PATH_OFFER_CANCEL)
+        url, path = self.url_path_for(PATH_OFFER_CANCEL)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -278,7 +276,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # Get the status of an offer. Is it active? Was it cancelled? To what extent has it been executed? etc.
     def status_offer(self, offer_id):
-        url, path = self.client.url_path_for(PATH_OFFER_STATUS)
+        url, path = self.url_path_for(PATH_OFFER_STATUS)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -288,7 +286,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # View your active offers.
     def active_offers(self):
-        url, path = self.client.url_path_for(PATH_OFFERS)
+        url, path = self.url_path_for(PATH_OFFERS)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
@@ -315,10 +313,10 @@ class BitfinexAuth(BitfinexPublic):
     def _sign_and_get(self, url, payload):
         payload = clean_parameters(payload)
         signed_payload = self._sign_payload(payload)
-        return self.client.get(url, headers=signed_payload)
+        return self.get(url, headers=signed_payload)
 
     # Packs and sign the payload and send the request with POST.
     def _sign_and_post(self, url, payload):
         payload = clean_parameters(payload)
         signed_payload = self._sign_payload(payload)
-        return self.client.post(url, headers=signed_payload, data=payload)
+        return self.post(url, headers=signed_payload, data=payload)
