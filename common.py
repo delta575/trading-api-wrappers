@@ -1,5 +1,8 @@
 from urllib.parse import urlencode
+import logging
 import time
+# pip
+import requests
 
 
 def gen_nonce():
@@ -9,14 +12,43 @@ def gen_nonce():
     return str(int(time.time() * 1E6))
 
 
+def log_message(msg):
+    msg = "Trading API: " + msg
+    return msg
+
+
+def log_error(msg):
+    logging.error(log_message(msg))
+    return log_message(msg)
+
+
+def log_warning(msg):
+    logging.warning(log_message(msg))
+    return log_message(msg)
+
+
+def log_request_exception(err: requests.RequestException):
+    msg = 'RequestsException: ' + str(err)
+    return log_error(msg)
+
+
+def log_json_decode():
+    msg = 'JSONDecodeError: Unable to decode JSON from response (no content).'
+    return log_error(msg)
+
+
 def check_keys(key, secret):
     if not key or not secret:
-        raise ValueError('API Key and Secret are needed!')
+        msg = 'API Key and Secret are needed!'
+        log_error(msg)
+        raise ValueError(msg)
 
 
 def check_response(response):
     if 'message' in response:
-        raise Exception(response['message'])
+        msg = 'ResponseMessage: ' + response['message']
+        log_error(msg)
+        raise ValueError(msg)
 
 
 def build_parameters(parameters):
