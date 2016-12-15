@@ -8,7 +8,7 @@ Tested on Python 3.5.
 Install the libs
 
     pip install -r ./requirements.txt
-    
+
 ## Installation
 
     pip install -e git+https://github.com/delta575/trading-api-wrappers.git#egg=trading_api_wrappers
@@ -26,18 +26,18 @@ Authenticated API:
 
     from bitfinex import BitfinexAuth
     client = BitfinexAuth(API_KEY, API_SECRET)
-    
+
 Bitfinex API Doc:
 https://bitfinex.readme.io/v1/docs
-    
+
 ### SURBTC
 
     from surbtc import SURBTC
     client = SURBTC(API_KEY, API_SECRET)
-    
+
 SURBTC API Doc:
 https://www.surbtc.com/docs/api
-    
+
 ### CoinDesk
 
     from coindesk import CoinDesk
@@ -45,7 +45,7 @@ https://www.surbtc.com/docs/api
 
 Coindesk API Doc:
 http://www.coindesk.com/api
-    
+
 ### BtcVol
 
     from btcvol import BtcVol
@@ -58,7 +58,7 @@ https://btcvol.info
 
 Copyright (c) 2016 Felipe Aránguiz | Sebastián Aránguiz
 
-See [LICENSE.md](LICENSE.md)
+See [LICENSE](LICENSE)
 
 ## Based on
 
