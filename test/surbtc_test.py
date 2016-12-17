@@ -2,7 +2,7 @@ import unittest
 # pip
 from decouple import config
 # local
-from surbtc import SURBTC
+from trading_api_wrappers import SURBTC
 
 TEST = config('TEST', cast=bool, default=False)
 API_KEY = config('SURBTC_API_KEY')

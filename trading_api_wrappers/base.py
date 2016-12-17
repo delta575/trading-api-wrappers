@@ -1,9 +1,9 @@
-from urllib.parse import urlparse
 import json
-# pip
+from urllib.parse import urlparse
+
 import requests
-# local
-from common import check_response, log_request_exception, log_json_decode
+
+from trading_api_wrappers.common import check_response, log_request_exception, log_json_decode
 
 
 class Server(object):

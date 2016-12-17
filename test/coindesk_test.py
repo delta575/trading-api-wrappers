@@ -1,6 +1,6 @@
 import unittest
 # local
-from coindesk import CoinDesk
+from trading_api_wrappers import CoinDesk
 
 CURRENCY = 'clp'
 

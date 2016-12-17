@@ -1,6 +1,6 @@
 import unittest
 # local
-from btcvol import BtcVol
+from trading_api_wrappers import BtcVol
 
 
 class BtcVolTest(unittest.TestCase):

@@ -1,5 +1,6 @@
-from base import Client
-from bitfinex.constants import BitfinexServer
+from .constants import BitfinexServer
+
+from trading_api_wrappers.base import Client
 
 # API Paths
 PATH_TICKER = 'pubticker/%s'

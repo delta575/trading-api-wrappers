@@ -1,4 +1,4 @@
-from base import Client, Server
+from trading_api_wrappers.base import Client, Server
 
 # API Server
 PROTOCOL = 'https'

@@ -3,7 +3,7 @@ from datetime import datetime
 # pip
 from decouple import config
 # local
-from bitfinex import BitfinexAuth, BitfinexPublic, Symbols, Currencies
+from trading_api_wrappers.bitfinex import BitfinexAuth, BitfinexPublic, Symbols, Currencies
 
 # Bitfinex API Server
 TEST = config('TEST', cast=bool, default=False)

@@ -2,9 +2,10 @@ import base64
 import hashlib
 import hmac
 import json
-# local
-from base import Client, Server
-from common import check_keys, build_route, gen_nonce
+
+from trading_api_wrappers.common import check_keys, build_route, gen_nonce
+
+from trading_api_wrappers.base import Client, Server
 
 # API server
 PROTOCOL = 'https'

@@ -1,10 +1,10 @@
-import json
 import base64
-import hmac
 import hashlib
-# local
-from common import clean_parameters, check_keys, update_dictionary, gen_nonce
-from bitfinex.client_public import BitfinexPublic
+import hmac
+import json
+
+from trading_api_wrappers.bitfinex.client_public import BitfinexPublic
+from trading_api_wrappers.common import clean_parameters, check_keys, update_dictionary, gen_nonce
 
 # API Paths
 # Info
