@@ -40,8 +40,9 @@ class Client(object):
 
     def _request(self, method, url, headers, params=None, data=None):
         try:
+            data = json.dumps(data) if data else data
             response = requests.request(
-                method, url, headers=headers, params=params, data=json.dumps(data), verify=True, timeout=self.TIMEOUT
+                method, url, headers=headers, params=params, data=data, verify=True, timeout=self.TIMEOUT
             )
             response.raise_for_status()
             return response
