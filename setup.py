@@ -8,10 +8,7 @@ setup(name='trading_api_wrappers',
       authoremail='faranguiz575@gmail.com, sarang575@gmail.com',
       license='MIT',
       packages=[
-          'bitfinex',
-          'btcvol',
-          'coindesk',
-          'surbtc',
+          'trading_api_wrappers',
       ],
       install_requires=[
           'requests',
