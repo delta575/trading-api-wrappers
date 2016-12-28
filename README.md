@@ -1,17 +1,24 @@
 # Trading API Wrappers
 
-Trading Python API Wrapper.
-Tested on Python 3.5.
+Trading API Wrappers.
+Tested on Python 3.5
+
+- [Bitfinex](https://www.bitfinex.com)
+- [SURBTC](https://www.surbtc.com)
+- [CoinDesk](http://www.coindesk.com)
+- [BtcVol](https://btcvol.info)
 
 ## Dev setup
 
 Install the libs
 
-    pip install -r ./requirements.txt
+    pip install -r requirements.txt
+
+Rename .env.example > .env
 
 ## Installation
 
-    pip install -e git+https://github.com/delta575/trading-api-wrappers.git#egg=trading_api_wrappers
+    pip install git+https://github.com/delta575/trading-api-wrappers.git
 
 ## Usage
 
