@@ -12,7 +12,7 @@ class BitfinexServer(Server):
 
 
 # Bitfinex supported symbols
-class Symbols:
+class Symbols(object):
     BTCUSD = 'btcusd'
     LTCUSD = 'ltcusd'
     ETHUSD = 'ethusd'
@@ -30,6 +30,6 @@ class Symbols:
 
 
 # Bitfinex supported currencies
-class Currencies:
+class Currencies(object):
     USD = 'usd'
     BTC = 'btc'

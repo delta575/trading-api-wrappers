@@ -1,6 +1,8 @@
-from .constants import BitfinexServer
-
+# pip
+from requests import RequestException
+# local
 from trading_api_wrappers.base import Client
+from .constants import BitfinexServer
 
 # API Paths
 PATH_TICKER = 'pubticker/%s'
@@ -23,22 +25,24 @@ class BitfinexPublic(Client):
         try:
             self.symbols()
             return True
-        except:
+        except RequestException:
             return False
 
     def ticker(self, symbol):
         """Gets the innermost bid and asks and information on the most recent trade.
 
-        The ticker is a high level overview of the state of the market. It shows you the current best bid and ask,
-        as well as the last trade price. It also includes information such as daily volume and how much the price has
-        moved over the last day.
+        The ticker is a high level overview of the state of the market. It
+        shows you the current best bid and ask, as well as the last trade
+        price. It also includes information such as daily volume and how much
+        the price has moved over the last day.
 
         GET https://api.bitfinex.com/v1/pubticker/[symbol]
 
         Args:
             symbol (str): (Required)
                 The symbol you want information about.
-                You can find the list of valid symbols by calling the /symbols endpoint.
+                You can find the list of valid symbols by calling the /symbols
+                endpoint.
 
         Returns:
             dict: A dictionary of the following:
@@ -47,11 +51,13 @@ class BitfinexPublic(Client):
             mid         [float as str]      (bid + ask) / 2
             bid         [float as str]      Innermost bid
             ask         [float as str]      Innermost ask
-            last_price  [float as str]      The price at which the last order executed
-            low         [float as str]      Lowest trade price of the last 24 hours
-            high        [float as str]      Highest trade price of the last 24 hours
-            volume      [float as str]      Trading volume of the last 24 hours
-            timestamp   [float as str]      The timestamp at which this information was valid
+            last_price  [float as str]      The price at which the last order
+                                            executed
+            low         [float as str]      Lowest trade price of the last 24h
+            high        [float as str]      Highest trade price of the last 24h
+            volume      [float as str]      Trading volume of the last 24h
+            timestamp   [float as str]      The timestamp at which this
+                                            information was valid
 
         """
         url = self.url_for(PATH_TICKER, path_arg=symbol)
@@ -65,7 +71,8 @@ class BitfinexPublic(Client):
         Args:
             symbol (str): (Required)
                 The symbol you want information about.
-                You can find the list of valid symbols by calling the /symbols endpoint.
+                You can find the list of valid symbols by calling the /symbols
+                endpoint.
 
         Returns:
             list: A list of dicts with the following:
@@ -86,7 +93,8 @@ class BitfinexPublic(Client):
         Args:
             symbol (str): (Required)
                 The symbol you want information about.
-                You can find the list of valid symbols by calling the /symbols endpoint.
+                You can find the list of valid symbols by calling the /symbols
+                endpoint.
 
         Returns:
             dict: A dictionary of the following:
@@ -110,10 +118,12 @@ class BitfinexPublic(Client):
                 Currency (USD, BTC, etc.)
 
             limit_bids (int): (Optional, default=50)
-                Limit the number of bids returned. May be 0 in which case the array of bids is empty.
+                Limit the number of bids returned. May be 0 in which case the
+                array of bids is empty.
 
             limit_asks (int): (Optional, default=50)
-                Limit the number of asks returned. May be 0 in which case the array of bids is empty.
+                Limit the number of asks returned. May be 0 in which case the
+                array of bids is empty.
 
         Returns:
             dict: A dictionary of the following:
@@ -127,9 +137,12 @@ class BitfinexPublic(Client):
             Key	        Type            Description
             rate        [float as str]  Rate in % per 365 days
             amount      [float as str]
-            period      [int]           Minimum period for the margin funding contract in days
+            period      [int]           Minimum period for the margin funding
+                                        contract in days
             timestamp   [float as str]
-            frr	        [str]           “Yes” if the offer is at Flash Return Rate, “No” if the offer is at fixed rate
+            frr	        [str]           “Yes” if the offer is at Flash Return
+                                        Rate, “No” if the offer is at fixed
+                                        rate
 
         """
         parameters = {
@@ -147,16 +160,20 @@ class BitfinexPublic(Client):
         Args:
             symbol (str): (Required)
                 The symbol you want information about.
-                You can find the list of valid symbols by calling the /symbols endpoint.
+                You can find the list of valid symbols by calling the /symbols
+                endpoint.
 
             limit_bids (int): (Optional, default=50)
-                Limit the number of bids returned. May be 0 in which case the array of bids is empty.
+                Limit the number of bids returned. May be 0 in which case the
+                array of bids is empty.
 
             limit_asks (int): (Optional, default=50)
-                Limit the number of asks returned. May be 0 in which case the array of bids is empty.
+                Limit the number of asks returned. May be 0 in which case the
+                array of bids is empty.
 
             group (int): (Optional, default=1)
-                If 1, orders are grouped by price in the order book. If 0, orders are sorted individually.
+                If 1, orders are grouped by price in the order book. If 0,
+                orders are sorted individually.
 
         Returns:
             dict: A dictionary of the following:
@@ -189,7 +206,8 @@ class BitfinexPublic(Client):
         Args:
             symbol (str): (Required)
                 The symbol you want information about.
-                You can find the list of valid symbols by calling the /symbols endpoint.
+                You can find the list of valid symbols by calling the /symbols
+                endpoint.
 
             timestamp (float): (Optional)
                 Only show trades at or after this timestamp.
@@ -206,7 +224,8 @@ class BitfinexPublic(Client):
             price       [float as str]
             amount      [float as str]
             exchange    [str]
-            type        [str]           “sell” or “buy” (can be “” if undetermined)
+            type        [str]           'sell' or 'buy'
+                                        (can be '' if undetermined)
 
         """
         parameters = {
@@ -237,10 +256,13 @@ class BitfinexPublic(Client):
             list: A list of dicts with the following:
 
             Key         Type	        Description
-            rate        [float as str]	Average rate of total funding received at fixed rates,
-                                        ie past Flash Return Rate annualized (% by 365 days)
-            amount_lent [float as str]  Total amount of open margin funding in the given currency
-            amount_used [float as str]  Total amount of open margin funding used in a margin position
+            rate        [float as str]	Average rate of total funding received
+                                        at fixed rates, ie past Flash Return
+                                        Rate annualized (% by 365 days)
+            amount_lent [float as str]  Total amount of open margin funding in
+                                        the given currency
+            amount_used [float as str]  Total amount of open margin funding
+                                        used in a margin position
                                         in the given currency
             timestamp   [int]
 
@@ -251,7 +273,7 @@ class BitfinexPublic(Client):
         }
         url = self.url_for(PATH_LENDS, path_arg=currency)
         return self.get(url, params=parameters)
-    
+
     def symbols(self):
         """Get a list of valid symbol IDs.
 
@@ -263,7 +285,7 @@ class BitfinexPublic(Client):
         """
         url = self.url_for(PATH_SYMBOLS)
         return self.get(url)
-    
+
     def symbols_details(self):
         """Get a list of valid symbol IDs and the pair details.
 
@@ -274,11 +296,14 @@ class BitfinexPublic(Client):
 
             Key                 Type            Description
             pair                [str]           The pair code (symbol)
-            price_precision     [int]           Maximum number of significant digits for price in this pair
-            initial_margin      [float as str]  Initial margin required to open a position in this pair
-            minimum_margin      [float as str]  Minimal margin to maintain (in %)
+            price_precision     [int]           Maximum number of significant
+                                                digits for price in this pair
+            initial_margin      [float as str]  Initial margin required to open
+                                                a position in this pair
+            minimum_margin      [float as str]  Minimal margin to maintain (%)
             maximum_order_size  [float as str]  Maximum order size of the pair
-            expiration          [str]           Expiration date for limited contracts/pairs
+            expiration          [str]           Expiration date for limited
+                                                contracts/pairs
 
         """
         url = self.url_for(PATH_SYMBOLS_DETAILS)

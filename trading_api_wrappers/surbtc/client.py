@@ -2,9 +2,10 @@ import base64
 import hashlib
 import hmac
 import json
-
+# pip
+from requests import RequestException
+# local
 from trading_api_wrappers.common import check_keys, build_route, gen_nonce
-
 from trading_api_wrappers.base import Client, Server
 
 # API server
@@ -42,29 +43,29 @@ class SURBTC(Client):
         try:
             self.markets()
             return True
-        except:
+        except RequestException:
             return False
 
-    # MARKETS-----------------------------------------------------------------------------------------------------------   
+    # MARKETS------------------------------------------------------------------
     def markets(self):
         url, path = self.url_path_for(PATH_MARKETS)
-        signed_payload = self._sign_payload(method='GET', path=path)
-        return self.get(url, headers=signed_payload)
+        headers = self._sign_payload(method='GET', path=path)
+        return self.get(url, headers=headers)
 
     def market_details(self, market_id):
         url, path = self.url_path_for(PATH_MARKET_DETAILS, path_arg=market_id)
-        signed_payload = self._sign_payload(method='GET', path=path)
-        return self.get(url, headers=signed_payload)
+        headers = self._sign_payload(method='GET', path=path)
+        return self.get(url, headers=headers)
 
     def indicators(self, market_id):
         url, path = self.url_path_for(PATH_INDICATORS, path_arg=market_id)
-        signed_payload = self._sign_payload(method='GET', path=path)
-        return self.get(url, headers=signed_payload)
+        headers = self._sign_payload(method='GET', path=path)
+        return self.get(url, headers=headers)
 
     def order_book(self, market_id):
         url, path = self.url_path_for(PATH_ORDER_BOOK, path_arg=market_id)
-        signed_payload = self._sign_payload(method='GET', path=path)
-        return self.get(url, headers=signed_payload)
+        headers = self._sign_payload(method='GET', path=path)
+        return self.get(url, headers=headers)
 
     def quotation(self, market_id, quotation_type, reverse, amount):
         payload = {
@@ -75,46 +76,49 @@ class SURBTC(Client):
             },
         }
         url, path = self.url_path_for(PATH_QUOTATION, path_arg=market_id)
-        signed_payload = self._sign_payload(method='POST', path=path, payload=payload)
-        return self.post(url, headers=signed_payload, data=payload)
+        headers = self._sign_payload(method='POST', path=path, payload=payload)
+        return self.post(url, headers=headers, data=payload)
 
     def fee_percentage(self, market_id, order_type, market_order=False):
-        parameters = {
+        params = {
             'type': order_type,
             'market_order': market_order,
         }
         url, path = self.url_path_for(PATH_FEE_PERCENTAGE, path_arg=market_id)
-        signed_payload = self._sign_payload(method='GET', path=path, params=parameters)
-        return self.get(url, headers=signed_payload, params=parameters)
+        headers = self._sign_payload(method='GET', path=path, params=params)
+        return self.get(url, headers=headers, params=params)
 
     def trade_transactions(self, market_id, page=None, per_page=None):
-        parameters = {
+        params = {
             'page': page,
             'per_page': per_page,
         }
-        url, path = self.url_path_for(PATH_TRADE_TRANSACTIONS, path_arg=market_id)
-        signed_payload = self._sign_payload(method='GET', path=path, params=parameters)
-        return self.get(url, headers=signed_payload, params=parameters)
+        url, path = self.url_path_for(PATH_TRADE_TRANSACTIONS,
+                                      path_arg=market_id)
+        headers = self._sign_payload(method='GET', path=path, params=params)
+        return self.get(url, headers=headers, params=params)
 
-    def reports(self, market_id, report_type, from_timestamp=None, to_timestamp=None):
-        parameters = {
+    def reports(self, market_id, report_type, from_timestamp=None,
+                to_timestamp=None):
+        params = {
             'report_type': report_type,
             'from': from_timestamp,
             'to': to_timestamp,
         }
         url, path = self.url_path_for(PATH_REPORTS, path_arg=market_id)
-        signed_payload = self._sign_payload(method='GET', path=path, params=parameters)
-        return self.get(url, headers=signed_payload, params=parameters)
+        headers = self._sign_payload(method='GET', path=path, params=params)
+        return self.get(url, headers=headers, params=params)
 
-    # BALANCES----------------------------------------------------------------------------------------------------------
+    # BALANCES-----------------------------------------------------------------
     def balance(self, currency):
         url, path = self.url_path_for(PATH_BALANCES, path_arg=currency)
-        signed_payload = self._sign_payload(method='GET', path=path)
-        return self.get(url, headers=signed_payload)
+        headers = self._sign_payload(method='GET', path=path)
+        return self.get(url, headers=headers)
 
     # Call with 'page' param return authentication error
-    def balance_events(self, currencies, event_names, page=None, per_page=None, relevant=None):
-        parameters = {
+    def balance_events(self, currencies, event_names, page=None, per_page=None,
+                       relevant=None):
+        params = {
             'currencies[]': currencies,
             'event_names[]': event_names,
             'page': page,
@@ -122,11 +126,12 @@ class SURBTC(Client):
             'relevant': relevant,
         }
         url, path = self.url_path_for(PATH_BALANCES_EVENTS)
-        signed_payload = self._sign_payload(method='GET', path=path, params=parameters)
-        return self.get(url, headers=signed_payload, params=parameters)
+        headers = self._sign_payload(method='GET', path=path, params=params)
+        return self.get(url, headers=headers, params=params)
 
-    # ORDERS------------------------------------------------------------------------------------------------------------
-    def new_order(self, market_id, order_type, limit, amount, original_amount, price_type):
+    # ORDERS-------------------------------------------------------------------
+    def new_order(self, market_id, order_type, limit, amount, original_amount,
+                  price_type):
         payload = {
             'type': order_type,
             'limit': limit,
@@ -138,33 +143,33 @@ class SURBTC(Client):
 
     def new_order_payload(self, market, payload):
         url, path = self.url_path_for(PATH_ORDERS, path_arg=market)
-        signed_payload = self._sign_payload(method='POST', path=path, payload=payload)
-        return self.post(url, headers=signed_payload, data=payload)
+        headers = self._sign_payload(method='POST', path=path, payload=payload)
+        return self.post(url, headers=headers, data=payload)
 
     def orders(self, market_id, page=None, per_page=None, state=None):
-        parameters = {
+        params = {
             'per': per_page,
             'page': page,
             'state': state,
         }
         url, path = self.url_path_for(PATH_ORDERS, path_arg=market_id)
-        signed_payload = self._sign_payload(method='GET', path=path, params=parameters)
-        return self.get(url, headers=signed_payload, params=parameters)
+        headers = self._sign_payload(method='GET', path=path, params=params)
+        return self.get(url, headers=headers, params=params)
 
     def single_order(self, order_id):
         url, path = self.url_path_for(PATH_SINGLE_ORDER, path_arg=order_id)
-        signed_payload = self._sign_payload(method='GET', path=path)
-        return self.get(url, headers=signed_payload)
+        headers = self._sign_payload(method='GET', path=path)
+        return self.get(url, headers=headers)
 
     def cancel_order(self, order_id):
         payload = {
             'state': 'canceling',
         }
         url, path = self.url_path_for(PATH_SINGLE_ORDER, path_arg=order_id)
-        signed_payload = self._sign_payload(method='PUT', path=path, payload=payload)
-        return self.put(url, headers=signed_payload, data=payload)
+        headers = self._sign_payload(method='PUT', path=path, payload=payload)
+        return self.put(url, headers=headers, data=payload)
 
-    # PAYMENTS----------------------------------------------------------------------------------------------------------
+    # PAYMENTS-----------------------------------------------------------------
     def withdraw(self, target_address, amount, currency='BTC'):
         payload = {
             'withdrawal_data': {
@@ -174,10 +179,10 @@ class SURBTC(Client):
             'currency': currency,
         }
         url, path = self.url_path_for(PATH_WITHDRAWAL)
-        signed_payload = self._sign_payload(method='POST', path=path, payload=payload)
-        return self.post(url, headers=signed_payload, data=payload)
+        headers = self._sign_payload(method='POST', path=path, payload=payload)
+        return self.post(url, headers=headers, data=payload)
 
-    # PRIVATE METHODS---------------------------------------------------------------------------------------------------
+    # PRIVATE METHODS----------------------------------------------------------
     def _sign_payload(self, method, path, params=None, payload=None):
 
         route = build_route(path, params)
@@ -186,11 +191,14 @@ class SURBTC(Client):
         if payload:
             j = json.dumps(payload).encode('utf-8')
             encoded_body = base64.standard_b64encode(j).decode('utf-8')
-            string_to_sign = method + ' ' + route + ' ' + encoded_body + ' ' + nonce
+            string = method + ' ' + route + ' ' + encoded_body + ' ' + nonce
         else:
-            string_to_sign = method + ' ' + route + ' ' + nonce
+            string = method + ' ' + route + ' ' + nonce
 
-        h = hmac.new(self.SECRET.encode('utf-8'), string_to_sign.encode('utf-8'), hashlib.sha384)
+        h = hmac.new(key=self.SECRET.encode('utf-8'),
+                     msg=string.encode('utf-8'),
+                     digestmod=hashlib.sha384)
+
         signature = h.hexdigest()
 
         return {

@@ -19,7 +19,7 @@ setup(
         'trading_api_wrappers': 'trading_api_wrappers',
     },
     install_requires=[
-      'requests',
+        'requests',
     ],
     tests_require=[
         'coverage>=4.2',

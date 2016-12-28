@@ -1,3 +1,6 @@
+# pip
+from requests import RequestException
+# local
 from trading_api_wrappers.base import Client, Server
 
 # API Server
@@ -11,7 +14,7 @@ PATH_HISTORICAL = 'bpi/historical/close.json'
 
 
 class CoinDesk(Client):
-    
+
     def __init__(self, timeout=15):
         server = Server(PROTOCOL, HOST, VERSION)
         Client.__init__(self, server, timeout)
@@ -20,7 +23,7 @@ class CoinDesk(Client):
         try:
             self.current_bpi('clp')
             return True
-        except:
+        except RequestException:
             return False
 
     def current_bpi(self, currency):
@@ -62,7 +65,8 @@ class CoinDesk(Client):
         url = self.url_for(PATH_BPI, path_arg=currency)
         return self.get(url)
 
-    def historical_bpi(self, index=None, currency=None, start=None, end=None, yesterday=None):
+    def historical_bpi(self, index=None, currency=None, start=None, end=None,
+                       yesterday=None):
         """Gets the hstorical Bitcoin Price Index (BPI) for the specified currency.
 
         GET http(s)://api.coindesk.com/v1/bpi/historical/close.json
@@ -72,20 +76,24 @@ class CoinDesk(Client):
                 [USD/CNY] The index to return data for. Defaults to USD.
 
             currency (str):
-                The currency to return the data in, specified in ISO 4217 format. Defaults to USD.
+                The currency to return the data in, specified in ISO 4217
+                format. Defaults to USD.
 
             start (datetime):
                 Allows data to be returned for a specific date range.
-                Must be listed as a pair of start and end parameters, with dates supplied in the YYYY-MM-DD format,
+                Must be listed as a pair of start and end parameters, with
+                dates supplied in the YYYY-MM-DD format.
                 e.g. 2013-09-01 for September 1st, 2013.
 
             end (datetime):
                 Allows data to be returned for a specific date range.
-                Must be listed as a pair of start and end parameters, with dates supplied in the YYYY-MM-DD format,
+                Must be listed as a pair of start and end parameters, with
+                dates supplied in the YYYY-MM-DD format.
                 e.g. 2013-09-01 for September 1st, 2013.
 
             yesterday (bool):
-                Specifying this will return a single value for the previous day. Overrides the start/end parameter.
+                Specifying this will return a single value for the previous
+                day. Overrides the start/end parameter.
 
         Returns:
             dict: A dictionary with the following (example):

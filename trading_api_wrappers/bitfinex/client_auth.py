@@ -2,9 +2,12 @@ import base64
 import hashlib
 import hmac
 import json
-
+# local
 from trading_api_wrappers.bitfinex.client_public import BitfinexPublic
-from trading_api_wrappers.common import clean_parameters, check_keys, update_dictionary, gen_nonce
+from trading_api_wrappers.common import (clean_parameters,
+                                         check_keys,
+                                         update_dictionary,
+                                         gen_nonce)
 
 # API Paths
 # Info
@@ -38,7 +41,7 @@ PATH_OFFERS = 'offers'
 
 
 class BitfinexAuth(BitfinexPublic):
-    
+
     def __init__(self, key=False, secret=False, timeout=30):
         BitfinexPublic.__init__(self, timeout)
         check_keys(key, secret)
@@ -91,7 +94,7 @@ class BitfinexAuth(BitfinexPublic):
         }
         return self._sign_and_get(url, payload)
 
-    # MOVEMENTS---------------------------------------------------------------------------------------------------------
+    # MOVEMENTS-----------------------------------------------------------------
     # Return your deposit address to make a new deposit.
     def new_deposit(self, method, wallet_name, renew=0):
         url, path = self.url_path_for(PATH_DEPOSIT_NEW)
@@ -130,9 +133,10 @@ class BitfinexAuth(BitfinexPublic):
         }
         return self._sign_and_post(url, payload)
 
-    # ORDERS------------------------------------------------------------------------------------------------------------
+    # ORDERS--------------------------------------------------------------------
     # Submit a new order.
-    def place_order(self, amount, price, side, ord_type, symbol, exchange, params=None):
+    def place_order(self, amount, price, side, ord_type, symbol, exchange,
+                    params=None):
         url, path = self.url_path_for(PATH_ORDER_NEW)
         payload = {
             'request': path,
@@ -166,7 +170,8 @@ class BitfinexAuth(BitfinexPublic):
         }
         return self._sign_and_post(url, payload)
 
-    # Get the status of an order. Is it active? Was it cancelled? To what extent has it been executed? etc.
+    # Get the status of an order. Is it active? Was it cancelled?
+    # To what extent has it been executed? etc.
     def status_order(self, order_id):
         url, path = self.url_path_for(PATH_ORDER_STATUS)
         payload = {
@@ -206,9 +211,10 @@ class BitfinexAuth(BitfinexPublic):
         }
         return self._sign_and_post(url, payload)
 
-    # HISTORICAL DATA--------------------------------------------------------------------------------------------------
+    # HISTORICAL DATA----------------------------------------------------------
     # View your past deposits/withdrawals.
-    def balance_history(self, currency, since=None, until=None, limit=None, wallet=None):
+    def balance_history(self, currency, since=None, until=None, limit=None,
+                        wallet=None):
         url, path = self.url_path_for(PATH_HISTORY)
         payload = {
             'request': path,
@@ -222,7 +228,8 @@ class BitfinexAuth(BitfinexPublic):
         return self._sign_and_post(url, payload)
 
     # View your past deposits/withdrawals.
-    def movements(self, currency, method=None, since=None, until=None, limit=None):
+    def movements(self, currency, method=None, since=None, until=None,
+                  limit=None):
         url, path = self.url_path_for(PATH_HISTORY_MOVEMENTS)
         payload = {
             'request': path,
@@ -236,7 +243,8 @@ class BitfinexAuth(BitfinexPublic):
         return self._sign_and_post(url, payload)
 
     # View your past trades.
-    def past_trades(self, symbol, timestamp, until=None, limit_trades=None, reverse=None):
+    def past_trades(self, symbol, timestamp, until=None, limit_trades=None,
+                    reverse=None):
         url, path = self.url_path_for(PATH_PAST_TRADES)
         payload = {
             'request': path,
@@ -249,7 +257,7 @@ class BitfinexAuth(BitfinexPublic):
         }
         return self._sign_and_post(url, payload)
 
-    # MARGIN FUNDING----------------------------------------------------------------------------------------------------
+    # MARGIN FUNDING-----------------------------------------------------------
     # Submit a new Offer.
     def place_offer(self, currency, amount, rate, period, direction):
         url, path = self.url_path_for(PATH_OFFER_NEW)
@@ -274,7 +282,8 @@ class BitfinexAuth(BitfinexPublic):
         }
         return self._sign_and_post(url, payload)
 
-    # Get the status of an offer. Is it active? Was it cancelled? To what extent has it been executed? etc.
+    # Get the status of an offer. Is it active? Was it cancelled?
+    # To what extent has it been executed? etc.
     def status_offer(self, offer_id):
         url, path = self.url_path_for(PATH_OFFER_STATUS)
         payload = {
@@ -293,7 +302,7 @@ class BitfinexAuth(BitfinexPublic):
         }
         return self._sign_and_post(url, payload)
 
-    # PRIVATE METHODS---------------------------------------------------------------------------------------------------
+    # PRIVATE METHODS----------------------------------------------------------
     # Pack and sign the payload of the request.
     def _sign_payload(self, payload):
 

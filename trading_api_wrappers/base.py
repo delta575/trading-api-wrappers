@@ -1,9 +1,11 @@
 import json
 from urllib.parse import urlparse
-
+# pip
 import requests
-
-from trading_api_wrappers.common import check_response, log_request_exception, log_json_decode
+# local
+from trading_api_wrappers.common import (check_response,
+                                         log_request_exception,
+                                         log_json_decode)
 
 
 class Server(object):
@@ -42,7 +44,8 @@ class Client(object):
         try:
             data = json.dumps(data) if data else data
             response = requests.request(
-                method, url, headers=headers, params=params, data=data, verify=True, timeout=self.TIMEOUT
+                method, url, headers=headers, params=params, data=data,
+                verify=True, timeout=self.TIMEOUT
             )
             response.raise_for_status()
             return response
