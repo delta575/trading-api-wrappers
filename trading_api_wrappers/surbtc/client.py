@@ -148,6 +148,7 @@ class SURBTC(Client):
 
     def orders(self, market_id, page=None, per_page=None, state=None,
                minimum_exchanged=None):
+        # TODO Show warning when per_page is greater than max (300)
         params = {
             'per': per_page,
             'page': page,
