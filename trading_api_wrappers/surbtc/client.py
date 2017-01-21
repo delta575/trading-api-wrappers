@@ -146,11 +146,14 @@ class SURBTC(Client):
         headers = self._sign_payload(method='POST', path=path, payload=payload)
         return self.post(url, headers=headers, data=payload)
 
-    def orders(self, market_id, page=None, per_page=None, state=None):
+    def orders(self, market_id, page=None, per_page=None, state=None,
+               minimum_exchanged=None):
         params = {
             'per': per_page,
             'page': page,
             'state': state,
+            # API has a typo: minimum > mininum
+            'mininum_exchanged': minimum_exchanged,
         }
         url, path = self.url_path_for(PATH_ORDERS, path_arg=market_id)
         headers = self._sign_payload(method='GET', path=path, params=params)
