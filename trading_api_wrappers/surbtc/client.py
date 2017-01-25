@@ -28,6 +28,9 @@ PATH_ORDERS = 'markets/%s/orders'
 PATH_SINGLE_ORDER = 'orders/%s'
 PATH_WITHDRAWAL = 'withdrawals'
 
+# Limits
+ORDERS_LIMIT = 300
+
 
 class SURBTC(Client):
 
@@ -151,7 +154,9 @@ class SURBTC(Client):
                per_page=None,
                state=None,
                minimum_exchanged=None):
-        # TODO Show warning when per_page is greater than max (300)
+        if minimum_exchanged and minimum_exchanged > ORDERS_LIMIT:
+            raise ValueError('Param minimum_exchanged must be < {0}}'.
+                             format(ORDERS_LIMIT))
         params = {
             'per': per_page,
             'page': page,
