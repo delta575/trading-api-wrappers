@@ -1,5 +1,4 @@
-# pip
-from requests import RequestException
+from datetime import datetime, date, tzinfo
 # local
 from trading_api_wrappers.base import Client, Server
 
@@ -19,106 +18,59 @@ class CoinDesk(Client):
         server = Server(PROTOCOL, HOST, VERSION)
         Client.__init__(self, server, timeout)
 
-    def live(self):
-        try:
-            self.current_bpi('clp')
-            return True
-        except RequestException:
-            return False
+    def bpi(self, currency):
+        return _BPI(self, currency)
 
-    def current_bpi(self, currency):
-        """Gets the Bitcoin Price Index (BPI) in real-time for the specified currency.
+    def rate(self, currency):
+        return _Rate(self, currency)
 
-        GET http(s)://api.coindesk.com/v1/bpi/currentprice/[currency].json
 
-        Args:
-            currency (str): One of the supported currency codes.
-                http://api.coindesk.com/v1/bpi/supported-currencies.json
+class _BPI(CoinDesk):
 
-        Returns:
-            dict: A dictionary with the following (example):
+    def __init__(self, parent, currency):
+        super().__init__(timeout=parent.TIMEOUT)
+        self.currency = currency.upper()
 
-            {
-                'time': {
-                    'updatedISO': '2016-12-11T17:39:00+00:00',
-                    'updated': 'Dec 11, 2016 17:39:00 UTC',
-                    'updateduk': 'Dec 11, 2016 at 17:39 GMT'
-                    },
-                'bpi': {
-                    'BTC': {
-                        'rate': '1.0000',
-                        'rate_float': 1,
-                        'code': 'BTC',
-                        'description': 'Bitcoin'
-                    },
-                    'USD': {
-                        'rate': '768.4125',
-                        'rate_float': 768.4125,
-                        'code': 'USD',
-                        'description': 'United States Dollar'
-                    }
-                },
-                'disclaimer': 'Disclaimer text.'
-            }
-
-        """
-        url = self.url_for(PATH_BPI, path_arg=currency)
+    def current(self):
+        url = self.url_for(PATH_BPI, path_arg=self.currency)
         return self.get(url)
 
-    def historical_bpi(self, index=None, currency=None, start=None, end=None,
-                       yesterday=None):
-        """Gets the hstorical Bitcoin Price Index (BPI) for the specified currency.
-
-        GET http(s)://api.coindesk.com/v1/bpi/historical/close.json
-
-        Args:
-            index (str):
-                [USD/CNY] The index to return data for. Defaults to USD.
-
-            currency (str):
-                The currency to return the data in, specified in ISO 4217
-                format. Defaults to USD.
-
-            start (datetime):
-                Allows data to be returned for a specific date range.
-                Must be listed as a pair of start and end parameters, with
-                dates supplied in the YYYY-MM-DD format.
-                e.g. 2013-09-01 for September 1st, 2013.
-
-            end (datetime):
-                Allows data to be returned for a specific date range.
-                Must be listed as a pair of start and end parameters, with
-                dates supplied in the YYYY-MM-DD format.
-                e.g. 2013-09-01 for September 1st, 2013.
-
-            yesterday (bool):
-                Specifying this will return a single value for the previous
-                day. Overrides the start/end parameter.
-
-        Returns:
-            dict: A dictionary with the following (example):
-
-            {
-                'time': {
-                    'updatedISO': '2016-12-11T00:03:00+00:00',
-                    'updated': 'Dec 11, 2016 00:03:00 UTC'
-                },
-                'bpi': {
-                    '2016-11-20': 728.6075,
-                    '2016-11-21': 736.7163,
-                    '2016-11-15': 711.9563,
-                    ...
-                },
-                'disclaimer': 'Disclaimer text.'
-            }
-
-        """
+    def historical(self, start=None, end=None):
         parameters = {
-            'index': index,
-            'currency': currency,
+            'currency': self.currency,
             'start': start,
             'end': end,
-            'for': 'yesterday' if yesterday else None,
         }
         url = self.url_for(PATH_HISTORICAL)
         return self.get(url, params=parameters)
+
+
+class _Rate(CoinDesk):
+
+    def __init__(self, parent, currency):
+        super().__init__(timeout=parent.TIMEOUT)
+        self.currency = currency.upper()
+        self._bpi = self.bpi(self.currency)
+
+    def current(self):
+        response = self._bpi.current()
+        rate = response['bpi'][self.currency]['rate_float']
+        return rate
+
+    def historical(self, start=None, end=None):
+        response = self._bpi.historical(start=start, end=end)
+        rate_dict = response['bpi']
+        return rate_dict
+
+    def for_date(self, date_for: date):
+        date_now = datetime.utcnow().date()
+        if date_for > date_now:
+            msg = ('Param date_for must be a date <= the current date '
+                   '({0})'.format(date_now))
+            raise ValueError(msg)
+        if date_for == date_now:
+            rate = self.current()
+        else:
+            rate_dict = self.historical(start=date_for, end=date_for)
+            rate = rate_dict[str(date_for)]
+        return rate
