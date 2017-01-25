@@ -21,13 +21,6 @@ class BitfinexPublic(Client):
     def __init__(self, timeout=30):
         Client.__init__(self, BitfinexServer(), timeout)
 
-    def live(self):
-        try:
-            self.symbols()
-            return True
-        except RequestException:
-            return False
-
     def ticker(self, symbol):
         """Gets the innermost bid and asks and information on the most recent trade.
 

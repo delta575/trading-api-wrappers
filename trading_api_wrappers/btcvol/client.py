@@ -18,13 +18,6 @@ class BtcVol(Client):
         server = Server(PROTOCOL, HOST, version=None)
         Client.__init__(self, server, timeout)
 
-    def live(self):
-        try:
-            self.latest()
-            return True
-        except RequestException:
-            return False
-
     def latest(self):
         url = self.url_for(PATH_LATEST)
         return self.get(url)

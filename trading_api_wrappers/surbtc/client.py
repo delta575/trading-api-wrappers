@@ -39,13 +39,6 @@ class SURBTC(Client):
         self.KEY = str(key)
         self.SECRET = str(secret)
 
-    def live(self):
-        try:
-            self.markets()
-            return True
-        except RequestException:
-            return False
-
     # MARKETS------------------------------------------------------------------
     def markets(self):
         url, path = self.url_path_for(PATH_MARKETS)
