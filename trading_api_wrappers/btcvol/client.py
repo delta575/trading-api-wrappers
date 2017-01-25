@@ -1,5 +1,3 @@
-# pip
-from requests import RequestException
 # local
 from trading_api_wrappers.base import Client, Server
 

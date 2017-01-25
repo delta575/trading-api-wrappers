@@ -1,13 +1,13 @@
 import unittest
 from datetime import datetime
+
 # pip
 from decouple import config
 from requests import RequestException
+
 # local
-from trading_api_wrappers.bitfinex import (BitfinexAuth,
-                                           BitfinexPublic,
-                                           Symbols,
-                                           Currencies)
+from trading_api_wrappers.bitfinex import (BitfinexAuth, BitfinexPublic,
+                                           Currencies, Symbols)
 
 # Bitfinex API Server
 TEST = config('TEST', cast=bool, default=False)

@@ -1,6 +1,6 @@
 import unittest
-
 from datetime import datetime, timedelta
+
 # local
 from trading_api_wrappers import CoinDesk
 
@@ -46,4 +46,4 @@ class CoinDeskTest(unittest.TestCase):
 
     def test_rate_for_date_tomorrow_raises_error(self):
         self.assertRaises(ValueError, lambda:
-        self.client.rate(CURRENCY).for_date(TOMORROW))
+                          self.client.rate(CURRENCY).for_date(TOMORROW))

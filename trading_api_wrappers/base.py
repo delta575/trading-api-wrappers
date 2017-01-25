@@ -1,14 +1,15 @@
 import json
 from urllib.parse import urlparse
+
 # pip
 import requests
 # local
-from trading_api_wrappers.common import (check_response,
-                                         log_request_exception,
-                                         log_json_decode)
+from trading_api_wrappers.common import (check_response, log_json_decode,
+                                         log_request_exception)
 
 
 class Server(object):
+
     def __init__(self, protocol, host, version=None):
         url = '{0:s}://{1:s}'.format(protocol, host)
         if version:
@@ -21,6 +22,7 @@ class Server(object):
 
 
 class Client(object):
+
     def __init__(self, server: Server, timeout=30):
         self.SERVER = server
         self.TIMEOUT = timeout
@@ -44,9 +46,13 @@ class Client(object):
         try:
             data = json.dumps(data) if data else data
             response = requests.request(
-                method, url, headers=headers, params=params, data=data,
-                verify=True, timeout=self.TIMEOUT
-            )
+                method,
+                url,
+                headers=headers,
+                params=params,
+                data=data,
+                verify=True,
+                timeout=self.TIMEOUT)
             response.raise_for_status()
             return response
         except requests.exceptions.RequestException as err:

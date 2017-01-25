@@ -1,4 +1,5 @@
-from datetime import datetime, date, tzinfo
+from datetime import date, datetime
+
 # local
 from trading_api_wrappers.base import Client, Server
 

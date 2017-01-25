@@ -1,6 +1,7 @@
-from urllib.parse import urlencode
 import logging
 import time
+from urllib.parse import urlencode
+
 # pip
 import requests
 

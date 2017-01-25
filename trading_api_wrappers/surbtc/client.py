@@ -2,11 +2,10 @@ import base64
 import hashlib
 import hmac
 import json
-# pip
-from requests import RequestException
+
 # local
-from trading_api_wrappers.common import check_keys, build_route, gen_nonce
 from trading_api_wrappers.base import Client, Server
+from trading_api_wrappers.common import build_route, check_keys, gen_nonce
 
 # API server
 PROTOCOL = 'https'
@@ -86,12 +85,15 @@ class SURBTC(Client):
             'page': page,
             'per_page': per_page,
         }
-        url, path = self.url_path_for(PATH_TRADE_TRANSACTIONS,
-                                      path_arg=market_id)
+        url, path = self.url_path_for(
+            PATH_TRADE_TRANSACTIONS, path_arg=market_id)
         headers = self._sign_payload(method='GET', path=path, params=params)
         return self.get(url, headers=headers, params=params)
 
-    def reports(self, market_id, report_type, from_timestamp=None,
+    def reports(self,
+                market_id,
+                report_type,
+                from_timestamp=None,
                 to_timestamp=None):
         params = {
             'report_type': report_type,
@@ -109,7 +111,11 @@ class SURBTC(Client):
         return self.get(url, headers=headers)
 
     # Call with 'page' param return authentication error
-    def balance_events(self, currencies, event_names, page=None, per_page=None,
+    def balance_events(self,
+                       currencies,
+                       event_names,
+                       page=None,
+                       per_page=None,
                        relevant=None):
         params = {
             'currencies[]': currencies,
@@ -122,7 +128,7 @@ class SURBTC(Client):
         headers = self._sign_payload(method='GET', path=path, params=params)
         return self.get(url, headers=headers, params=params)
 
-    # ORDERS-------------------------------------------------------------------
+    # ORDERS ------------------------------------------------------------------
     def new_order(self, market_id, order_type, limit, amount, original_amount,
                   price_type):
         payload = {
@@ -139,7 +145,11 @@ class SURBTC(Client):
         headers = self._sign_payload(method='POST', path=path, payload=payload)
         return self.post(url, headers=headers, data=payload)
 
-    def orders(self, market_id, page=None, per_page=None, state=None,
+    def orders(self,
+               market_id,
+               page=None,
+               per_page=None,
+               state=None,
                minimum_exchanged=None):
         # TODO Show warning when per_page is greater than max (300)
         params = {
@@ -159,14 +169,12 @@ class SURBTC(Client):
         return self.get(url, headers=headers)
 
     def cancel_order(self, order_id):
-        payload = {
-            'state': 'canceling',
-        }
+        payload = {'state': 'canceling', }
         url, path = self.url_path_for(PATH_SINGLE_ORDER, path_arg=order_id)
         headers = self._sign_payload(method='PUT', path=path, payload=payload)
         return self.put(url, headers=headers, data=payload)
 
-    # PAYMENTS-----------------------------------------------------------------
+    # PAYMENTS ----------------------------------------------------------------
     def withdraw(self, target_address, amount, currency='BTC'):
         payload = {
             'withdrawal_data': {
@@ -179,7 +187,7 @@ class SURBTC(Client):
         headers = self._sign_payload(method='POST', path=path, payload=payload)
         return self.post(url, headers=headers, data=payload)
 
-    # PRIVATE METHODS----------------------------------------------------------
+    # PRIVATE METHODS ---------------------------------------------------------
     def _sign_payload(self, method, path, params=None, payload=None):
 
         route = build_route(path, params)

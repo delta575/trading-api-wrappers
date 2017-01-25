@@ -1,4 +1,5 @@
 import unittest
+
 # local
 from trading_api_wrappers import BtcVol
 
