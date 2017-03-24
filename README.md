@@ -26,12 +26,12 @@ Rename .env.example > .env
 
 Public API:
 
-    from trading_api_wrappers import BitfinexPublic
+    from bitfinex import BitfinexPublic
     client = BitfinexPublic()
 
 Authenticated API:
 
-    from trading_api_wrappers import BitfinexAuth
+    from bitfinex import BitfinexAuth
     client = BitfinexAuth(API_KEY, API_SECRET)
 
 Bitfinex API Doc:
@@ -39,7 +39,7 @@ https://bitfinex.readme.io/v1/docs
 
 ### SURBTC
 
-    from trading_api_wrappers import SURBTC
+    from surbtc import SURBTC
     client = SURBTC(API_KEY, API_SECRET)
 
 SURBTC API Doc:
@@ -47,7 +47,7 @@ https://www.surbtc.com/docs/api
 
 ### CoinDesk
 
-    from trading_api_wrappers import CoinDesk
+    from coindesk import CoinDesk
     client = CoinDesk()    
 
 Coindesk API Doc:
@@ -55,7 +55,7 @@ http://www.coindesk.com/api
 
 ### BtcVol
 
-    from trading_api_wrappers import BtcVol
+    from btcvol import BtcVol
     client = BtcVol()
 
 BtcVol API Doc:
