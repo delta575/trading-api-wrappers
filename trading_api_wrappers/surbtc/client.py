@@ -16,7 +16,7 @@ VERSION = 'v1'
 # API paths
 PATH_MARKETS = 'markets'
 PATH_MARKET_DETAILS = 'markets/%s'
-PATH_INDICATORS = "markets/%s/indicators"
+PATH_TICKER = "markets/%s/ticker"
 PATH_ORDER_BOOK = 'markets/%s/order_book'
 PATH_QUOTATION = 'markets/%s/quotations'
 PATH_FEE_PERCENTAGE = 'markets/%s/fee_percentage'
@@ -26,7 +26,7 @@ PATH_BALANCES = 'balances/%s'
 PATH_BALANCES_EVENTS = 'balance_events'
 PATH_ORDERS = 'markets/%s/orders'
 PATH_SINGLE_ORDER = 'orders/%s'
-PATH_WITHDRAWAL = 'withdrawals'
+PATH_WITHDRAWAL = 'currencies/%s/withdrawals'
 
 # Limits
 ORDERS_LIMIT = 300
@@ -136,10 +136,9 @@ class SURBTC(Client):
                   price_type):
         payload = {
             'type': order_type,
-            'limit': limit,
-            'amount': amount,
-            'original_amount': original_amount,
             'price_type': price_type,
+            'limit': limit,
+            'amount': amount
         }
         return self.new_order_payload(market_id, payload)
 
@@ -185,10 +184,10 @@ class SURBTC(Client):
             'withdrawal_data': {
                 'target_address': target_address,
             },
-            'amount': str(amount),
+            'amount': amount,
             'currency': currency,
         }
-        url, path = self.url_path_for(PATH_WITHDRAWAL)
+        url, path = self.url_path_for(PATH_WITHDRAWAL, path_arg=currency)
         headers = self._sign_payload(method='POST', path=path, payload=payload)
         return self.post(url, headers=headers, data=payload)
 
