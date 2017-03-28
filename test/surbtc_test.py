@@ -29,9 +29,9 @@ class SURBTCTest(unittest.TestCase):
         markets_details = self.client.market_details(MARKET_ID)
         self.assertIn('market', markets_details.keys())
 
-    def test_indicators_returns_data(self):
-        indicators = self.client.indicators(MARKET_ID)
-        self.assertIn('indicators', indicators.keys())
+    def test_ticker_returns_data(self):
+        ticker = self.client.ticker(MARKET_ID)
+        self.assertIn('ticker', ticker.keys())
 
     def test_order_book_returns_data(self):
         order_book = self.client.order_book(MARKET_ID)

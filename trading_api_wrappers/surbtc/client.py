@@ -52,8 +52,8 @@ class SURBTC(Client):
         headers = self._sign_payload(method='GET', path=path)
         return self.get(url, headers=headers)
 
-    def indicators(self, market_id):
-        url, path = self.url_path_for(PATH_INDICATORS, path_arg=market_id)
+    def ticker(self, market_id):
+        url, path = self.url_path_for(PATH_TICKER, path_arg=market_id)
         headers = self._sign_payload(method='GET', path=path)
         return self.get(url, headers=headers)
 
@@ -62,14 +62,15 @@ class SURBTC(Client):
         headers = self._sign_payload(method='GET', path=path)
         return self.get(url, headers=headers)
 
-    def quotation(self, market_id, quotation_type, reverse, amount):
+    def quotation(self, market_id, quotation_type, price_limit, amount):
         payload = {
             'quotation': {
                 'type': quotation_type,
-                'reverse': reverse,
+                'limit': str(price_limit),
                 'amount': str(amount),
             },
         }
+        print(payload)
         url, path = self.url_path_for(PATH_QUOTATION, path_arg=market_id)
         headers = self._sign_payload(method='POST', path=path, payload=payload)
         return self.post(url, headers=headers, data=payload)
@@ -132,8 +133,7 @@ class SURBTC(Client):
         return self.get(url, headers=headers, params=params)
 
     # ORDERS ------------------------------------------------------------------
-    def new_order(self, market_id, order_type, limit, amount, original_amount,
-                  price_type):
+    def new_order(self, market_id, order_type, limit, amount, price_type):
         payload = {
             'type': order_type,
             'price_type': price_type,
