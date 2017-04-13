@@ -19,7 +19,7 @@ class BitfinexPublic(Client):
     def __init__(self, timeout=30):
         Client.__init__(self, BitfinexServer(), timeout)
 
-    def ticker(self, symbol):
+    def ticker(self, symbol='btcusd'):
         """Gets the innermost bid and asks and information on the most recent trade.
 
         The ticker is a high level overview of the state of the market. It

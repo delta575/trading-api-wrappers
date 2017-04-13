@@ -139,19 +139,20 @@ class BitfinexAuth(BitfinexPublic):
                     price,
                     side,
                     ord_type,
-                    symbol,
-                    exchange,
+                    symbol='btcusd',
                     params=None):
         url, path = self.url_path_for(PATH_ORDER_NEW)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
             'symbol': symbol,
-            'amount': amount,
-            'price': price,
-            'exchange': exchange,
+            'amount': str(amount),
+            'price': str(price),
             'side': side,
             'type': ord_type,
+            'ocoorder': False,
+            'buy_price_oco': 1,
+            'sell_price_oco': 9999
         }
         update_dictionary(payload, params)
         return self._sign_and_post(url, payload)
