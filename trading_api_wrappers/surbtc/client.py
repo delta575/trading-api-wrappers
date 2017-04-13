@@ -22,7 +22,7 @@ PATH_QUOTATION = 'markets/%s/quotations'
 PATH_FEE_PERCENTAGE = 'markets/%s/fee_percentage'
 PATH_TRADE_TRANSACTIONS = 'markets/%s/trade_transactions'
 PATH_REPORTS = 'markets/%s/reports'
-PATH_BALANCES = 'balances/%s'
+PATH_BALANCES = 'balances'
 PATH_BALANCES_EVENTS = 'balance_events'
 PATH_ORDERS = 'markets/%s/orders'
 PATH_SINGLE_ORDER = 'orders/%s'
@@ -62,12 +62,12 @@ class SURBTC(Client):
         headers = self._sign_payload(method='GET', path=path)
         return self.get(url, headers=headers)
 
-    def quotation(self, market_id, quotation_type, price_limit, amount):
+    def quotation(self, market_id, quotation_type, price_limit, currency, amount):
         payload = {
             'quotation': {
                 'type': quotation_type,
-                'limit': str(price_limit),
-                'amount': str(amount),
+                'limit': [str(price_limit), currency],
+                'amount': [str(amount), currency]
             },
         }
         print(payload)
@@ -109,8 +109,8 @@ class SURBTC(Client):
         return self.get(url, headers=headers, params=params)
 
     # BALANCES-----------------------------------------------------------------
-    def balance(self, currency):
-        url, path = self.url_path_for(PATH_BALANCES, path_arg=currency)
+    def balances(self):
+        url, path = self.url_path_for(PATH_BALANCES)
         headers = self._sign_payload(method='GET', path=path)
         return self.get(url, headers=headers)
 
@@ -179,7 +179,7 @@ class SURBTC(Client):
         return self.put(url, headers=headers, data=payload)
 
     # PAYMENTS ----------------------------------------------------------------
-    def withdraw(self, target_address, amount, currency='BTC'):
+    def withdraw(self, amount, currency, target_address=None):
         payload = {
             'withdrawal_data': {
                 'target_address': target_address,
