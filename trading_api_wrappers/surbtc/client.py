@@ -109,8 +109,8 @@ class SURBTC(Client):
         return self.get(url, headers=headers, params=params)
 
     # BALANCES-----------------------------------------------------------------
-    def balances(self):
-        url, path = self.url_path_for(PATH_BALANCES)
+    def balance(self, currency):
+        url, path = self.url_path_for(PATH_BALANCES, path_arg=currency)
         headers = self._sign_payload(method='GET', path=path)
         return self.get(url, headers=headers)
 
