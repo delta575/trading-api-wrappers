@@ -152,16 +152,15 @@ class SURBTC(Client):
                page=None,
                per_page=None,
                state=None,
-               minimum_exchanged=None):
-        if minimum_exchanged and minimum_exchanged > ORDERS_LIMIT:
-            raise ValueError('Param minimum_exchanged must be < {0}}'.
+               minimun_exchanged=None):
+        if minimun_exchanged and minimun_exchanged > ORDERS_LIMIT:
+            raise ValueError('Param minimun_exchanged must be < {0}}'.
                              format(ORDERS_LIMIT))
         params = {
             'per': per_page,
             'page': page,
             'state': state,
-            # API has a typo: minimum > mininum
-            'mininum_exchanged': minimum_exchanged,
+            'minimun_exchanged': minimun_exchanged,
         }
         url, path = self.url_path_for(PATH_ORDERS, path_arg=market_id)
         headers = self._sign_payload(method='GET', path=path, params=params)
