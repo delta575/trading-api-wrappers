@@ -6,6 +6,7 @@ Tested on Python 3.5
 - [Bitfinex](https://www.bitfinex.com)
 - [SURBTC](https://www.surbtc.com)
 - [CoinDesk](http://www.coindesk.com)
+- [Kraken](http://www.kraken.com)
 - [BtcVol](https://btcvol.info)
 
 ## Dev setup
