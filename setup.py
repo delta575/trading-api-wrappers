@@ -17,7 +17,8 @@ setup(
         'trading_api_wrappers.bitfinex',
         'trading_api_wrappers.btcvol',
         'trading_api_wrappers.coindesk',
-        'trading_api_wrappers.surbtc',
+        'trading_api_wrappers.kraken',
+        'trading_api_wrappers.surbtc'
     ],
     package_dir={
         'trading_api_wrappers': 'trading_api_wrappers',
