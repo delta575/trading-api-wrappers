@@ -7,32 +7,28 @@ import json
 from trading_api_wrappers.base import Client, Server
 from trading_api_wrappers.common import build_route, check_keys, gen_nonce
 
+from .constants import Path as _p
+from . import models as _m
+from . import constants as _c
+
 # API server
 PROTOCOL = 'https'
 HOST = 'www.surbtc.com/api'
 TEST_HOST = 'stg.surbtc.com/api'
 VERSION = 'v1'
 
-# API paths
-PATH_MARKETS = 'markets'
-PATH_MARKET_DETAILS = 'markets/%s'
-PATH_TICKER = "markets/%s/ticker"
-PATH_ORDER_BOOK = 'markets/%s/order_book'
-PATH_QUOTATION = 'markets/%s/quotations'
-PATH_FEE_PERCENTAGE = 'markets/%s/fee_percentage'
-PATH_TRADE_TRANSACTIONS = 'markets/%s/trade_transactions'
-PATH_REPORTS = 'markets/%s/reports'
-PATH_BALANCES = 'balances/%s'
-PATH_BALANCES_EVENTS = 'balance_events'
-PATH_ORDERS = 'markets/%s/orders'
-PATH_SINGLE_ORDER = 'orders/%s'
-PATH_WITHDRAWAL = 'currencies/%s/withdrawals'
-
 # Limits
 ORDERS_LIMIT = 300
 
 
 class SURBTC(Client):
+    Currency = _c.Currency
+    Market = _c.Market
+    OrderType = _c.OrderType
+    OrderState = _c.OrderState
+    OrderPriceType = _c.OrderPriceType
+    BalanceEvent = _c.BalanceEvent
+    QuotationType = _c.QuotationType
 
     def __init__(self, key=False, secret=False, test=False, timeout=30):
         server = Server(PROTOCOL, HOST if not test else TEST_HOST, VERSION)
@@ -43,56 +39,89 @@ class SURBTC(Client):
 
     # MARKETS------------------------------------------------------------------
     def markets(self):
-        url, path = self.url_path_for(PATH_MARKETS)
+        url, path = self.url_path_for(_p.MARKETS)
         headers = self._sign_payload(method='GET', path=path)
-        return self.get(url, headers=headers)
+        data = self.get(url, headers=headers)
+        return [_m.Market.create_from_json(market)
+                for market in data['markets']]
 
-    def market_details(self, market_id):
-        url, path = self.url_path_for(PATH_MARKET_DETAILS, path_arg=market_id)
+    def market_details(self, market_id: Market):
+        market_id = self.Market.check_param(market_id)
+        url, path = self.url_path_for(_p.MARKET_DETAILS,
+                                      path_arg=market_id.value)
         headers = self._sign_payload(method='GET', path=path)
-        return self.get(url, headers=headers)
+        data = self.get(url, headers=headers)
+        return _m.Market.create_from_json(data['market'])
 
-    def ticker(self, market_id):
-        url, path = self.url_path_for(PATH_TICKER, path_arg=market_id)
+    def ticker(self, market_id: Market):
+        market_id = self.Market.check_param(market_id)
+        url, path = self.url_path_for(_p.TICKER,
+                                      path_arg=market_id.value)
         headers = self._sign_payload(method='GET', path=path)
-        return self.get(url, headers=headers)
+        data = self.get(url, headers=headers)
+        return _m.Ticker.create_from_json(data['ticker'])
 
-    def order_book(self, market_id):
-        url, path = self.url_path_for(PATH_ORDER_BOOK, path_arg=market_id)
+    def order_book(self, market_id: Market):
+        market_id = self.Market.check_param(market_id)
+        url, path = self.url_path_for(_p.ORDER_BOOK,
+                                      path_arg=market_id.value)
         headers = self._sign_payload(method='GET', path=path)
-        return self.get(url, headers=headers)
+        data = self.get(url, headers=headers)
+        return _m.OrderBook.create_from_json(data['order_book'])
 
-    def quotation(self, market_id, quotation_type, price_limit, currency, amount):
+    def quotation(self,
+                  market_id: Market,
+                  currency: Currency,
+                  quotation_type: QuotationType,
+                  price_limit: float,
+                  amount: float):
+        market_id = self.Market.check_param(market_id)
+        currency = self.Currency.check_param(currency)
+        quotation_type = self.QuotationType.check_param(quotation_type)
         payload = {
             'quotation': {
-                'type': quotation_type,
-                'limit': [str(price_limit), currency],
-                'amount': [str(amount), currency]
+                'type': quotation_type.value,
+                'limit': [str(price_limit), currency.value],
+                'amount': [str(amount), currency.value]
             },
         }
-        print(payload)
-        url, path = self.url_path_for(PATH_QUOTATION, path_arg=market_id)
+        url, path = self.url_path_for(_p.QUOTATION,
+                                      path_arg=market_id.value)
         headers = self._sign_payload(method='POST', path=path, payload=payload)
-        return self.post(url, headers=headers, data=payload)
+        data = self.post(url, headers=headers, data=payload)
+        return _m.Quotation.create_from_json(data['quotation'])
 
-    def fee_percentage(self, market_id, order_type, market_order=False):
+    def fee_percentage(self,
+                       market_id: Market,
+                       order_type: OrderType,
+                       market_order: bool = False):
+        market_id = self.Market.check_param(market_id)
+        order_type = self.OrderType.check_param(order_type)
         params = {
-            'type': order_type,
+            'type': order_type.value,
             'market_order': market_order,
         }
-        url, path = self.url_path_for(PATH_FEE_PERCENTAGE, path_arg=market_id)
+        url, path = self.url_path_for(_p.FEE_PERCENTAGE,
+                                      path_arg=market_id.value)
         headers = self._sign_payload(method='GET', path=path, params=params)
-        return self.get(url, headers=headers, params=params)
+        data = self.get(url, headers=headers, params=params)
+        return _m.FeePercentage.create_from_json(data['fee_percentage'])
 
-    def trade_transactions(self, market_id, page=None, per_page=None):
+    def trade_transactions(self,
+                           market_id: Market,
+                           page: int = None,
+                           per_page: int = None):
+        market_id = self.Market.check_param(market_id)
         params = {
             'page': page,
             'per_page': per_page,
         }
-        url, path = self.url_path_for(
-            PATH_TRADE_TRANSACTIONS, path_arg=market_id)
+        url, path = self.url_path_for(_p.TRADE_TRANSACTIONS,
+                                      path_arg=market_id.value)
         headers = self._sign_payload(method='GET', path=path, params=params)
-        return self.get(url, headers=headers, params=params)
+        data = self.get(url, headers=headers, params=params)
+        return [_m.TradeTransaction.create_from_json(transaction)
+                for transaction in data['trade_transactions']]
 
     def reports(self,
                 market_id,
@@ -104,23 +133,29 @@ class SURBTC(Client):
             'from': from_timestamp,
             'to': to_timestamp,
         }
-        url, path = self.url_path_for(PATH_REPORTS, path_arg=market_id)
+        url, path = self.url_path_for(_p.REPORTS.value, path_arg=market_id)
         headers = self._sign_payload(method='GET', path=path, params=params)
         return self.get(url, headers=headers, params=params)
 
     # BALANCES-----------------------------------------------------------------
-    def balance(self, currency):
-        url, path = self.url_path_for(PATH_BALANCES, path_arg=currency)
+    def balance(self, currency: Currency):
+        currency = self.Currency.check_param(currency)
+        url, path = self.url_path_for(_p.BALANCES, path_arg=currency.value)
         headers = self._sign_payload(method='GET', path=path)
-        return self.get(url, headers=headers)
+        data = self.get(url, headers=headers)
+        return _m.Balance.create_from_json(data['balance'])
 
     # Call with 'page' param return authentication error
     def balance_events(self,
                        currencies,
                        event_names,
-                       page=None,
-                       per_page=None,
-                       relevant=None):
+                       page: int = None,
+                       per_page: int = None,
+                       relevant: bool = None):
+        currencies = [self.Currency.check_param(c).value
+                      for c in currencies]
+        event_names = [self.BalanceEvent.check_param(e).value
+                       for e in event_names]
         params = {
             'currencies[]': currencies,
             'event_names[]': event_names,
@@ -128,54 +163,77 @@ class SURBTC(Client):
             'per': per_page,
             'relevant': relevant,
         }
-        url, path = self.url_path_for(PATH_BALANCES_EVENTS)
+        url, path = self.url_path_for(_p.BALANCES_EVENTS)
         headers = self._sign_payload(method='GET', path=path, params=params)
-        return self.get(url, headers=headers, params=params)
+        data = self.get(url, headers=headers, params=params)
+        return _m.BalanceEventPages.create_from_json(
+            data['balance_events'], data['total_count'], page)
 
     # ORDERS ------------------------------------------------------------------
-    def new_order(self, market_id, order_type, limit, amount, price_type):
+    def new_order(self,
+                  market_id: Market,
+                  order_type: OrderType,
+                  price_type: OrderPriceType,
+                  amount: float,
+                  limit: float = None):
+        market_id = self.Market.check_param(market_id)
+        order_type = self.OrderType.check_param(order_type)
+        price_type = self.OrderPriceType.check_param(price_type)
         payload = {
-            'type': order_type,
-            'price_type': price_type,
+            'type': order_type.value,
+            'price_type': price_type.value,
+            'amount': amount,
             'limit': limit,
-            'amount': amount
         }
         return self.new_order_payload(market_id, payload)
 
-    def new_order_payload(self, market, payload):
-        url, path = self.url_path_for(PATH_ORDERS, path_arg=market)
+    def new_order_payload(self, market_id: Market, payload):
+        url, path = self.url_path_for(_p.ORDERS,
+                                      path_arg=market_id.value)
         headers = self._sign_payload(method='POST', path=path, payload=payload)
-        return self.post(url, headers=headers, data=payload)
+        data = self.post(url, headers=headers, data=payload)
+        return _m.Order.create_from_json(data['order'])
 
     def orders(self,
-               market_id,
-               page=None,
-               per_page=None,
-               state=None,
-               minimun_exchanged=None):
-        if minimun_exchanged and minimun_exchanged > ORDERS_LIMIT:
-            raise ValueError('Param minimun_exchanged must be < {0}}'.
-                             format(ORDERS_LIMIT))
+               market_id: Market,
+               page: int = None,
+               per_page: int = None,
+               state: OrderState = None,
+               minimum_exchanged: float = None):
+        market_id = self.Market.check_param(market_id)
+        state = self.OrderState.check_param(state)
+        if per_page and per_page > ORDERS_LIMIT:
+            msg = f"Param 'per_page' must be <= {ORDERS_LIMIT}"
+            raise ValueError(msg)
         params = {
             'per': per_page,
             'page': page,
-            'state': state,
-            'minimun_exchanged': minimun_exchanged,
+            'state': state.value if state else state,
+            # API has a typo: minimun must be minimum
+            'minimun_exchanged': minimum_exchanged,
         }
-        url, path = self.url_path_for(PATH_ORDERS, path_arg=market_id)
+        url, path = self.url_path_for(_p.ORDERS,
+                                      path_arg=market_id.value)
         headers = self._sign_payload(method='GET', path=path, params=params)
-        return self.get(url, headers=headers, params=params)
+        data = self.get(url, headers=headers, params=params)
+        return _m.OrderPages.create_from_json(data['orders'], data['meta'])
 
-    def single_order(self, order_id):
-        url, path = self.url_path_for(PATH_SINGLE_ORDER, path_arg=order_id)
+    def single_order(self, order_id: int):
+        url, path = self.url_path_for(_p.SINGLE_ORDER,
+                                      path_arg=order_id)
         headers = self._sign_payload(method='GET', path=path)
-        return self.get(url, headers=headers)
+        data = self.get(url, headers=headers)
+        return _m.Order.create_from_json(data['order'])
 
-    def cancel_order(self, order_id):
-        payload = {'state': 'canceling', }
-        url, path = self.url_path_for(PATH_SINGLE_ORDER, path_arg=order_id)
+    def cancel_order(self, order_id: int):
+        payload = {
+            'state': SURBTC.OrderState.CANCELING.value,
+        }
+        url, path = self.url_path_for(_p.SINGLE_ORDER,
+                                      path_arg=order_id)
         headers = self._sign_payload(method='PUT', path=path, payload=payload)
-        return self.put(url, headers=headers, data=payload)
+        data = self.put(url, headers=headers, data=payload)
+        return _m.Order.create_from_json(data['order'])
 
     # PAYMENTS ----------------------------------------------------------------
     def withdraw(self, amount, currency, target_address=None):
@@ -186,7 +244,7 @@ class SURBTC(Client):
             'amount': amount,
             'currency': currency,
         }
-        url, path = self.url_path_for(PATH_WITHDRAWAL, path_arg=currency)
+        url, path = self.url_path_for(_p.WITHDRAWAL, path_arg=currency)
         headers = self._sign_payload(method='POST', path=path, payload=payload)
         return self.post(url, headers=headers, data=payload)
 
