@@ -22,6 +22,11 @@ ORDERS_LIMIT = 300
 
 
 class SURBTC(Client):
+
+    # Models
+    models = _m
+
+    # Enum Types
     Currency = _c.Currency
     Market = _c.Market
     OrderType = _c.OrderType
