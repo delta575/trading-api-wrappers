@@ -81,8 +81,8 @@ class SURBTC(Client):
         payload = {
             'quotation': {
                 'type': quotation_type.value,
-                'limit': [str(price_limit), currency.value],
-                'amount': [str(amount), currency.value]
+                'limit': str([str(price_limit), currency.value]),
+                'amount': str([str(amount), currency.value])
             },
         }
         url, path = self.url_path_for(_p.QUOTATION,
