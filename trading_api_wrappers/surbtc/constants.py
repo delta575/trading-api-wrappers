@@ -26,6 +26,8 @@ class _Enum(Enum):
 
     @classmethod
     def check(cls, value):
+        if value is None:
+            return value
         if type(value) is cls:
             return value
         try:
