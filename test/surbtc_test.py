@@ -6,11 +6,12 @@ from requests import RequestException
 
 # local
 from trading_api_wrappers import SURBTC
+from trading_api_wrappers.surbtc import models
 
 TEST = config('TEST', cast=bool, default=False)
 API_KEY = config('SURBTC_API_KEY')
 API_SECRET = config('SURBTC_API_SECRET')
-MARKET_ID = 'btc-clp'
+MARKET_ID = SURBTC.Market.BTC_CLP
 
 
 class SURBTCTest(unittest.TestCase):
@@ -21,66 +22,66 @@ class SURBTCTest(unittest.TestCase):
     def test_instantiate_client(self):
         self.assertIsInstance(self.client, SURBTC)
 
-    def test_markets_returns_data(self):
+    def test_markets(self):
         markets = self.client.markets()
-        self.assertIn('markets', markets.keys())
+        self.assertEqual(len(markets), len(SURBTC.Market))
+        for market in markets:
+            self.assertIsInstance(market, models.Market)
 
-    def test_markets_details_returns_data(self):
-        markets_details = self.client.market_details(MARKET_ID)
-        self.assertIn('market', markets_details.keys())
+    def test_markets_details(self):
+        market = self.client.market_details(MARKET_ID)
+        self.assertIsInstance(market, models.Market)
 
-    def test_ticker_returns_data(self):
+    def test_ticker(self):
         ticker = self.client.ticker(MARKET_ID)
-        self.assertIn('ticker', ticker.keys())
+        self.assertIsInstance(ticker, models.Ticker)
 
-    def test_order_book_returns_data(self):
+    def test_order_book(self):
         order_book = self.client.order_book(MARKET_ID)
-        self.assertIn('order_book', order_book.keys())
+        self.assertIsInstance(order_book, models.OrderBook)
 
-    def test_quotation_returns_data(self):
+    def test_quotation(self):
         quotation = self.client.quotation(
-            MARKET_ID, quotation_type='ask', reverse=False, amount=1)
-        self.assertIn('quotation', quotation.keys())
+            MARKET_ID, SURBTC.Currency.BTC,
+            SURBTC.QuotationType.ASK_GIVEN_SIZE,
+            price_limit=1, amount=1)
+        self.assertIsInstance(quotation, models.Quotation)
 
-    def test_fee_percentage_returns_data(self):
+    def test_fee_percentage(self):
         fee_percentage = self.client.fee_percentage(
-            MARKET_ID, order_type='Bid', market_order=False)
-        self.assertIn('fee_percentage', fee_percentage.keys())
+            MARKET_ID, SURBTC.OrderType.ASK, market_order=False)
+        self.assertIsInstance(fee_percentage, models.FeePercentage)
 
-    def test_trade_transactions_returns_data(self):
+    def test_trade_transactions(self):
         trade_transactions = self.client.trade_transactions(MARKET_ID)
-        self.assertIn('trade_transactions', trade_transactions.keys())
+        for transaction in trade_transactions:
+            self.assertIsInstance(transaction, models.TradeTransaction)
 
-    def test_reports_returns_data(self):
-        reports = self.client.reports(MARKET_ID, report_type='candlestick')
-        self.assertIn('reports', reports.keys())
+    # def test_reports(self):
+    #     reports = self.client.reports(MARKET_ID, report_type='candlestick')
+    #     self.assertIn('reports', reports.keys())
 
-    def test_balance_returns_data(self):
-        balance = self.client.balance(currency='BTC')
-        self.assertIn('balance', balance.keys())
+    def test_balance(self):
+        balance = self.client.balance(SURBTC.Currency.BTC)
+        self.assertIsInstance(balance, models.Balance)
 
-    def test_balances_events_returns_data(self):
-        currencies = ['BTC', 'CLP']
-        event_names = [
-            'deposit_confirm',
-            'withdrawal_confirm',
-            'transaction',
-            'transfer_confirmation',
-        ]
+    def test_balances_events(self):
+        currencies = [item for item in SURBTC.Currency]
+        event_names = [item for item in SURBTC.BalanceEvent]
         balance_events = self.client.balance_events(currencies, event_names)
-        self.assertIn('balance_events', balance_events.keys())
+        self.assertIsInstance(balance_events, models.BalanceEventPages)
 
-    def test_orders_returns_data(self):
+    def test_orders(self):
         per_page = 10
-        orders = self.client.orders(MARKET_ID, page=1, per_page=per_page)
-        self.assertIn('orders', orders.keys())
-        self.assertEqual(len(orders['orders']), per_page)
+        order_pages = self.client.orders(MARKET_ID, page=1, per_page=per_page)
+        self.assertIsInstance(order_pages, models.OrderPages)
+        self.assertEqual(len(order_pages.orders), per_page)
 
-    def test_single_order_returns_data(self):
-        orders = self.client.orders(MARKET_ID, page=1, per_page=1)['orders']
+    def test_single_order(self):
+        orders = self.client.orders(MARKET_ID, page=1, per_page=1).orders
         first_order = orders[0]
-        single_order = self.client.single_order(first_order['id'])
-        self.assertIn('order', single_order.keys())
+        single_order = self.client.single_order(first_order.id)
+        self.assertIsInstance(single_order, models.Order)
 
 
 class SURBTCTestBadApi(unittest.TestCase):
