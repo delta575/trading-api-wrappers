@@ -18,38 +18,38 @@ class Path(object):
     WITHDRAWAL = 'currencies/%s/withdrawals'
 
 
-class Currency(Enum):
+class _Enum(Enum):
+
+    @staticmethod
+    def _format_value(value):
+        return str(value).upper()
+
+    @classmethod
+    def check(cls, value):
+        if type(value) is cls:
+            return value
+        try:
+            return cls[cls._format_value(value)]
+        except KeyError:
+            return cls._missing_(value)
+
+
+class Currency(_Enum):
     BTC = 'BTC'
     CLP = 'CLP'
     COP = 'COP'
 
-    @staticmethod
-    def check_param(currency):
-        if not isinstance(currency, Currency):
-            try:
-                currency = Currency[str(currency).upper()]
-            except KeyError:
-                msg = f"Param '{currency}' is not a valid currency!"
-                raise ValueError(msg) from None
-        return currency
 
-
-class Market(Enum):
+class Market(_Enum):
     BTC_CLP = 'BTC-CLP'
     BTC_COP = 'BTC-COP'
 
     @staticmethod
-    def check_param(market_id):
-        if not isinstance(market_id, Market):
-            try:
-                market_id = Market[str(market_id).replace('-', '_').upper()]
-            except KeyError:
-                msg = f"Param '{market_id}' is not a valid Market ID!"
-                raise ValueError(msg) from None
-        return market_id
+    def _format_value(value):
+        return str(value).replace('-', '_').upper()
 
 
-class QuotationType(Enum):
+class QuotationType(_Enum):
     BID_GIVEN_SIZE = 'bid_given_size'
     BID_GIVEN_EARNED_BASE = 'bid_given_earned_base'
     BID_GIVEN_SPENT_QUOTE = 'bid_given_spent_quote'
@@ -57,77 +57,27 @@ class QuotationType(Enum):
     ASK_GIVEN_EARNED_QUOTE = 'ask_given_earned_quote'
     ASK_GIVEN_SPENT_BASE = 'ask_given_spent_base'
 
-    @staticmethod
-    def check_param(q_type):
-        if not isinstance(q_type, QuotationType):
-            try:
-                q_type = QuotationType[str(q_type).upper()]
-            except KeyError:
-                msg = f"Param '{q_type}' is not a valid Quotation Type!"
-                raise ValueError(msg) from None
-        return q_type
 
-
-class OrderType(Enum):
+class OrderType(_Enum):
     ASK = 'Ask'
     BID = 'Bid'
 
-    @staticmethod
-    def check_param(order_type):
-        if not isinstance(order_type, OrderType):
-            try:
-                order_type = OrderType[str(order_type).upper()]
-            except KeyError:
-                msg = f"Param '{order_type}' is not a valid Order Type!"
-                raise ValueError(msg) from None
-        return order_type
 
-
-class OrderPriceType(Enum):
+class OrderPriceType(_Enum):
     MARKET = 'market'
     LIMIT = 'limit'
 
-    @staticmethod
-    def check_param(price_type):
-        if not isinstance(price_type, OrderPriceType):
-            try:
-                price_type = OrderPriceType[str(price_type).upper()]
-            except KeyError:
-                msg = f"Param '{price_type}' is not a valid Price Type!"
-                raise ValueError(msg) from None
-        return price_type
 
-
-class OrderState(Enum):
+class OrderState(_Enum):
     RECEIVED = 'received'
     PENDING = 'pending'
     TRADED = 'traded'
     CANCELING = 'canceling'
     CANCELED = 'canceled'
 
-    @staticmethod
-    def check_param(state):
-        if state and not isinstance(state, OrderState):
-            try:
-                state = OrderState[str(state).upper()]
-            except KeyError:
-                msg = f"Param '{state}' is not a valid Order State!"
-                raise ValueError(msg) from None
-        return state
 
-
-class BalanceEvent(Enum):
+class BalanceEvent(_Enum):
     DEPOSIT_CONFIRM = 'deposit_confirm'
     WITHDRAWAL_CONFIRM = 'withdrawal_confirm'
     TRANSACTION = 'transaction'
     TRANSFER_CONFIRMATION = 'transfer_confirmation'
-
-    @staticmethod
-    def check_param(event_name):
-        if event_name and not isinstance(event_name, BalanceEvent):
-            try:
-                event_name = BalanceEvent[str(event_name).upper()]
-            except KeyError:
-                msg = f"Param '{event_name}' is not a valid Event Name!"
-                raise ValueError(msg) from None
-        return event_name

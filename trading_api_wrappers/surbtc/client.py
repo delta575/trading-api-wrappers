@@ -46,7 +46,7 @@ class SURBTC(Client):
                 for market in data['markets']]
 
     def market_details(self, market_id: Market):
-        market_id = self.Market.check_param(market_id)
+        market_id = self.Market.check(market_id)
         url, path = self.url_path_for(_p.MARKET_DETAILS,
                                       path_arg=market_id.value)
         headers = self._sign_payload(method='GET', path=path)
@@ -54,7 +54,7 @@ class SURBTC(Client):
         return _m.Market.create_from_json(data['market'])
 
     def ticker(self, market_id: Market):
-        market_id = self.Market.check_param(market_id)
+        market_id = self.Market.check(market_id)
         url, path = self.url_path_for(_p.TICKER,
                                       path_arg=market_id.value)
         headers = self._sign_payload(method='GET', path=path)
@@ -62,7 +62,7 @@ class SURBTC(Client):
         return _m.Ticker.create_from_json(data['ticker'])
 
     def order_book(self, market_id: Market):
-        market_id = self.Market.check_param(market_id)
+        market_id = self.Market.check(market_id)
         url, path = self.url_path_for(_p.ORDER_BOOK,
                                       path_arg=market_id.value)
         headers = self._sign_payload(method='GET', path=path)
@@ -75,9 +75,9 @@ class SURBTC(Client):
                   quotation_type: QuotationType,
                   price_limit: float,
                   amount: float):
-        market_id = self.Market.check_param(market_id)
-        currency = self.Currency.check_param(currency)
-        quotation_type = self.QuotationType.check_param(quotation_type)
+        market_id = self.Market.check(market_id)
+        currency = self.Currency.check(currency)
+        quotation_type = self.QuotationType.check(quotation_type)
         payload = {
             'quotation': {
                 'type': quotation_type.value,
@@ -95,8 +95,8 @@ class SURBTC(Client):
                        market_id: Market,
                        order_type: OrderType,
                        market_order: bool = False):
-        market_id = self.Market.check_param(market_id)
-        order_type = self.OrderType.check_param(order_type)
+        market_id = self.Market.check(market_id)
+        order_type = self.OrderType.check(order_type)
         params = {
             'type': order_type.value,
             'market_order': market_order,
@@ -111,7 +111,7 @@ class SURBTC(Client):
                            market_id: Market,
                            page: int = None,
                            per_page: int = None):
-        market_id = self.Market.check_param(market_id)
+        market_id = self.Market.check(market_id)
         params = {
             'page': page,
             'per_page': per_page,
@@ -139,7 +139,7 @@ class SURBTC(Client):
 
     # BALANCES-----------------------------------------------------------------
     def balance(self, currency: Currency):
-        currency = self.Currency.check_param(currency)
+        currency = self.Currency.check(currency)
         url, path = self.url_path_for(_p.BALANCES, path_arg=currency.value)
         headers = self._sign_payload(method='GET', path=path)
         data = self.get(url, headers=headers)
@@ -152,9 +152,9 @@ class SURBTC(Client):
                        page: int = None,
                        per_page: int = None,
                        relevant: bool = None):
-        currencies = [self.Currency.check_param(c).value
+        currencies = [self.Currency.check(c).value
                       for c in currencies]
-        event_names = [self.BalanceEvent.check_param(e).value
+        event_names = [self.BalanceEvent.check(e).value
                        for e in event_names]
         params = {
             'currencies[]': currencies,
@@ -176,9 +176,9 @@ class SURBTC(Client):
                   price_type: OrderPriceType,
                   amount: float,
                   limit: float = None):
-        market_id = self.Market.check_param(market_id)
-        order_type = self.OrderType.check_param(order_type)
-        price_type = self.OrderPriceType.check_param(price_type)
+        market_id = self.Market.check(market_id)
+        order_type = self.OrderType.check(order_type)
+        price_type = self.OrderPriceType.check(price_type)
         payload = {
             'type': order_type.value,
             'price_type': price_type.value,
@@ -200,8 +200,8 @@ class SURBTC(Client):
                per_page: int = None,
                state: OrderState = None,
                minimum_exchanged: float = None):
-        market_id = self.Market.check_param(market_id)
-        state = self.OrderState.check_param(state)
+        market_id = self.Market.check(market_id)
+        state = self.OrderState.check(state)
         if per_page and per_page > ORDERS_LIMIT:
             msg = f"Param 'per_page' must be <= {ORDERS_LIMIT}"
             raise ValueError(msg)
