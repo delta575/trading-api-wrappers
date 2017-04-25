@@ -1,5 +1,7 @@
 import unittest
 
+from datetime import datetime, timedelta
+
 # pip
 from decouple import config
 from requests import RequestException
@@ -66,9 +68,12 @@ class SURBTCAuthTest(unittest.TestCase):
         for transaction in trade_transactions:
             self.assertIsInstance(transaction, models.TradeTransaction)
 
-    # def test_reports(self):
-    #     reports = self.client.reports(MARKET_ID, report_type='candlestick')
-    #     self.assertIn('reports', reports.keys())
+    def test_report(self):
+        end = datetime.now()
+        start = end - timedelta(days=30)
+        reports = self.client.report(
+            MARKET_ID, SURBTC.ReportType.CANDLESTICK, start, end)
+        self.assertIn('reports', reports.keys())
 
     def test_balance(self):
         balance = self.client.balance(SURBTC.Currency.BTC)

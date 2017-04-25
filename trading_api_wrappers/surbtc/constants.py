@@ -86,3 +86,8 @@ class BalanceEvent(_Enum):
     WITHDRAWAL_CONFIRM = 'withdrawal_confirm'
     TRANSACTION = 'transaction'
     TRANSFER_CONFIRMATION = 'transfer_confirmation'
+
+
+class ReportType(_Enum):
+    CANDLESTICK = 'candlestick'
+    AVERAGE_PRICES = 'average_prices'

@@ -15,6 +15,7 @@ class SURBTC(object):
     OrderPriceType = _c.OrderPriceType
     BalanceEvent = _c.BalanceEvent
     QuotationType = _c.QuotationType
+    ReportType = _c.ReportType
     # Clients
     Auth = SURBTCAuth
     Public = SURBTCPublic

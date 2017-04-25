@@ -1,4 +1,5 @@
 import base64
+from datetime import datetime
 import hashlib
 import hmac
 import json
@@ -77,19 +78,29 @@ class SURBTCAuth(SURBTCPublic):
         return [_m.TradeTransaction.create_from_json(transaction)
                 for transaction in data['trade_transactions']]
 
-    def reports(self,
-                market_id,
-                report_type,
-                from_timestamp=None,
-                to_timestamp=None):
+    # REPORTS -----------------------------------------------------------------
+    def report(self,
+               market_id: _c.Market,
+               report_type: _c.ReportType,
+               start_at: datetime=None,
+               end_at: datetime=None):
+        market_id = _c.Market.check(market_id)
+        report_type = _c.ReportType.check(report_type)
+        if isinstance(start_at, datetime):
+            start_at = int(start_at.timestamp())
+        if isinstance(end_at, datetime):
+            end_at = int(end_at.timestamp())
         params = {
-            'report_type': report_type,
-            'from': from_timestamp,
-            'to': to_timestamp,
+            'report_type': report_type.value,
+            'from': start_at,
+            'to': end_at,
         }
-        url, path = self.url_path_for(_p.REPORTS.value, path_arg=market_id)
+        url, path = self.url_path_for(_p.REPORTS,
+                                      path_arg=market_id.value)
         headers = self._sign_payload(method='GET', path=path, params=params)
-        return self.get(url, headers=headers, params=params)
+        data = self.get(url, headers=headers, params=params)
+        # TODO: Report doesn't have a model
+        return data
 
     # BALANCES-----------------------------------------------------------------
     def balance(self, currency: _c.Currency):
