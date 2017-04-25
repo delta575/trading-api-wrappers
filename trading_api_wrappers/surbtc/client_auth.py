@@ -211,9 +211,9 @@ class SURBTCAuth(SURBTCPublic):
         if payload:
             j = json.dumps(payload).encode('utf-8')
             encoded_body = base64.standard_b64encode(j).decode('utf-8')
-            string = method + ' ' + route + ' ' + encoded_body + ' ' + nonce
+            string = f'{method} {route} {encoded_body} {nonce}'
         else:
-            string = method + ' ' + route + ' ' + nonce
+            string = f'{method} {route} {nonce}'
 
         h = hmac.new(key=self.SECRET.encode('utf-8'),
                      msg=string.encode('utf-8'),
