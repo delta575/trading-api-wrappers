@@ -59,10 +59,10 @@ class SURBTCAuth(SURBTCPublic):
         data = self.get(url, headers=headers, params=params)
         return _m.FeePercentage.create_from_json(data['fee_percentage'])
 
-    def trade_transactions(self,
-                           market_id: _c.Market,
-                           page: int = None,
-                           per_page: int = None):
+    def trade_transaction_pages(self,
+                                market_id: _c.Market,
+                                page: int = None,
+                                per_page: int = None):
         market_id = _c.Market.check(market_id)
         params = {
             'page': page,
