@@ -201,6 +201,7 @@ class SURBTCAuth(SURBTCPublic):
         return _m.Order.create_from_json(data['order'])
 
     # PAYMENTS ----------------------------------------------------------------
+    # TODO: UNTESTED
     def withdraw(self, amount, currency, target_address=None):
         payload = {
             'withdrawal_data': {
