@@ -8,12 +8,12 @@ class SURBTC(object):
     # Models
     models = _m
     # Enum Types
+    BalanceEvent = _c.BalanceEvent
     Currency = _c.Currency
     Market = _c.Market
-    OrderType = _c.OrderType
     OrderState = _c.OrderState
+    OrderType = _c.OrderType
     OrderPriceType = _c.OrderPriceType
-    BalanceEvent = _c.BalanceEvent
     QuotationType = _c.QuotationType
     ReportType = _c.ReportType
     # Clients
