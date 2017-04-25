@@ -82,12 +82,12 @@ class SURBTCAuthTest(unittest.TestCase):
 
     def test_orders(self):
         per_page = 10
-        order_pages = self.client.orders(MARKET_ID, page=1, per_page=per_page)
+        order_pages = self.client.order_pages(MARKET_ID, page=1, per_page=per_page)
         self.assertIsInstance(order_pages, models.OrderPages)
         self.assertEqual(len(order_pages.orders), per_page)
 
     def test_single_order(self):
-        orders = self.client.orders(MARKET_ID, page=1, per_page=1).orders
+        orders = self.client.order_pages(MARKET_ID, page=1, per_page=1).order_pages
         first_order = orders[0]
         single_order = self.client.single_order(first_order.id)
         self.assertIsInstance(single_order, models.Order)

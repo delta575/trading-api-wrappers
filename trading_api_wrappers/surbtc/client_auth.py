@@ -146,12 +146,12 @@ class SURBTCAuth(SURBTCPublic):
         data = self.post(url, headers=headers, data=payload)
         return _m.Order.create_from_json(data['order'])
 
-    def orders(self,
-               market_id: _c.Market,
-               page: int = None,
-               per_page: int = None,
-               state: _c.OrderState = None,
-               minimum_exchanged: float = None):
+    def order_pages(self,
+                    market_id: _c.Market,
+                    page: int = None,
+                    per_page: int = None,
+                    state: _c.OrderState = None,
+                    minimum_exchanged: float = None):
         market_id = _c.Market.check(market_id)
         state = _c.OrderState.check(state)
         if per_page and per_page > _c.ORDERS_LIMIT:
