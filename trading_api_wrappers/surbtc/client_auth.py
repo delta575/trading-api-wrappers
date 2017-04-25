@@ -170,7 +170,7 @@ class SURBTCAuth(SURBTCPublic):
         data = self.get(url, headers=headers, params=params)
         return _m.OrderPages.create_from_json(data['orders'], data['meta'])
 
-    def single_order(self, order_id: int):
+    def order_details(self, order_id: int):
         url, path = self.url_path_for(_p.SINGLE_ORDER,
                                       path_arg=order_id)
         headers = self._sign_payload(method='GET', path=path)

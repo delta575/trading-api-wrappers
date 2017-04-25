@@ -89,7 +89,7 @@ class SURBTCAuthTest(unittest.TestCase):
     def test_single_order(self):
         orders = self.client.order_pages(MARKET_ID, page=1, per_page=1).order_pages
         first_order = orders[0]
-        single_order = self.client.single_order(first_order.id)
+        single_order = self.client.order_details(first_order.id)
         self.assertIsInstance(single_order, models.Order)
 
     @unittest.skipUnless(TEST, 'Only run on staging context')
