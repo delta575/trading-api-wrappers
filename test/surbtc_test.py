@@ -14,13 +14,13 @@ API_SECRET = config('SURBTC_API_SECRET')
 MARKET_ID = SURBTC.Market.BTC_CLP
 
 
-class SURBTCTest(unittest.TestCase):
+class SURBTCPublicTest(unittest.TestCase):
 
     def setUp(self):
-        self.client = SURBTC(API_KEY, API_SECRET, TEST)
+        self.client = SURBTC.Public(TEST)
 
     def test_instantiate_client(self):
-        self.assertIsInstance(self.client, SURBTC)
+        self.assertIsInstance(self.client, SURBTC.Public)
 
     def test_markets(self):
         markets = self.client.markets()
@@ -39,6 +39,15 @@ class SURBTCTest(unittest.TestCase):
     def test_order_book(self):
         order_book = self.client.order_book(MARKET_ID)
         self.assertIsInstance(order_book, models.OrderBook)
+
+
+class SURBTCAuthTest(unittest.TestCase):
+
+    def setUp(self):
+        self.client = SURBTC.Auth(API_KEY, API_SECRET, TEST)
+
+    def test_instantiate_client(self):
+        self.assertIsInstance(self.client, SURBTC.Auth)
 
     def test_quotation(self):
         quotation = self.client.quotation(
@@ -83,17 +92,29 @@ class SURBTCTest(unittest.TestCase):
         single_order = self.client.single_order(first_order.id)
         self.assertIsInstance(single_order, models.Order)
 
+    @unittest.skipUnless(TEST, 'Only run on staging context')
+    def test_new_order_cancel_order(self):
+        # New order
+        new_order = self.client.new_order(
+            MARKET_ID, SURBTC.OrderType.ASK, SURBTC.OrderPriceType.LIMIT,
+            amount=0.001, limit=100000)
+        # Cancel order
+        canceled_order = self.client.cancel_order(new_order.id)
+        # Assertions
+        self.assertIsInstance(new_order, models.Order)
+        self.assertIsInstance(canceled_order, models.Order)
 
-class SURBTCTestBadApi(unittest.TestCase):
+
+class SURBTCAuthTestBadApi(unittest.TestCase):
 
     def setUp(self):
-        self.client = SURBTC('BAD_KEY', 'BAD_SECRET')
+        self.client = SURBTC.Auth('BAD_KEY', 'BAD_SECRET')
 
     def test_instantiate_client(self):
-        self.assertIsInstance(self.client, SURBTC)
+        self.assertIsInstance(self.client, SURBTC.Auth)
 
     def test_key_secret(self):
-        self.assertRaises(ValueError, lambda: SURBTC())
+        self.assertRaises(ValueError, lambda: SURBTC.Auth())
 
     def test_markets_returns_error(self):
         self.assertRaises(RequestException, lambda: self.client.markets())

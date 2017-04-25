@@ -1,5 +1,8 @@
 from enum import Enum
 
+# Limits
+ORDERS_LIMIT = 300
+
 
 # API paths
 class Path(object):

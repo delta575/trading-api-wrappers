@@ -4,85 +4,32 @@ import hmac
 import json
 
 # local
-from trading_api_wrappers.base import Client, Server
 from trading_api_wrappers.common import build_route, check_keys, gen_nonce
 
-from .constants import Path as _p
-from . import models as _m
 from . import constants as _c
+from . import models as _m
+from .client_public import SURBTCPublic
 
-# API server
-PROTOCOL = 'https'
-HOST = 'www.surbtc.com/api'
-TEST_HOST = 'stg.surbtc.com/api'
-VERSION = 'v1'
-
-# Limits
-ORDERS_LIMIT = 300
+_p = _c.Path
 
 
-class SURBTC(Client):
-
-    # Models
-    models = _m
-
-    # Enum Types
-    Currency = _c.Currency
-    Market = _c.Market
-    OrderType = _c.OrderType
-    OrderState = _c.OrderState
-    OrderPriceType = _c.OrderPriceType
-    BalanceEvent = _c.BalanceEvent
-    QuotationType = _c.QuotationType
+class SURBTCAuth(SURBTCPublic):
 
     def __init__(self, key=False, secret=False, test=False, timeout=30):
-        server = Server(PROTOCOL, HOST if not test else TEST_HOST, VERSION)
-        Client.__init__(self, server, timeout)
+        SURBTCPublic.__init__(self, test, timeout)
         check_keys(key, secret)
         self.KEY = str(key)
         self.SECRET = str(secret)
 
-    # MARKETS------------------------------------------------------------------
-    def markets(self):
-        url, path = self.url_path_for(_p.MARKETS)
-        headers = self._sign_payload(method='GET', path=path)
-        data = self.get(url, headers=headers)
-        return [_m.Market.create_from_json(market)
-                for market in data['markets']]
-
-    def market_details(self, market_id: Market):
-        market_id = self.Market.check(market_id)
-        url, path = self.url_path_for(_p.MARKET_DETAILS,
-                                      path_arg=market_id.value)
-        headers = self._sign_payload(method='GET', path=path)
-        data = self.get(url, headers=headers)
-        return _m.Market.create_from_json(data['market'])
-
-    def ticker(self, market_id: Market):
-        market_id = self.Market.check(market_id)
-        url, path = self.url_path_for(_p.TICKER,
-                                      path_arg=market_id.value)
-        headers = self._sign_payload(method='GET', path=path)
-        data = self.get(url, headers=headers)
-        return _m.Ticker.create_from_json(data['ticker'])
-
-    def order_book(self, market_id: Market):
-        market_id = self.Market.check(market_id)
-        url, path = self.url_path_for(_p.ORDER_BOOK,
-                                      path_arg=market_id.value)
-        headers = self._sign_payload(method='GET', path=path)
-        data = self.get(url, headers=headers)
-        return _m.OrderBook.create_from_json(data['order_book'])
-
     def quotation(self,
-                  market_id: Market,
-                  currency: Currency,
-                  quotation_type: QuotationType,
+                  market_id: _c.Market,
+                  currency: _c.Currency,
+                  quotation_type: _c.QuotationType,
                   price_limit: float,
                   amount: float):
-        market_id = self.Market.check(market_id)
-        currency = self.Currency.check(currency)
-        quotation_type = self.QuotationType.check(quotation_type)
+        market_id = _c.Market.check(market_id)
+        currency = _c.Currency.check(currency)
+        quotation_type = _c.QuotationType.check(quotation_type)
         payload = {
             'quotation': {
                 'type': quotation_type.value,
@@ -97,11 +44,11 @@ class SURBTC(Client):
         return _m.Quotation.create_from_json(data['quotation'])
 
     def fee_percentage(self,
-                       market_id: Market,
-                       order_type: OrderType,
+                       market_id: _c.Market,
+                       order_type: _c.OrderType,
                        market_order: bool = False):
-        market_id = self.Market.check(market_id)
-        order_type = self.OrderType.check(order_type)
+        market_id = _c.Market.check(market_id)
+        order_type = _c.OrderType.check(order_type)
         params = {
             'type': order_type.value,
             'market_order': market_order,
@@ -113,13 +60,13 @@ class SURBTC(Client):
         return _m.FeePercentage.create_from_json(data['fee_percentage'])
 
     def trade_transactions(self,
-                           market_id: Market,
+                           market_id: _c.Market,
                            page: int = None,
                            per_page: int = None):
-        market_id = self.Market.check(market_id)
+        market_id = _c.Market.check(market_id)
         params = {
             'page': page,
-            'per_page': per_page,
+            'per': per_page,
         }
         url, path = self.url_path_for(_p.TRADE_TRANSACTIONS,
                                       path_arg=market_id.value)
@@ -143,8 +90,8 @@ class SURBTC(Client):
         return self.get(url, headers=headers, params=params)
 
     # BALANCES-----------------------------------------------------------------
-    def balance(self, currency: Currency):
-        currency = self.Currency.check(currency)
+    def balance(self, currency: _c.Currency):
+        currency = _c.Currency.check(currency)
         url, path = self.url_path_for(_p.BALANCES, path_arg=currency.value)
         headers = self._sign_payload(method='GET', path=path)
         data = self.get(url, headers=headers)
@@ -157,9 +104,9 @@ class SURBTC(Client):
                        page: int = None,
                        per_page: int = None,
                        relevant: bool = None):
-        currencies = [self.Currency.check(c).value
+        currencies = [_c.Currency.check(c).value
                       for c in currencies]
-        event_names = [self.BalanceEvent.check(e).value
+        event_names = [_c.BalanceEvent.check(e).value
                        for e in event_names]
         params = {
             'currencies[]': currencies,
@@ -176,23 +123,23 @@ class SURBTC(Client):
 
     # ORDERS ------------------------------------------------------------------
     def new_order(self,
-                  market_id: Market,
-                  order_type: OrderType,
-                  price_type: OrderPriceType,
+                  market_id: _c.Market,
+                  order_type: _c.OrderType,
+                  price_type: _c.OrderPriceType,
                   amount: float,
                   limit: float = None):
-        market_id = self.Market.check(market_id)
-        order_type = self.OrderType.check(order_type)
-        price_type = self.OrderPriceType.check(price_type)
+        market_id = _c.Market.check(market_id)
+        order_type = _c.OrderType.check(order_type)
+        price_type = _c.OrderPriceType.check(price_type)
         payload = {
             'type': order_type.value,
             'price_type': price_type.value,
-            'amount': amount,
-            'limit': limit,
+            'amount': str(amount),
+            'limit': str(limit),
         }
         return self.new_order_payload(market_id, payload)
 
-    def new_order_payload(self, market_id: Market, payload):
+    def new_order_payload(self, market_id: _c.Market, payload):
         url, path = self.url_path_for(_p.ORDERS,
                                       path_arg=market_id.value)
         headers = self._sign_payload(method='POST', path=path, payload=payload)
@@ -200,15 +147,15 @@ class SURBTC(Client):
         return _m.Order.create_from_json(data['order'])
 
     def orders(self,
-               market_id: Market,
+               market_id: _c.Market,
                page: int = None,
                per_page: int = None,
-               state: OrderState = None,
+               state: _c.OrderState = None,
                minimum_exchanged: float = None):
-        market_id = self.Market.check(market_id)
-        state = self.OrderState.check(state)
-        if per_page and per_page > ORDERS_LIMIT:
-            msg = f"Param 'per_page' must be <= {ORDERS_LIMIT}"
+        market_id = _c.Market.check(market_id)
+        state = _c.OrderState.check(state)
+        if per_page and per_page > _c.ORDERS_LIMIT:
+            msg = f"Param 'per_page' must be <= {_c.ORDERS_LIMIT}"
             raise ValueError(msg)
         params = {
             'per': per_page,
@@ -232,7 +179,7 @@ class SURBTC(Client):
 
     def cancel_order(self, order_id: int):
         payload = {
-            'state': SURBTC.OrderState.CANCELING.value,
+            'state': _c.OrderState.CANCELING.value,
         }
         url, path = self.url_path_for(_p.SINGLE_ORDER,
                                       path_arg=order_id)
