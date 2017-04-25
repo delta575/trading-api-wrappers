@@ -64,6 +64,7 @@ class SURBTCAuth(SURBTCPublic):
                                 page: int = None,
                                 per_page: int = None):
         market_id = _c.Market.check(market_id)
+        # TODO: Pagination isn't working, it always returns 25 items
         params = {
             'page': page,
             'per': per_page,
@@ -72,6 +73,7 @@ class SURBTCAuth(SURBTCPublic):
                                       path_arg=market_id.value)
         headers = self._sign_payload(method='GET', path=path, params=params)
         data = self.get(url, headers=headers, params=params)
+        # TODO: Response doesn't contain a meta field
         return [_m.TradeTransaction.create_from_json(transaction)
                 for transaction in data['trade_transactions']]
 
@@ -97,7 +99,6 @@ class SURBTCAuth(SURBTCPublic):
         data = self.get(url, headers=headers)
         return _m.Balance.create_from_json(data['balance'])
 
-    # Call with 'page' param return authentication error
     def balance_event_pages(self,
                             currencies,
                             event_names,
@@ -118,6 +119,7 @@ class SURBTCAuth(SURBTCPublic):
         url, path = self.url_path_for(_p.BALANCES_EVENTS)
         headers = self._sign_payload(method='GET', path=path, params=params)
         data = self.get(url, headers=headers, params=params)
+        # TODO: Response only contains a 'total_count' field instead of meta
         return _m.BalanceEventPages.create_from_json(
             data['balance_events'], data['total_count'], page)
 
@@ -161,7 +163,7 @@ class SURBTCAuth(SURBTCPublic):
             'per': per_page,
             'page': page,
             'state': state.value if state else state,
-            # API has a typo: minimun must be minimum
+            # TODO: API has a typo, 'minimun' must be 'minimum'
             'minimun_exchanged': minimum_exchanged,
         }
         url, path = self.url_path_for(_p.ORDERS,
