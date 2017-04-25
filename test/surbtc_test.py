@@ -61,8 +61,8 @@ class SURBTCAuthTest(unittest.TestCase):
             MARKET_ID, SURBTC.OrderType.ASK, market_order=False)
         self.assertIsInstance(fee_percentage, models.FeePercentage)
 
-    def test_trade_transactions(self):
-        trade_transactions = self.client.trade_transactions(MARKET_ID)
+    def test_trade_transaction_pages(self):
+        trade_transactions = self.client.trade_transaction_pages(MARKET_ID)
         for transaction in trade_transactions:
             self.assertIsInstance(transaction, models.TradeTransaction)
 
@@ -87,7 +87,7 @@ class SURBTCAuthTest(unittest.TestCase):
         self.assertEqual(len(order_pages.orders), per_page)
 
     def test_order_details(self):
-        orders = self.client.order_pages(MARKET_ID, page=1, per_page=1).order_pages
+        orders = self.client.order_pages(MARKET_ID, page=1, per_page=1).orders
         first_order = orders[0]
         single_order = self.client.order_details(first_order.id)
         self.assertIsInstance(single_order, models.Order)
