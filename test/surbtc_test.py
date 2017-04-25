@@ -82,17 +82,20 @@ class SURBTCAuthTest(unittest.TestCase):
     def test_balances_event_pages(self):
         currencies = [item for item in SURBTC.Currency]
         event_names = [item for item in SURBTC.BalanceEvent]
-        balance_events = self.client.balance_event_pages(currencies, event_names)
+        balance_events = self.client.balance_event_pages(
+            currencies, event_names)
         self.assertIsInstance(balance_events, models.BalanceEventPages)
 
     def test_order_pages(self):
         per_page = 10
-        order_pages = self.client.order_pages(MARKET_ID, page=1, per_page=per_page)
+        order_pages = self.client.order_pages(
+            MARKET_ID, page=1, per_page=per_page)
         self.assertIsInstance(order_pages, models.OrderPages)
         self.assertEqual(len(order_pages.orders), per_page)
 
     def test_order_details(self):
-        orders = self.client.order_pages(MARKET_ID, page=1, per_page=1).orders
+        orders = self.client.order_pages(
+            MARKET_ID, page=1, per_page=1).orders
         first_order = orders[0]
         single_order = self.client.order_details(first_order.id)
         self.assertIsInstance(single_order, models.Order)
