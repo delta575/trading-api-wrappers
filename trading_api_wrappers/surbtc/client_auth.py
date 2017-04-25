@@ -98,12 +98,12 @@ class SURBTCAuth(SURBTCPublic):
         return _m.Balance.create_from_json(data['balance'])
 
     # Call with 'page' param return authentication error
-    def balance_events(self,
-                       currencies,
-                       event_names,
-                       page: int = None,
-                       per_page: int = None,
-                       relevant: bool = None):
+    def balance_event_pages(self,
+                            currencies,
+                            event_names,
+                            page: int = None,
+                            per_page: int = None,
+                            relevant: bool = None):
         currencies = [_c.Currency.check(c).value
                       for c in currencies]
         event_names = [_c.BalanceEvent.check(e).value

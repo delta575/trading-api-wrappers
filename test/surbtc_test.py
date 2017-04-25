@@ -77,7 +77,7 @@ class SURBTCAuthTest(unittest.TestCase):
     def test_balances_events(self):
         currencies = [item for item in SURBTC.Currency]
         event_names = [item for item in SURBTC.BalanceEvent]
-        balance_events = self.client.balance_events(currencies, event_names)
+        balance_events = self.client.balance_event_pages(currencies, event_names)
         self.assertIsInstance(balance_events, models.BalanceEventPages)
 
     def test_orders(self):
