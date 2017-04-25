@@ -2,8 +2,6 @@ from collections import namedtuple
 from datetime import datetime
 import math
 
-from . import constants as _c
-
 
 def parse_datetime(datetime_str):
     return datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -80,8 +78,8 @@ class Ticker(
             min_ask=Amount.create_from_json(ticker['min_ask']),
             max_bid=Amount.create_from_json(ticker['max_bid']),
             volume=Amount.create_from_json(ticker['volume']),
-            price_variation_24h=ticker['price_variation_24h'],
-            price_variation_7d=ticker['price_variation_7d'],
+            price_variation_24h=float(ticker['price_variation_24h']),
+            price_variation_7d=float(ticker['price_variation_7d']),
         )
 
 
@@ -119,7 +117,7 @@ class Quotation(
                 quotation['quote_balance_change']),
             quote_exchanged=Amount.create_from_json(
                 quotation['quote_exchanged']),
-            type=_c.QuotationType[quotation['type'].upper()],
+            type=quotation['type'],
         )
 
 
@@ -217,16 +215,16 @@ class Order(
             account_id=order['account_id'],
             amount=Amount.create_from_json(order['amount']),
             created_at=parse_datetime(order['created_at']),
-            fee_currency=_c.Currency[order['fee_currency'].upper()],
+            fee_currency=order['fee_currency'],
             limit=Amount.create_from_json(order['limit']),
             market_id=order['market_id'],
             original_amount=Amount.create_from_json(order['original_amount']),
             paid_fee=Amount.create_from_json(order['paid_fee']),
-            price_type=_c.OrderPriceType[order['price_type'].upper()],
-            state=_c.OrderState[order['state'].upper()],
+            price_type=order['price_type'],
+            state=order['state'],
             total_exchanged=Amount.create_from_json(order['total_exchanged']),
             traded_amount=Amount.create_from_json(order['traded_amount']),
-            type=_c.OrderType[order['type'].upper()],
+            type=order['type'],
             weighted_quotation=order['weighted_quotation'],
         )
 
@@ -274,8 +272,8 @@ class BalanceEvent(
             id=event['id'],
             account_id=event['account_id'],
             created_at=parse_datetime(event['created_at']),
-            currency=_c.Currency[event['currency'].upper()],
-            event=_c.BalanceEvent[event['event'].upper()],
+            currency=event['currency'],
+            event=event['event'],
             event_ids=event['event_ids'],
             new_amount=event['new_amount'],
             new_available_amount=event['new_available_amount'],
