@@ -178,33 +178,77 @@ class KrakenAuth(KrakenPublic):
             'txid': txid,
         }
         req = clean_parameters(req)
-        return self.krakenex.query_private('AddOrder', req)
+        return self.krakenex.query_private('CancelOrder', req)
 
     # Private user funding  --------------------------------------------------------------------
     # Get deposit methods.
-    def deposit_methods(self):
-        pass
+    def deposit_methods(self, asset, asset_class='currency'):
+        req = {
+            'aclass': asset_class,
+            'asset': asset,
+        }
+        req = clean_parameters(req)
+        return self.krakenex.query_private('DepositMethods', req)
 
     # Get deposit addresses
-    def deposit_addresses(self):
-        pass
+    def deposit_addresses(self, asset, method, asset_class='currency', new=False):
+        req = {
+            'aclass': asset_class,
+            'asset': asset,
+            'method': method,
+            'new': new,
+        }
+        req = clean_parameters(req)
+        return self.krakenex.query_private('DepositAddresses', req)
 
     # Get status of recent deposits
-    def deposit_status(self):
-        pass
+    def deposit_status(self, asset, method, asset_class='currency'):
+        req = {
+            'aclass': asset_class,
+            'asset': asset,
+            'method': method,
+        }
+        req = clean_parameters(req)
+        return self.krakenex.query_private('DepositStatus', req)
 
     # Get withdrawal information
-    def withdraw_info(self):
-        pass
+    def withdraw_info(self, asset, amount, key, asset_class='currency'):
+        req = {
+            'aclass': asset_class,
+            'asset': asset,
+            'amount': amount,
+            'key': key,
+        }
+        req = clean_parameters(req)
+        return self.krakenex.query_private('WithdrawInfo', req)
 
     # Withdraw funds
-    def withdraw_funds(self):
-        pass
+    def withdraw_funds(self, asset, amount, key, asset_class='currency'):
+        req = {
+            'aclass': asset_class,
+            'asset': asset,
+            'amount': amount,
+            'key': key,
+        }
+        req = clean_parameters(req)
+        return self.krakenex.query_private('Withdraw', req)
 
     # Get status of recent withdrawals
-    def withdraw_status(self):
-        pass
+    def withdraw_status(self, asset, method, asset_class='currency'):
+        req = {
+            'aclass': asset_class,
+            'asset': asset,
+            'method': method,
+        }
+        req = clean_parameters(req)
+        return self.krakenex.query_private('WithdrawStatus', req)
 
     # Request withdrawal cancelation
-    def withdraw_cancel(self):
-        pass
+    def withdraw_cancel(self, asset, refid, asset_class='currency'):
+        req = {
+            'aclass': asset_class,
+            'asset': asset,
+            'refid': refid,
+        }
+        req = clean_parameters(req)
+        return self.krakenex.query_private('WithdrawCancel', req)
