@@ -1,8 +1,8 @@
 import sys
 from setuptools import setup
 
-if not (sys.version_info >= (3,6)):
-    sys.exit('Sorry, only Python 3.6 or later is supported')
+if not (sys.version_info >= (3, 5)):
+    sys.exit('Sorry, only Python 3.5 or later is supported')
 
 setup(
     name='trading_api_wrappers',

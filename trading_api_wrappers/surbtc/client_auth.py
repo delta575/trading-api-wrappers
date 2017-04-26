@@ -168,7 +168,7 @@ class SURBTCAuth(SURBTCPublic):
         market_id = _c.Market.check(market_id)
         state = _c.OrderState.check(state)
         if per_page and per_page > _c.ORDERS_LIMIT:
-            msg = f"Param 'per_page' must be <= {_c.ORDERS_LIMIT}"
+            msg = "Param 'per_page' must be <= {0}".format(_c.ORDERS_LIMIT)
             raise ValueError(msg)
         params = {
             'per': per_page,
@@ -223,9 +223,9 @@ class SURBTCAuth(SURBTCPublic):
         if payload:
             j = json.dumps(payload).encode('utf-8')
             encoded_body = base64.standard_b64encode(j).decode('utf-8')
-            string = f'{method} {route} {encoded_body} {nonce}'
+            string = method + ' ' + route + ' ' + encoded_body + ' ' + nonce
         else:
-            string = f'{method} {route} {nonce}'
+            string = method + ' ' + route + ' ' + nonce
 
         h = hmac.new(key=self.SECRET.encode('utf-8'),
                      msg=string.encode('utf-8'),
