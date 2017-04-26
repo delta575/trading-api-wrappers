@@ -145,8 +145,7 @@ class KrakenAuth(KrakenPublic):
         req = clean_parameters(req)
         return self.krakenex.query_private('TradeVolume',req)
 
-    # Private user data  --------------------------------------------------------------------
-
+    # Private user trading  --------------------------------------------------------------------
     # Add standard order
     def add_order(self, pair, direction, order_type, price, volume, price2=None, leverage=None,
                   oflags=None, starttm=0, expiretm=0, userref=None, validate=None,
@@ -180,3 +179,32 @@ class KrakenAuth(KrakenPublic):
         }
         req = clean_parameters(req)
         return self.krakenex.query_private('AddOrder', req)
+
+    # Private user funding  --------------------------------------------------------------------
+    # Get deposit methods.
+    def deposit_methods(self):
+        pass
+
+    # Get deposit addresses
+    def deposit_addresses(self):
+        pass
+
+    # Get status of recent deposits
+    def deposit_status(self):
+        pass
+
+    # Get withdrawal information
+    def withdraw_info(self):
+        pass
+
+    # Withdraw funds
+    def withdraw_funds(self):
+        pass
+
+    # Get status of recent withdrawals
+    def withdraw_status(self):
+        pass
+
+    # Request withdrawal cancelation
+    def withdraw_cancel(self):
+        pass
