@@ -1,348 +1,182 @@
-import base64
-import hashlib
-import hmac
-import json
+import krakenex
 
 # local
 from trading_api_wrappers.kraken.client_public import KrakenPublic
-from trading_api_wrappers.common import (check_keys, clean_parameters,
-                                         gen_nonce, update_dictionary)
+from trading_api_wrappers.common import clean_parameters
 
 # API Paths
-# Info
-PATH_ACCOUNT_INFO = 'account_infos'
-PATH_SUMMARY = 'summary'
-PATH_KEY_INFO = 'key_info'
-PATH_MARGIN_INFO = 'margin_infos'
-PATH_BALANCES = 'balances'
-# Movements
-PATH_DEPOSIT_NEW = 'deposit/new'
-PATH_TRANSFER = 'transfer'
-PATH_WITHDRAW = 'withdraw'
-# Orders
-PATH_ORDER_NEW = 'order/new'
-PATH_ORDER_CANCEL = 'order/cancel'
-PATH_ORDER_CANCEL_ALL = 'order/cancel/all'
-PATH_ORDER_STATUS = 'order/status'
-PATH_ORDERS = 'orders'
-# Positions
-PATH_POSITIONS = 'positions'
-PATH_POSITION_CLAIM = 'position/claim'
-# Historical Data
-PATH_HISTORY = 'history'
-PATH_HISTORY_MOVEMENTS = 'history/movements'
-PATH_PAST_TRADES = 'mytrades'
-# Margin Funding
-PATH_OFFER_NEW = 'offer/new'
-PATH_OFFER_CANCEL = 'offer/cancel'
-PATH_OFFER_STATUS = 'offer/status'
-PATH_OFFERS = 'offers'
+# Private user data
+PATH_BALANCE = 'private/Balance'
+PATH_TRADE_BALANCE = 'private/TradeBalance'
+PATH_OPEN_ORDERS = 'private/OpenOrders'
+PATH_CLOSED_ORDERS = 'private/ClosedOrders'
+PATH_QUERY_ORDERS = 'private/QueryOrders'
+PATH_TRADES_HISTORY = 'private/TradesHistory'
+PATH_QUERY_TRADES = 'private/QueryTrades'
+PATH_OPEN_POSITIONS = 'private/OpenPositions'
+PATH_LEDGERS = 'private/Ledgers'
+PATH_QUERY_LEDGERS = 'private/QueryLedgers'
+PATH_TRADE_VOLUME = 'private/TradeVolume'
+# Private user trading
+PATH_ADD_ORDER = 'private/AddOrder'
+PATH_CANCEL_ORDER = 'private/CancelOrder'
+# Private user funding
+PATH_DEPOSIT_METHODS = 'private/DepositMethods'
+PATH_DEPOSIT_ADDRESSES = 'private/DepositAddresses'
+PATH_DEPOSIT_STATUS = 'private/DepositStatus'
+PATH_WITHDRAW_INFO = 'private/WithdrawInfo'
+PATH_WITHDRAW = 'private/Withdraw'
+PATH_WITHDRAW_STATUS = 'private/WithdrawStatus'
+PATH_WITHDRAW_CANCEL = 'private/WithdrawCancel'
 
 
 class KrakenAuth(KrakenPublic):
 
-    def __init__(self, key=False, secret=False, timeout=30):
-        BitfinexPublic.__init__(self, timeout)
-        check_keys(key, secret)
+    def __init__(self, key=False, secret=False, test=False, timeout=30):
+        KrakenPublic.__init__(self, timeout)
         self.KEY = str(key)
         self.SECRET = str(secret)
+        self.TEST = test
+        self.krakenex = krakenex.API(key=self.KEY,secret=self.SECRET)
 
-    # INFO --------------------------------------------------------------------
-    # Return information about your account (trading fees).
-    def account_info(self):
-        url, path = self.url_path_for(PATH_ACCOUNT_INFO)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
+    # Private user data  --------------------------------------------------------------------
+    # Get account balance.
+    def balance(self):
+        return self.krakenex.query_private('Balance')
+
+    # Get trade balance.
+    def trade_balance(self, asset_class='currency', asset='ZUSD'):
+        req = {
+            'aclass': asset_class,
+            'asset': asset,
         }
-        return self._sign_and_get(url, payload)
+        req = clean_parameters(req)
+        return self.krakenex.query_private('TradeBalance',req)
 
-    # Return information about your account (trading fees).
-    def summary(self):
-        url, path = self.url_path_for(PATH_SUMMARY)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
+    # Get open orders.
+    def open_orders(self, include_trades=False, userref=None):
+        req = {
+            'trades': include_trades,
+            'userref': userref,
         }
-        return self._sign_and_get(url, payload)
+        req = clean_parameters(req)
+        return self.krakenex.query_private('OpenOrders',req)
 
-    # Check the permissions of the key being used to generate this request.
-    def key_info(self):
-        url, path = self.url_path_for(PATH_KEY_INFO)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
+    # Get closed orders.
+    def closed_orders(self, include_trades=False, userref=None, start=None, end=None, ofs=None, closetime='both'):
+        req = {
+            'trades': include_trades,
+            'userref': userref,
+            'start': start,
+            'end': end,
+            'ofs': ofs,
+            'closetime': closetime,
         }
-        return self._sign_and_get(url, payload)
+        req = clean_parameters(req)
+        return self.krakenex.query_private('ClosedOrders',req)
 
-    # See your trading wallet information for margin trading.
-    def margin_info(self):
-        url, path = self.url_path_for(PATH_MARGIN_INFO)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
+    # Query orders info.
+    def query_orders(self, txid=None, include_trades=False, userref=None):
+        req = {
+            'trades': include_trades,
+            'userref': userref,
+            'txid': txid,
         }
-        return self._sign_and_get(url, payload)
+        req = clean_parameters(req)
+        return self.krakenex.query_private('ClosedOrders',req)
 
-    # See your balances.
-    def balances(self):
-        url, path = self.url_path_for(PATH_BALANCES)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
+    # Get trades history.
+    def trades_history(self, type='all', include_trades=False, start=None, end=None, ofs=None):
+        req = {
+            'type': type,
+            'trades': include_trades,
+            'start': start,
+            'end': end,
+            'ofs': ofs,
         }
-        return self._sign_and_get(url, payload)
+        req = clean_parameters(req)
+        return self.krakenex.query_private('TradesHistory',req)
 
-    # MOVEMENTS ---------------------------------------------------------------
-    # Return your deposit address to make a new deposit.
-    def new_deposit(self, method, wallet_name, renew=0):
-        url, path = self.url_path_for(PATH_DEPOSIT_NEW)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-            'method': method,
-            'wallet_name': wallet_name,
-            'renew': renew,
+    # Query trades info.
+    def query_trades(self, txid, include_trades=False):
+        req = {
+            'txid': txid,
+            'trades': include_trades,
         }
-        return self._sign_and_post(url, payload)
+        req = clean_parameters(req)
+        return self.krakenex.query_private('QueryTrades',req)
 
-    # Allow you to move available balances between your wallets.
-    def transfer(self, amount, currency, wallet_from, wallet_to):
-        url, path = self.url_path_for(PATH_TRANSFER)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-            'amount': str(amount),
-            'currency': currency,
-            'walletfrom': wallet_from,
-            'walletto': wallet_to,
+    # Query trades info.
+    def open_positions(self, txid=None, include_pl=False):
+        req = {
+            'txid': txid,
+            'docalcs': include_pl,
         }
-        return self._sign_and_post(url, payload)
+        req = clean_parameters(req)
+        return self.krakenex.query_private('OpenPositions',req)
 
-    # Allow you to request a withdrawal from one of your wallet.
-    def withdraw(self, currency, wallet, amount, address):
-        url, path = self.url_path_for(PATH_WITHDRAW)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-            'withdraw_type': currency,
-            'walletselected': wallet,
-            'amount': str(amount),
-            'address': address,
+    # Get ledgers info.
+    def ledgers(self, asset_class='currency', asset='all', type='all', start=None, end=None, ofs=None):
+        req = {
+            'aclass': asset_class,
+            'asset': asset,
+            'type': type,
+            'start': start,
+            'end': end,
+            'ofs': ofs,
         }
-        return self._sign_and_post(url, payload)
+        req = clean_parameters(req)
+        return self.krakenex.query_private('Ledgers',req)
 
-    # ORDERS ------------------------------------------------------------------
-    # Submit a new order.
-    def place_order(self,
-                    amount,
-                    price,
-                    side,
-                    ord_type,
-                    symbol,
-                    exchange,
-                    params=None):
-        url, path = self.url_path_for(PATH_ORDER_NEW)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-            'symbol': symbol,
-            'amount': amount,
+    # Query ledgers.
+    def query_ledgers(self, ledger_id):
+        req = {
+            'id': ledger_id,
+        }
+        req = clean_parameters(req)
+        return self.krakenex.query_private('QueryLedgers',req)
+
+    # Get trade volume.
+    def trade_volume(self, pair=None, fee_info=None):
+        req = {
+            'pair': pair,
+            'fee-info': fee_info,
+        }
+        req = clean_parameters(req)
+        return self.krakenex.query_private('TradeVolume',req)
+
+    # Private user data  --------------------------------------------------------------------
+
+    # Add standard order
+    def add_order(self, pair, direction, order_type, price, volume, price2=None, leverage=None,
+                  oflags=None, starttm=0, expiretm=0, userref=None, validate=None,
+                  c_ordertype=None, c_price=None, c_price2=None):
+        if self.TEST:
+            validate = True
+        req = {
+            'pair': pair,
+            'type': direction,
+            'ordertype': order_type,
             'price': price,
-            'exchange': exchange,
-            'side': side,
-            'type': ord_type,
+            'price2': price2,
+            'volume': volume,
+            'leverage': leverage,
+            'oflags': oflags,
+            'starttm': starttm,
+            'expiretm': expiretm,
+            'userref': userref,
+            'validate': validate,
+            'close[ordertype]': c_ordertype,
+            'close[price]': c_price,
+            'close[price2]': c_price2,
         }
-        update_dictionary(payload, params)
-        return self._sign_and_post(url, payload)
+        req = clean_parameters(req)
+        return self.krakenex.query_private('AddOrder',req)
 
-    # Cancel an order.
-    def delete_order(self, order_id):
-        url, path = self.url_path_for(PATH_ORDER_CANCEL)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-            'order_id': order_id,
+        # Cancel open order
+    def cancel_order(self, txid):
+        req = {
+            'txid': txid,
         }
-        return self._sign_and_post(url, payload)
-
-    # Cancel all orders.
-    def delete_all_order(self):
-        url, path = self.url_path_for(PATH_ORDER_CANCEL_ALL)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-        }
-        return self._sign_and_post(url, payload)
-
-    # Get the status of an order. Is it active? Was it cancelled?
-    # To what extent has it been executed? etc.
-    def status_order(self, order_id):
-        url, path = self.url_path_for(PATH_ORDER_STATUS)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-            'order_id': order_id,
-        }
-        return self._sign_and_post(url, payload)
-
-    # View your active orders.
-    def active_orders(self):
-        url, path = self.url_path_for(PATH_ORDERS)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-        }
-        return self._sign_and_post(url, payload)
-
-    # POSITIONS ---------------------------------------------------------------
-
-    # View your active positions.
-    def active_positions(self):
-        url, path = self.url_path_for(PATH_POSITIONS)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-        }
-        return self._sign_and_post(url, payload)
-
-    # Claim a position.
-    def claim_position(self, position_id):
-        url, path = self.url_path_for(PATH_POSITION_CLAIM)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-            'position_id': position_id,
-        }
-        return self._sign_and_post(url, payload)
-
-    # HISTORICAL DATA ---------------------------------------------------------
-    # View your past deposits/withdrawals.
-    def balance_history(self,
-                        currency,
-                        since=None,
-                        until=None,
-                        limit=None,
-                        wallet=None):
-        url, path = self.url_path_for(PATH_HISTORY)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-            'currency': currency,
-            'since': since,
-            'until': until,
-            'limit': limit,
-            'wallet': wallet,
-        }
-        return self._sign_and_post(url, payload)
-
-    # View your past deposits/withdrawals.
-    def movements(self,
-                  currency,
-                  method=None,
-                  since=None,
-                  until=None,
-                  limit=None):
-        url, path = self.url_path_for(PATH_HISTORY_MOVEMENTS)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-            'currency': currency,
-            'method': method,
-            'since': since,
-            'until': until,
-            'limit': limit,
-        }
-        return self._sign_and_post(url, payload)
-
-    # View your past trades.
-    def past_trades(self,
-                    symbol,
-                    timestamp,
-                    until=None,
-                    limit_trades=None,
-                    reverse=None):
-        url, path = self.url_path_for(PATH_PAST_TRADES)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-            'symbol': symbol,
-            'timestamp': str(timestamp),
-            'until': until,
-            'limit_trades': limit_trades,
-            'reverse': reverse,
-        }
-        return self._sign_and_post(url, payload)
-
-    # MARGIN FUNDING ----------------------------------------------------------
-    # Submit a new Offer.
-    def place_offer(self, currency, amount, rate, period, direction):
-        url, path = self.url_path_for(PATH_OFFER_NEW)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-            'currency': currency,
-            'amount': amount,
-            'rate': rate,
-            'period': period,
-            'direction': direction,
-        }
-        return self._sign_and_post(url, payload)
-
-    # Cancel an offer.
-    def cancel_offer(self, offer_id):
-        url, path = self.url_path_for(PATH_OFFER_CANCEL)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-            'offer_id': offer_id,
-        }
-        return self._sign_and_post(url, payload)
-
-    # Get the status of an offer. Is it active? Was it cancelled?
-    # To what extent has it been executed? etc.
-    def status_offer(self, offer_id):
-        url, path = self.url_path_for(PATH_OFFER_STATUS)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-            'offer_id': offer_id,
-        }
-        return self._sign_and_post(url, payload)
-
-    # View your active offers.
-    def active_offers(self):
-        url, path = self.url_path_for(PATH_OFFERS)
-        payload = {
-            'request': path,
-            'nonce': gen_nonce(),
-        }
-        return self._sign_and_post(url, payload)
-
-    # PRIVATE METHODS ---------------------------------------------------------
-    # Pack and sign the payload of the request.
-    def _sign_payload(self, payload):
-
-        j = json.dumps(payload).encode('utf-8')
-        encoded_body = base64.standard_b64encode(j)
-
-        h = hmac.new(self.SECRET.encode('utf-8'), encoded_body, hashlib.sha384)
-        signature = h.hexdigest()
-
-        return {
-            'X-BFX-APIKEY': self.KEY,
-            'X-BFX-SIGNATURE': signature,
-            'X-BFX-PAYLOAD': encoded_body,
-        }
-
-    # Packs and sign the payload and send the request with GET.
-    def _sign_and_get(self, url, payload):
-        payload = clean_parameters(payload)
-        signed_payload = self._sign_payload(payload)
-        return self.get(url, headers=signed_payload)
-
-    # Packs and sign the payload and send the request with POST.
-    def _sign_and_post(self, url, payload):
-        payload = clean_parameters(payload)
-        signed_payload = self._sign_payload(payload)
-        return self.post(url, headers=signed_payload, data=payload)
+        req = clean_parameters(req)
+        return self.krakenex.query_private('AddOrder', req)
