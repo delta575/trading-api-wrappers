@@ -254,9 +254,9 @@ class KrakenAuth(KrakenPublic):
             'API-Sign': sig_digest.decode()
         }
 
-    # def _encode_data(self, data):
-    #     encoded_data = urlencode(data)
-    #     return encoded_data
+    def _encode_data(self, data):
+        encoded_data = urlencode(data)
+        return encoded_data
 
     # Packs and sign the payload and send the request with POST.
     def _sign_and_post(self, url, path, payload):
