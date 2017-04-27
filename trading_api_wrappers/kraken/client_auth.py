@@ -21,7 +21,15 @@ class KrakenAuth(KrakenPublic):
         self.KEY = str(key)
         self.SECRET = str(secret)
 
-    # INFO --------------------------------------------------------------------
+    # Private user data --------------------------------------------------------------------
+    # Get account balance.
+    def balance(self):
+        url, path = self.url_path_for(_p.BALANCE)
+        payload = {
+            'nonce': 0
+        }
+        return self._sign_and_post(url, path, payload)
+
     # Get trade balance.
     def trade_balance(self, asset=_c.Currency.ZUSD.value,
                       asset_class='currency'):
