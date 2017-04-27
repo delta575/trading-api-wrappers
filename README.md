@@ -4,9 +4,9 @@ Trading API Wrappers.
 Tested on Python 3.5
 
 - [Bitfinex](https://www.bitfinex.com)
+- [Kraken](http://www.kraken.com)
 - [SURBTC](https://www.surbtc.com)
 - [CoinDesk](http://www.coindesk.com)
-- [Kraken](http://www.kraken.com)
 - [BtcVol](https://btcvol.info)
 
 ## Dev setup
@@ -38,10 +38,32 @@ Authenticated API:
 Bitfinex API Doc:
 https://bitfinex.readme.io/v1/docs
 
+### Kraken
+
+Public API:
+
+    from trading_api_wrappers import Kraken
+    client = Kraken.Public()
+
+Authenticated API:
+
+    from trading_api_wrappers import Kraken
+    client = Kraken.Auth(API_KEY, API_SECRET)
+
+Kraken API Doc:
+https://www.kraken.com/help/api
+
 ### SURBTC
 
+Public API:
+
     from trading_api_wrappers import SURBTC
-    client = SURBTC(API_KEY, API_SECRET)
+    client = SURBTC.Public()
+
+Authenticated API:
+
+    from trading_api_wrappers import SURBTC
+    client = SURBTC.Auth(API_KEY, API_SECRET)
 
 SURBTC API Doc:
 https://www.surbtc.com/docs/api
