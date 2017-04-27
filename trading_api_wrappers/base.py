@@ -44,7 +44,7 @@ class Client(object):
 
     def _request(self, method, url, headers, params=None, data=None):
         try:
-            data = json.dumps(data) if data else data
+            data = self._encode_data(data)
             response = requests.request(
                 method,
                 url,
@@ -58,6 +58,10 @@ class Client(object):
         except requests.exceptions.RequestException as err:
             log_request_exception(err)
             raise
+
+    def _encode_data(self, data):
+        data = json.dumps(data) if data else data
+        return data
 
     def _resp_to_json(self, response):
         try:

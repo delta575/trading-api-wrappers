@@ -1,19 +1,62 @@
-from trading_api_wrappers.base import Server
-
-PROTOCOL = 'https'
-HOST = 'api.kraken.com'
-VERSION = '0'
+from enum import Enum
 
 
-# Kraken API server
-class KrakenServer(Server):
+# API paths
+class Path(object):
+    # Public
+    SERVER_TIME = 'public/Time'
+    ASSETS = 'public/Assets'
+    ASSET_PAIRS = 'public/AssetPairs'
+    TICKER = 'public/Ticker'
+    OHCL = 'public/OHCL'
+    ORDER_BOOK = 'public/Depth'
+    TRADES = 'public/Trades'
+    SPREAD = 'public/Spread'
+    # Private user data
+    BALANCE = 'private/Balance'
+    TRADE_BALANCE = 'private/TradeBalance'
+    OPEN_ORDERS = 'private/OpenOrders'
+    CLOSED_ORDERS = 'private/ClosedOrders'
+    QUERY_ORDERS = 'private/QueryOrders'
+    TRADES_HISTORY = 'private/TradesHistory'
+    QUERY_TRADES = 'private/QueryTrades'
+    OPEN_POSITIONS = 'private/OpenPositions'
+    LEDGERS = 'private/Ledgers'
+    QUERY_LEDGERS = 'private/QueryLedgers'
+    TRADE_VOLUME = 'private/TradeVolume'
+    # Private user trading
+    ADD_ORDER = 'private/AddOrder'
+    CANCEL_ORDER = 'private/CancelOrder'
+    # Private user funding
+    DEPOSIT_METHODS = 'private/DepositMethods'
+    DEPOSIT_ADDRESSES = 'private/DepositAddresses'
+    DEPOSIT_STATUS = 'private/DepositStatus'
+    WITHDRAW_INFO = 'private/WithdrawInfo'
+    WITHDRAW = 'private/Withdraw'
+    WITHDRAW_STATUS = 'private/WithdrawStatus'
+    WITHDRAW_CANCEL = 'private/WithdrawCancel'
 
-    def __init__(self):
-        Server.__init__(self, PROTOCOL, HOST, VERSION)
+
+class _Enum(Enum):
+
+    @staticmethod
+    def _format_value(value):
+        return str(value).upper()
+
+    @classmethod
+    def check(cls, value):
+        if value is None:
+            return value
+        if type(value) is cls:
+            return value
+        try:
+            return cls[cls._format_value(value)]
+        except KeyError:
+            return cls._missing_(value)
 
 
 # Kraken supported symbols
-class Symbols(object):
+class Symbol(_Enum):
     DASHEUR = 'DASHEUR'
     DASHUSD = 'DASHUSD'
     DASHXBT = 'DASHXBT'
@@ -23,17 +66,17 @@ class Symbols(object):
     XETCZEUR = 'ETCEUR'
     XETCZUSD = 'ETCUSD'
     XETHXXBT = 'ETHXBT'
-    #XETHXXBT.d = 'ETHXBT.d'
+    # XETHXXBT.d = 'ETHXBT.d'
     XETHZCAD = 'ETHCAD'
-    #XETHZCAD.d = 'ETHCAD.d'
+    # XETHZCAD.d = 'ETHCAD.d'
     XETHZEUR = 'ETHEUR'
-    #XETHZEUR.d = 'ETHEUR.d'
+    # XETHZEUR.d = 'ETHEUR.d'
     XETHZGBP = 'ETHGBP'
-    #XETHZGBP.d = 'ETHGBP.d'
+    # XETHZGBP.d = 'ETHGBP.d'
     XETHZJPY = 'ETHJPY'
-    #XETHZJPY.d = 'ETHJPY.d'
+    # XETHZJPY.d = 'ETHJPY.d'
     XETHZUSD = 'ETHUSD'
-    #XETHZUSD.d = 'ETHUSD.d'
+    # XETHZUSD.d = 'ETHUSD.d'
     XICNXETH = 'ICNETH'
     XICNXXBT = 'ICNXBT'
     XLTCXXBT = 'LTCXBT'
@@ -46,15 +89,15 @@ class Symbols(object):
     XREPZEUR = 'REPEUR'
     XREPZUSD = 'REPUSD'
     XXBTZCAD = 'XBTCAD'
-    #XXBTZCAD.d = 'XBTCAD.d'
+    # XXBTZCAD.d = 'XBTCAD.d'
     XXBTZEUR = 'XBTEUR'
-    #XXBTZEUR.d = 'XBTEUR.d'
+    # XXBTZEUR.d = 'XBTEUR.d'
     XXBTZGBP = 'XBTGBP'
-    #XXBTZGBP.d = 'XBTGBP.d'
+    # XXBTZGBP.d = 'XBTGBP.d'
     XXBTZJPY = 'XBTJPY'
-    #XXBTZJPY.d = 'XBTJPY.d'
+    # XXBTZJPY.d = 'XBTJPY.d'
     XXBTZUSD = 'XBTUSD'
-    #XXBTZUSD.d = 'XBTUSD.d'
+    # XXBTZUSD.d = 'XBTUSD.d'
     XXDGXXBT = 'XDGXBT'
     XXLMXXBT = 'XLMXBT'
     XXLMZEUR = 'XLMEUR'
@@ -69,7 +112,7 @@ class Symbols(object):
 
 
 # Kraken supported currencies
-class Currencies(object):
+class Currency(_Enum):
     DASH = 'DASH'
     KFEE = 'FEE'
     USDT = 'USDT'

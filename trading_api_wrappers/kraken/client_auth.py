@@ -1,70 +1,50 @@
-import krakenex
+import base64
+import hashlib
+import hmac
+from urllib.parse import urlencode
 
 # local
-from trading_api_wrappers.kraken.client_public import KrakenPublic
-from trading_api_wrappers.common import clean_parameters
+from trading_api_wrappers.common import (check_keys, gen_nonce,
+                                         clean_parameters)
 
-# API Paths
-# Private user data
-PATH_BALANCE = 'private/Balance'
-PATH_TRADE_BALANCE = 'private/TradeBalance'
-PATH_OPEN_ORDERS = 'private/OpenOrders'
-PATH_CLOSED_ORDERS = 'private/ClosedOrders'
-PATH_QUERY_ORDERS = 'private/QueryOrders'
-PATH_TRADES_HISTORY = 'private/TradesHistory'
-PATH_QUERY_TRADES = 'private/QueryTrades'
-PATH_OPEN_POSITIONS = 'private/OpenPositions'
-PATH_LEDGERS = 'private/Ledgers'
-PATH_QUERY_LEDGERS = 'private/QueryLedgers'
-PATH_TRADE_VOLUME = 'private/TradeVolume'
-# Private user trading
-PATH_ADD_ORDER = 'private/AddOrder'
-PATH_CANCEL_ORDER = 'private/CancelOrder'
-# Private user funding
-PATH_DEPOSIT_METHODS = 'private/DepositMethods'
-PATH_DEPOSIT_ADDRESSES = 'private/DepositAddresses'
-PATH_DEPOSIT_STATUS = 'private/DepositStatus'
-PATH_WITHDRAW_INFO = 'private/WithdrawInfo'
-PATH_WITHDRAW = 'private/Withdraw'
-PATH_WITHDRAW_STATUS = 'private/WithdrawStatus'
-PATH_WITHDRAW_CANCEL = 'private/WithdrawCancel'
+from . import constants as _c
+# from . import models as _m
+from .client_public import KrakenPublic
+
+_p = _c.Path
 
 
 class KrakenAuth(KrakenPublic):
-
-    def __init__(self, key=False, secret=False, test=False, timeout=30):
+    def __init__(self, key=False, secret=False, timeout=30):
         KrakenPublic.__init__(self, timeout)
+        check_keys(key, secret)
         self.KEY = str(key)
         self.SECRET = str(secret)
-        self.TEST = test
-        self.krakenex = krakenex.API(key=self.KEY,secret=self.SECRET)
 
-    # Private user data  --------------------------------------------------------------------
-    # Get account balance.
-    def balance(self):
-        return self.krakenex.query_private('Balance')
-
+    # INFO --------------------------------------------------------------------
     # Get trade balance.
-    def trade_balance(self, asset_class='currency', asset='ZUSD'):
-        req = {
-            'aclass': asset_class,
+    def trade_balance(self, asset=_c.Currency.ZUSD.value,
+                      asset_class='currency'):
+        payload = {
             'asset': asset,
+            'aclass': asset_class,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('TradeBalance',req)
+        url, path = self.url_path_for(_p.TRADE_BALANCE)
+        return self._sign_and_post(url, path, payload)
 
     # Get open orders.
     def open_orders(self, include_trades=False, userref=None):
-        req = {
+        payload = {
             'trades': include_trades,
             'userref': userref,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('OpenOrders',req)
+        url, path = self.url_path_for(_p.OPEN_ORDERS)
+        return self._sign_and_post(url, path, payload)
 
     # Get closed orders.
-    def closed_orders(self, include_trades=False, userref=None, start=None, end=None, ofs=None, closetime='both'):
-        req = {
+    def closed_orders(self, include_trades=False, userref=None, start=None,
+                      end=None, ofs=None, closetime='both'):
+        payload = {
             'trades': include_trades,
             'userref': userref,
             'start': start,
@@ -72,87 +52,88 @@ class KrakenAuth(KrakenPublic):
             'ofs': ofs,
             'closetime': closetime,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('ClosedOrders',req)
+        url, path = self.url_path_for(_p.CLOSED_ORDERS)
+        return self._sign_and_post(url, path, payload)
 
     # Query orders info.
     def query_orders(self, txid=None, include_trades=False, userref=None):
-        req = {
+        payload = {
             'trades': include_trades,
             'userref': userref,
             'txid': txid,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('ClosedOrders',req)
+        url, path = self.url_path_for(_p.QUERY_ORDERS)
+        return self._sign_and_post(url, path, payload)
 
     # Get trades history.
-    def trades_history(self, type='all', include_trades=False, start=None, end=None, ofs=None):
-        req = {
-            'type': type,
+    def trades_history(self, trade_type='all', include_trades=False,
+                       start=None, end=None, ofs=None):
+        payload = {
+            'type': trade_type,
             'trades': include_trades,
             'start': start,
             'end': end,
             'ofs': ofs,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('TradesHistory',req)
+        url, path = self.url_path_for(_p.TRADES_HISTORY)
+        return self._sign_and_post(url, path, payload)
 
     # Query trades info.
     def query_trades(self, txid, include_trades=False):
-        req = {
+        payload = {
             'txid': txid,
             'trades': include_trades,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('QueryTrades',req)
+        url, path = self.url_path_for(_p.QUERY_TRADES)
+        return self._sign_and_post(url, path, payload)
 
     # Query trades info.
     def open_positions(self, txid=None, include_pl=False):
-        req = {
+        payload = {
             'txid': txid,
             'docalcs': include_pl,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('OpenPositions',req)
+        url, path = self.url_path_for(_p.OPEN_POSITIONS)
+        return self._sign_and_post(url, path, payload)
 
     # Get ledgers info.
-    def ledgers(self, asset_class='currency', asset='all', type='all', start=None, end=None, ofs=None):
-        req = {
+    def ledgers(self, asset_class='currency', asset='all', ledger_type='all',
+                start=None, end=None, ofs=None):
+        payload = {
             'aclass': asset_class,
             'asset': asset,
-            'type': type,
+            'type': ledger_type,
             'start': start,
             'end': end,
             'ofs': ofs,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('Ledgers',req)
+        url, path = self.url_path_for(_p.LEDGERS)
+        return self._sign_and_post(url, path, payload)
 
     # Query ledgers.
     def query_ledgers(self, ledger_id):
-        req = {
+        payload = {
             'id': ledger_id,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('QueryLedgers',req)
+        url, path = self.url_path_for(_p.QUERY_LEDGERS)
+        return self._sign_and_post(url, path, payload)
 
     # Get trade volume.
     def trade_volume(self, pair=None, fee_info=None):
-        req = {
+        payload = {
             'pair': pair,
             'fee-info': fee_info,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('TradeVolume',req)
+        url, path = self.url_path_for(_p.TRADE_VOLUME)
+        return self._sign_and_post(url, path, payload)
 
-    # Private user trading  --------------------------------------------------------------------
+    # Private user trading  ---------------------------------------------------
     # Add standard order
-    def add_order(self, pair, direction, order_type, price, volume, price2=None, leverage=None,
-                  oflags=None, starttm=0, expiretm=0, userref=None, validate=None,
-                  c_ordertype=None, c_price=None, c_price2=None):
-        if self.TEST:
-            validate = True
-        req = {
+    def add_order(self, pair, direction, order_type, price, volume,
+                  price2=None, leverage=None, oflags=None, starttm=0,
+                  expiretm=0, userref=None, validate=None, c_ordertype=None,
+                  c_price=None, c_price2=None):
+        payload = {
             'pair': pair,
             'type': direction,
             'ordertype': order_type,
@@ -169,86 +150,116 @@ class KrakenAuth(KrakenPublic):
             'close[price]': c_price,
             'close[price2]': c_price2,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('AddOrder',req)
+        url, path = self.url_path_for(_p.ADD_ORDER)
+        return self._sign_and_post(url, path, payload)
 
-        # Cancel open order
+    # Cancel open order
     def cancel_order(self, txid):
-        req = {
+        payload = {
             'txid': txid,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('CancelOrder', req)
+        url, path = self.url_path_for(_p.CANCEL_ORDER)
+        return self._sign_and_post(url, path, payload)
 
-    # Private user funding  --------------------------------------------------------------------
+    # Private user funding  ---------------------------------------------------
     # Get deposit methods.
     def deposit_methods(self, asset, asset_class='currency'):
-        req = {
+        payload = {
             'aclass': asset_class,
             'asset': asset,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('DepositMethods', req)
+        url, path = self.url_path_for(_p.DEPOSIT_METHODS)
+        return self._sign_and_post(url, path, payload)
 
     # Get deposit addresses
-    def deposit_addresses(self, asset, method, asset_class='currency', new=False):
-        req = {
+    def deposit_addresses(self, asset, method, asset_class='currency',
+                          new=False):
+        payload = {
             'aclass': asset_class,
             'asset': asset,
             'method': method,
             'new': new,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('DepositAddresses', req)
+        url, path = self.url_path_for(_p.DEPOSIT_ADDRESSES)
+        return self._sign_and_post(url, path, payload)
 
     # Get status of recent deposits
     def deposit_status(self, asset, method, asset_class='currency'):
-        req = {
+        payload = {
             'aclass': asset_class,
             'asset': asset,
             'method': method,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('DepositStatus', req)
+        url, path = self.url_path_for(_p.DEPOSIT_STATUS)
+        return self._sign_and_post(url, path, payload)
 
     # Get withdrawal information
     def withdraw_info(self, asset, amount, key, asset_class='currency'):
-        req = {
+        payload = {
             'aclass': asset_class,
             'asset': asset,
             'amount': amount,
             'key': key,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('WithdrawInfo', req)
+        url, path = self.url_path_for(_p.WITHDRAW_INFO)
+        return self._sign_and_post(url, path, payload)
 
     # Withdraw funds
-    def withdraw_funds(self, asset, amount, key, asset_class='currency'):
-        req = {
+    def withdraw(self, asset, amount, key, asset_class='currency'):
+        payload = {
             'aclass': asset_class,
             'asset': asset,
             'amount': amount,
             'key': key,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('Withdraw', req)
+        url, path = self.url_path_for(_p.WITHDRAW)
+        return self._sign_and_post(url, path, payload)
 
     # Get status of recent withdrawals
     def withdraw_status(self, asset, method, asset_class='currency'):
-        req = {
+        payload = {
             'aclass': asset_class,
             'asset': asset,
             'method': method,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('WithdrawStatus', req)
+        url, path = self.url_path_for(_p.WITHDRAW_STATUS)
+        return self._sign_and_post(url, path, payload)
 
-    # Request withdrawal cancelation
+    # Request withdrawal cancellation
     def withdraw_cancel(self, asset, refid, asset_class='currency'):
-        req = {
+        payload = {
             'aclass': asset_class,
             'asset': asset,
             'refid': refid,
         }
-        req = clean_parameters(req)
-        return self.krakenex.query_private('WithdrawCancel', req)
+        url, path = self.url_path_for(_p.WITHDRAW_CANCEL)
+        return self._sign_and_post(url, path, payload)
+
+    # PRIVATE METHODS ---------------------------------------------------------
+    def _sign_payload(self, path, data=None):
+        data['nonce'] = gen_nonce()
+        encoded_data = self._encode_data(data)
+
+        # Unicode-objects must be encoded before hashing
+        encoded = (str(data['nonce']) + encoded_data).encode()
+        message = path.encode() + hashlib.sha256(encoded).digest()
+
+        signature = hmac.new(key=base64.b64decode(self.SECRET),
+                             msg=message,
+                             digestmod=hashlib.sha512)
+        sig_digest = base64.b64encode(signature.digest())
+
+        return {
+            'API-Key': self.KEY,
+            'API-Sign': sig_digest.decode()
+        }
+
+    # def _encode_data(self, data):
+    #     encoded_data = urlencode(data)
+    #     return encoded_data
+
+    # Packs and sign the payload and send the request with POST.
+    def _sign_and_post(self, url, path, payload):
+        payload = clean_parameters(payload)
+        signed_payload = self._sign_payload(path, payload)
+        return self.post(url, headers=signed_payload, data=payload)

@@ -1,39 +1,32 @@
 # local
 from trading_api_wrappers.base import Client
-from .constants import KrakenServer
 
-# API Paths
-PATH_SERVER_TIME = 'public/Time'
-PATH_ASSETS = 'public/Assets'
-PATH_ASSET_PAIRS = 'public/AssetPairs'
-PATH_TICKER = 'public/Ticker'
-PATH_OHCL = 'public/OHCL'
-PATH_ORDER_BOOK = 'public/Depth'
-PATH_TRADES = 'public/Trades'
-PATH_SPREAD = 'public/Spread'
+from . import constants as _c
+# from . import models as _m
+from .server import KrakenServer
 
+_p = _c.Path
 
 
 class KrakenPublic(Client):
-
     def __init__(self, timeout=30):
         Client.__init__(self, KrakenServer(), timeout)
 
     def server_time(self):
-        url = self.url_for(PATH_SERVER_TIME)
+        url = self.url_for(_p.SERVER_TIME)
         return self.get(url)
 
     def assets(self):
-        url = self.url_for(PATH_ASSETS)
+        url = self.url_for(_p.ASSETS)
         return self.get(url)
 
     def asset_pairs(self):
-        url = self.url_for(PATH_ASSET_PAIRS)
+        url = self.url_for(_p.ASSET_PAIRS)
         return self.get(url)
 
     def ticker(self, symbol):
         parameters = {'pair': symbol}
-        url = self.url_for(PATH_TICKER)
+        url = self.url_for(_p.TICKER)
         return self.get(url, params=parameters)
 
     def ohcl(self, symbol, interval=None, since=None):
@@ -42,7 +35,7 @@ class KrakenPublic(Client):
             'interval': interval,
             'since': since
         }
-        url = self.url_for(PATH_OHCL)
+        url = self.url_for(_p.OHCL)
         return self.get(url, params=parameters)
 
     def order_book(self, symbol, count=None):
@@ -50,7 +43,7 @@ class KrakenPublic(Client):
             'pair': symbol,
             'count': count
         }
-        url = self.url_for(PATH_ORDER_BOOK)
+        url = self.url_for(_p.ORDER_BOOK)
         return self.get(url, params=parameters)
 
     def trades(self, symbol, since=None):
@@ -58,7 +51,7 @@ class KrakenPublic(Client):
             'pair': symbol,
             'since': since
         }
-        url = self.url_for(PATH_TRADES)
+        url = self.url_for(_p.TRADES)
         return self.get(url, params=parameters)
 
     def spread(self, symbol, since=None):
@@ -66,5 +59,5 @@ class KrakenPublic(Client):
             'pair': symbol,
             'since': since
         }
-        url = self.url_for(PATH_SPREAD)
+        url = self.url_for(_p.SPREAD)
         return self.get(url, params=parameters)
