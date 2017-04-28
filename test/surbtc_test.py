@@ -124,5 +124,5 @@ class SURBTCAuthTestBadApi(unittest.TestCase):
     def test_key_secret(self):
         self.assertRaises(ValueError, lambda: SURBTC.Auth())
 
-    def test_markets_returns_error(self):
-        self.assertRaises(RequestException, lambda: self.client.markets())
+    def test_balance_returns_error(self):
+        self.assertRaises(RequestException, lambda: self.client.balance(SURBTC.Currency.CLP))
