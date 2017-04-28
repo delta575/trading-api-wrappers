@@ -153,8 +153,8 @@ class SURBTCAuth(SURBTCPublic):
         return self.new_order_payload(market_id, payload)
 
     def new_order_payload(self, market_id: _c.Market, payload):
-        url, path = self.url_path_for(_p.ORDERS,
-                                      path_arg=market_id.value)
+        market_id = _c.Market.check(market_id)
+        url, path = self.url_path_for(_p.ORDERS, path_arg=market_id.value)
         headers = self._sign_payload(method='POST', path=path, payload=payload)
         data = self.post(url, headers=headers, data=payload)
         return _m.Order.create_from_json(data['order'])
