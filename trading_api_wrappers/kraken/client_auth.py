@@ -263,7 +263,7 @@ class KrakenAuth(KrakenPublic):
         }
 
     def _encode_data(self, data):
-        encoded_data = urlencode(data)
+        encoded_data = urlencode(data) if data else data
         return encoded_data
 
     # Packs and sign the payload and send the request with POST.
