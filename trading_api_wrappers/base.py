@@ -23,6 +23,8 @@ class Server(object):
 
 class Client(object):
 
+    error_key = ''
+
     def __init__(self, server: Server, timeout=30):
         self.SERVER = server
         self.TIMEOUT = timeout
@@ -66,7 +68,7 @@ class Client(object):
     def _resp_to_json(self, response):
         try:
             json_resp = response.json()
-            check_response(json_resp)
+            check_response(json_resp, self.error_key)
             return json_resp
         except json.decoder.JSONDecodeError:
             log_json_decode()

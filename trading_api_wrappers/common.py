@@ -45,9 +45,10 @@ def check_keys(key, secret):
         raise ValueError(msg)
 
 
-def check_response(response):
-    if 'message' in response:
-        msg = 'ResponseMessage: ' + response['message']
+def check_response(response: dict, key: str):
+    msg = response.get(key)
+    if msg:
+        msg = 'ResponseMessage: {0}'.format(msg)
         log_error(msg)
         raise ValueError(msg)
 

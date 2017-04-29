@@ -9,6 +9,9 @@ _p = _c.Path
 
 
 class KrakenPublic(Client):
+
+    error_key = 'error'
+
     def __init__(self, timeout=30):
         Client.__init__(self, KrakenServer(), timeout)
 

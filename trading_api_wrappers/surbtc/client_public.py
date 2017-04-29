@@ -10,6 +10,8 @@ _p = _c.Path
 
 class SURBTCPublic(Client):
 
+    error_key = 'message'
+
     def __init__(self, test=False, timeout=30):
         Client.__init__(self, SURBTCServer(test), timeout)
 
