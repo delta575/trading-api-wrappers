@@ -86,7 +86,7 @@ https://btcvol.info
 
 ## Licence
 
-Copyright (c) 2016 Felipe Aránguiz | Sebastián Aránguiz
+Copyright (c) 2017 Felipe Aránguiz | Sebastián Aránguiz
 
 See [LICENSE](LICENSE)
 
