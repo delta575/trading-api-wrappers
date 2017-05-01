@@ -1,5 +1,4 @@
 import unittest
-
 from datetime import datetime, timedelta
 
 # pip
@@ -10,7 +9,7 @@ from requests import RequestException
 from trading_api_wrappers import SURBTC
 from trading_api_wrappers.surbtc import models
 
-TEST = config('TEST', cast=bool, default=False)
+TEST = config('SURBTC_TEST', cast=bool, default=True)
 API_KEY = config('SURBTC_API_KEY')
 API_SECRET = config('SURBTC_API_SECRET')
 MARKET_ID = SURBTC.Market.BTC_CLP
@@ -122,7 +121,9 @@ class SURBTCAuthTestBadApi(unittest.TestCase):
         self.assertIsInstance(self.client, SURBTC.Auth)
 
     def test_key_secret(self):
-        self.assertRaises(ValueError, lambda: SURBTC.Auth())
+        self.assertRaises(ValueError,
+                          lambda: SURBTC.Auth())
 
     def test_balance_returns_error(self):
-        self.assertRaises(RequestException, lambda: self.client.balance(SURBTC.Currency.CLP))
+        self.assertRaises(RequestException,
+                          lambda: self.client.balance(SURBTC.Currency.CLP))

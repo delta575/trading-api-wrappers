@@ -1,3 +1,5 @@
 from .client import CoinDesk
 
-__all__ = [CoinDesk]
+__all__ = [
+    CoinDesk,
+]

@@ -1,14 +1,13 @@
 import base64
-from datetime import datetime
 import hashlib
 import hmac
 import json
+from datetime import datetime
 
 # local
-from trading_api_wrappers.common import build_route, check_keys, gen_nonce
-
 from . import constants as _c
 from . import models as _m
+from ..common import build_route, check_keys, gen_nonce
 from .client_public import SURBTCPublic
 
 _p = _c.Path
@@ -47,7 +46,7 @@ class SURBTCAuth(SURBTCPublic):
     def fee_percentage(self,
                        market_id: _c.Market,
                        order_type: _c.OrderType,
-                       market_order: bool = False):
+                       market_order: bool=False):
         market_id = _c.Market.check(market_id)
         order_type = _c.OrderType.check(order_type)
         params = {
@@ -62,8 +61,8 @@ class SURBTCAuth(SURBTCPublic):
 
     def trade_transaction_pages(self,
                                 market_id: _c.Market,
-                                page: int = None,
-                                per_page: int = None):
+                                page: int=None,
+                                per_page: int=None):
         market_id = _c.Market.check(market_id)
         # TODO: Pagination isn't working, it always returns 25 items
         params = {
@@ -113,9 +112,9 @@ class SURBTCAuth(SURBTCPublic):
     def balance_event_pages(self,
                             currencies,
                             event_names,
-                            page: int = None,
-                            per_page: int = None,
-                            relevant: bool = None):
+                            page: int=None,
+                            per_page: int=None,
+                            relevant: bool=None):
         currencies = [_c.Currency.check(c).value
                       for c in currencies]
         event_names = [_c.BalanceEvent.check(e).value
@@ -140,7 +139,7 @@ class SURBTCAuth(SURBTCPublic):
                   order_type: _c.OrderType,
                   price_type: _c.OrderPriceType,
                   amount: float,
-                  limit: float = None):
+                  limit: float=None):
         market_id = _c.Market.check(market_id)
         order_type = _c.OrderType.check(order_type)
         price_type = _c.OrderPriceType.check(price_type)
@@ -161,10 +160,10 @@ class SURBTCAuth(SURBTCPublic):
 
     def order_pages(self,
                     market_id: _c.Market,
-                    page: int = None,
-                    per_page: int = None,
-                    state: _c.OrderState = None,
-                    minimum_exchanged: float = None):
+                    page: int=None,
+                    per_page: int=None,
+                    state: _c.OrderState=None,
+                    minimum_exchanged: float=None):
         market_id = _c.Market.check(market_id)
         state = _c.OrderState.check(state)
         if per_page and per_page > _c.ORDERS_LIMIT:

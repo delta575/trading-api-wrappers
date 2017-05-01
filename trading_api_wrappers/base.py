@@ -3,6 +3,7 @@ from urllib.parse import urlparse
 
 # pip
 import requests
+
 # local
 from trading_api_wrappers.common import (check_response, log_json_decode,
                                          log_request_exception)

@@ -1,8 +1,6 @@
 # local
-from trading_api_wrappers.base import Client
-
 from . import constants as _c
-# from . import models as _m
+from ..base import Client
 from .server import KrakenServer
 
 _p = _c.Path

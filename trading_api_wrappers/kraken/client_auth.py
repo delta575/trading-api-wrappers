@@ -4,24 +4,22 @@ import hmac
 from urllib.parse import urlencode
 
 # local
-from trading_api_wrappers.common import (check_keys, gen_nonce,
-                                         clean_parameters)
-
 from . import constants as _c
-# from . import models as _m
+from ..common import check_keys, clean_parameters, gen_nonce
 from .client_public import KrakenPublic
 
 _p = _c.Path
 
 
 class KrakenAuth(KrakenPublic):
+
     def __init__(self, key=False, secret=False, timeout=30):
         KrakenPublic.__init__(self, timeout)
         check_keys(key, secret)
         self.KEY = str(key)
         self.SECRET = str(secret)
 
-    # Private user data --------------------------------------------------------------------
+    # Private user data -------------------------------------------------------
     # Get account balance.
     def balance(self):
         url, path = self.url_path_for(_p.BALANCE)

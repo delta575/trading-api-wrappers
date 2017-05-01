@@ -2,8 +2,8 @@ import unittest
 from datetime import datetime
 
 # pip
-from decouple import config
 from requests import RequestException
+from decouple import config
 
 # local
 from trading_api_wrappers.bitfinex import (BitfinexAuth, BitfinexPublic,

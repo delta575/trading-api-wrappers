@@ -1,5 +1,5 @@
 # local
-from trading_api_wrappers.base import Client
+from ..base import Client
 from .constants import BitfinexServer
 
 # API Paths

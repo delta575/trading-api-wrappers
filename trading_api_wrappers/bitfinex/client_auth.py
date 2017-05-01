@@ -4,9 +4,8 @@ import hmac
 import json
 
 # local
-from trading_api_wrappers.bitfinex.client_public import BitfinexPublic
-from trading_api_wrappers.common import (check_keys, clean_parameters,
-                                         gen_nonce, update_dictionary)
+from ..common import check_keys, clean_parameters, gen_nonce, update_dictionary
+from .client_public import BitfinexPublic
 
 # API Paths
 # Info
