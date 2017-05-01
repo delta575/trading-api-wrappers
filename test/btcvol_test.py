@@ -12,10 +12,10 @@ class BtcVolTest(unittest.TestCase):
     def test_instantiate_client(self):
         self.assertIsInstance(self.client, BtcVol)
 
-    def test_current_bpi_returns_data(self):
+    def test_latest_returns_data(self):
         response = self.client.latest()
         self.assertIn('Volatility', response.keys())
 
-    def test_historical_bpi_returns_data(self):
+    def test_all_returns_data(self):
         response = self.client.all()
         self.assertIn('Volatility', response[0].keys())
