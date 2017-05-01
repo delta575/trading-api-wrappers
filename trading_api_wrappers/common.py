@@ -46,7 +46,10 @@ def check_keys(key, secret):
 
 
 def check_response(response: dict, key: str):
-    msg = response.get(key)
+    try:
+        msg = response.get(key)
+    except AttributeError:
+        return
     if msg:
         msg = 'ResponseMessage: {0}'.format(msg)
         log_error(msg)
