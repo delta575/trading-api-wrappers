@@ -10,7 +10,7 @@ from requests import RequestException
 from trading_api_wrappers import SURBTC
 from trading_api_wrappers.surbtc import models
 
-TEST = config('TEST', cast=bool, default=False)
+TEST = config('SURBTC_TEST', cast=bool, default=True)
 API_KEY = config('SURBTC_API_KEY')
 API_SECRET = config('SURBTC_API_SECRET')
 MARKET_ID = SURBTC.Market.BTC_CLP
