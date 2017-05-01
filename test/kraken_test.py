@@ -1,10 +1,7 @@
 import unittest
 
-from datetime import datetime, timedelta
-
 # pip
 from decouple import config
-from requests import RequestException
 
 # local
 from trading_api_wrappers import Kraken
