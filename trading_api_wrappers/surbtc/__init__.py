@@ -22,6 +22,5 @@ class SURBTC(object):
 
 
 __all__ = [
-    SURBTCAuth,
-    SURBTCPublic,
+    SURBTC,
 ]

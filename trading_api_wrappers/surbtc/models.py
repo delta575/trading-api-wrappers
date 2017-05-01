@@ -1,6 +1,6 @@
+import math
 from collections import namedtuple
 from datetime import datetime
-import math
 
 
 def parse_datetime(datetime_str):
@@ -13,13 +13,14 @@ class Amount(
         'currency',
     ])
 ):
+
     @classmethod
     def create_from_json(cls, amount):
         if amount:
             amount = cls(
-            amount=float(amount[0]),
-            currency=amount[1],
-        )
+                amount=float(amount[0]),
+                currency=amount[1],
+            )
         return amount
 
 
@@ -30,6 +31,7 @@ class PagesMeta(
         'total_pages',
     ])
 ):
+
     @classmethod
     def create_from_json(cls, meta):
         return cls(
@@ -48,6 +50,7 @@ class Market(
         'minimum_order_amount',
     ]),
 ):
+
     @classmethod
     def create_from_json(cls, market):
         return cls(
@@ -71,6 +74,7 @@ class Ticker(
         'price_variation_7d'
     ])
 ):
+
     @classmethod
     def create_from_json(cls, ticker):
         return cls(
@@ -97,6 +101,7 @@ class Quotation(
         'type',
     ])
 ):
+
     @classmethod
     def create_from_json(cls, quotation):
         return cls(
@@ -127,6 +132,7 @@ class OrderBookEntry(
         'amount',
     ])
 ):
+
     @classmethod
     def create_from_json(cls, book_entry):
         return cls(
@@ -141,6 +147,7 @@ class OrderBook(
         'bids',
     ])
 ):
+
     @classmethod
     def create_from_json(cls, order_book):
         return cls(
@@ -156,6 +163,7 @@ class FeePercentage(
         'value',
     ])
 ):
+
     @classmethod
     def create_from_json(cls, fee_percentage):
         return cls(
@@ -173,6 +181,7 @@ class Balance(
         'pending_withdraw_amount',
     ])
 ):
+
     @classmethod
     def create_from_json(cls, balance):
         return cls(
@@ -208,6 +217,7 @@ class Order(
         'weighted_quotation',
     ])
 ):
+
     @classmethod
     def create_from_json(cls, order):
         return cls(
@@ -235,6 +245,7 @@ class OrderPages(
         'meta',
     ])
 ):
+
     @classmethod
     def create_from_json(cls, orders, pages_meta):
         return cls(
@@ -266,6 +277,7 @@ class BalanceEvent(
         'transfer_description',
     ])
 ):
+
     @classmethod
     def create_from_json(cls, event):
         return cls(
@@ -296,6 +308,7 @@ class BalanceEventPages(
         'meta',
     ])
 ):
+
     @classmethod
     def create_from_json(cls, events, total_count, page):
         return cls(
@@ -321,6 +334,7 @@ class TradeTransaction(
         'triggering_order',
     ])
 ):
+
     @classmethod
     def create_from_json(cls, transaction):
         return cls(

@@ -1,5 +1,5 @@
 # local
-from trading_api_wrappers.base import Client, Server
+from ..base import Client, Server
 
 # API Server
 PROTOCOL = 'https'

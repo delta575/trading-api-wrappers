@@ -1,4 +1,4 @@
-from trading_api_wrappers.base import Server
+from ..base import Server
 
 PROTOCOL = 'https'
 HOST = 'api.bitfinex.com'
