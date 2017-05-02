@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from trading_api_wrappers import CoinDesk
 
 CURRENCY = 'clp'
-TODAY = datetime.utcnow().date()
+TODAY = datetime.utcnow()
 YESTERDAY = TODAY - timedelta(days=1)
 TOMORROW = TODAY + timedelta(days=1)
 
@@ -32,9 +32,9 @@ class CoinDeskTest(unittest.TestCase):
 
     def test_rate_historical_returns_valid_dict(self):
         rate_dict = self.client.rate(CURRENCY).historical(YESTERDAY, TODAY)
-        self.assertIn(str(YESTERDAY), rate_dict.keys())
-        self.assertNotIn(str(TODAY), rate_dict.keys())
-        self.assertEqual(len(rate_dict), 1)
+        self.assertIn(str(YESTERDAY.date()), rate_dict.keys())
+        self.assertNotIn(str(TODAY.date()), rate_dict.keys())
+        self.assertEqual(len(rate_dict), 2)
 
     def test_rate_for_date_today_returns_float(self):
         rate = self.client.rate(CURRENCY).for_date(TODAY)
@@ -43,6 +43,10 @@ class CoinDeskTest(unittest.TestCase):
     def test_rate_for_date_yesterday_returns_float(self):
         rate = self.client.rate(CURRENCY).for_date(YESTERDAY)
         self.assertIsInstance(rate, float)
+
+    def test_rate_historical_tomorrow_raises_error(self):
+        self.assertRaises(ValueError, lambda:
+        self.client.rate(CURRENCY).historical(TOMORROW, TOMORROW))
 
     def test_rate_for_date_tomorrow_raises_error(self):
         self.assertRaises(ValueError, lambda:
