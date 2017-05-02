@@ -2,10 +2,10 @@ import unittest
 from datetime import datetime
 
 # pip
-from requests import RequestException
 from decouple import config
 
 # local
+from trading_api_wrappers import errors
 from trading_api_wrappers.bitfinex import (BitfinexAuth, BitfinexPublic,
                                            Currencies, Symbols)
 
@@ -110,4 +110,5 @@ class BitfinexAuthTestBadApi(unittest.TestCase):
         self.assertRaises(ValueError, lambda: BitfinexAuth())
 
     def test_account_info_returns_error(self):
-        self.assertRaises(RequestException, lambda: self.client.account_info())
+        self.assertRaises(errors.InvalidResponse,
+                          lambda: self.client.account_info())

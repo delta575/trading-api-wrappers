@@ -7,7 +7,6 @@ Tested on Python 3.5
 - [Kraken](http://www.kraken.com)
 - [SURBTC](https://www.surbtc.com)
 - [CoinDesk](http://www.coindesk.com)
-- [BtcVol](https://btcvol.info)
 
 ## Dev setup
 
@@ -75,14 +74,6 @@ https://www.surbtc.com/docs/api
 
 Coindesk API Doc:
 http://www.coindesk.com/api
-
-### BtcVol
-
-    from trading_api_wrappers import BtcVol
-    client = BtcVol()
-
-BtcVol API Doc:
-https://btcvol.info
 
 ## Licence
 
