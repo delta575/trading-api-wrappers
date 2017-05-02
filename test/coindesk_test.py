@@ -23,7 +23,7 @@ class CoinDeskTest(unittest.TestCase):
         self.assertIn('bpi', bpi.keys())
 
     def test_historical_bpi_returns_data(self):
-        bpi = self.client.bpi(currency=CURRENCY).historical()
+        bpi = self.client.bpi(currency=CURRENCY).historical(YESTERDAY, TODAY)
         self.assertIn('bpi', bpi.keys())
 
     def test_rate_current_returns_float(self):
