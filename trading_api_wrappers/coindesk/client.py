@@ -57,7 +57,11 @@ class _BPI(CoinDesk):
             'end': end,
         }
         url = self.url_for(PATH_HISTORICAL)
-        return self.get(url, params=parameters)
+        response = self.get(url, params=parameters)
+        if end >= date_now:
+            response['bpi'][str(date_now)] = (
+                self.current()['bpi'][self.currency]['rate_float'])
+        return response
 
 
 class _Rate(CoinDesk):
