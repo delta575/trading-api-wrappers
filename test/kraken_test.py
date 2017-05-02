@@ -4,7 +4,7 @@ import unittest
 from decouple import config
 
 # local
-from trading_api_wrappers import Kraken
+from trading_api_wrappers import errors, Kraken
 
 API_KEY = config('KRAKEN_API_KEY')
 API_SECRET = config('KRAKEN_API_SECRET')
@@ -34,3 +34,7 @@ class KrakenAuthTest(unittest.TestCase):
     def test_trade_balance(self):
         response = self.client.trade_balance()
         self.assertIn('result', response.keys())
+
+    def test_error(self):
+        self.assertRaises(errors.InvalidResponse,
+                          lambda: self.client.trades('ERROR'))

@@ -3,10 +3,9 @@ from datetime import datetime, timedelta
 
 # pip
 from decouple import config
-from requests import RequestException
 
 # local
-from trading_api_wrappers import SURBTC
+from trading_api_wrappers import SURBTC, errors
 from trading_api_wrappers.surbtc import models
 
 TEST = config('SURBTC_TEST', cast=bool, default=True)
@@ -125,5 +124,5 @@ class SURBTCAuthTestBadApi(unittest.TestCase):
                           lambda: SURBTC.Auth())
 
     def test_balance_returns_error(self):
-        self.assertRaises(RequestException,
+        self.assertRaises(errors.InvalidResponse,
                           lambda: self.client.balance(SURBTC.Currency.CLP))

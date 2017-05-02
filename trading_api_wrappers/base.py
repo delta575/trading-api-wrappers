@@ -5,8 +5,7 @@ from urllib.parse import urlparse
 import requests
 
 # local
-from trading_api_wrappers.common import (check_response, log_json_decode,
-                                         log_request_exception)
+from . import errors
 
 
 class Server(object):
@@ -32,48 +31,56 @@ class Client(object):
 
     def get(self, url, headers=None, params=None):
         response = self._request('get', url, headers=headers, params=params)
-        json_resp = self._resp_to_json(response)
-        return json_resp
+        return response
 
     def put(self, url, headers, data):
         response = self._request('put', url, headers=headers, data=data)
-        json_resp = self._resp_to_json(response)
-        return json_resp
+        return response
 
     def post(self, url, headers, data):
         response = self._request('post', url, headers=headers, data=data)
-        json_resp = self._resp_to_json(response)
-        return json_resp
+        return response
 
     def _request(self, method, url, headers, params=None, data=None):
-        try:
-            data = self._encode_data(data)
-            response = requests.request(
-                method,
-                url,
-                headers=headers,
-                params=params,
-                data=data,
-                verify=True,
-                timeout=self.TIMEOUT)
-            response.raise_for_status()
-            return response
-        except requests.exceptions.RequestException as err:
-            log_request_exception(err)
-            raise
+        data = self._encode_data(data)
+        response = requests.request(
+            method,
+            url,
+            headers=headers,
+            params=params,
+            data=data,
+            verify=True,
+            timeout=self.TIMEOUT)
+        json_resp = self._resp_to_json(response)
+        self._check_response(response, json_resp)
+        return json_resp
 
     def _encode_data(self, data):
         data = json.dumps(data) if data else data
         return data
 
+    def _check_response(self, response: requests.Response, message: dict):
+        self._check_error_key(response, message)
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            raise errors.InvalidResponse(response) from e
+
+    def _check_error_key(self, response: requests.Response, message: dict):
+        try:
+            msg = message.get(self.error_key)
+        except AttributeError:
+            pass
+        else:
+            if msg:
+                raise errors.InvalidResponse(response)
+
     def _resp_to_json(self, response):
         try:
             json_resp = response.json()
-            check_response(json_resp, self.error_key)
-            return json_resp
-        except json.decoder.JSONDecodeError:
-            log_json_decode()
-            raise
+        except json.decoder.JSONDecodeError as e:
+            raise errors.DecodeError() from e
+        return json_resp
 
     def url_for(self, path, path_arg=None):
         url = '{0:s}/{1:s}'.format(self.SERVER.URL, path)
