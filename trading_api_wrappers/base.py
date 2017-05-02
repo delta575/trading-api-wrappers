@@ -60,20 +60,16 @@ class Client(object):
         return data
 
     def _check_response(self, response: requests.Response, message: dict):
-        self._check_error_key(response, message)
+        try:
+            has_error = bool(message.get(self.error_key))
+        except AttributeError:
+            has_error = False
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             raise errors.InvalidResponse(response) from e
-
-    def _check_error_key(self, response: requests.Response, message: dict):
-        try:
-            msg = message.get(self.error_key)
-        except AttributeError:
-            pass
-        else:
-            if msg:
-                raise errors.InvalidResponse(response)
+        if has_error:
+            raise errors.InvalidResponse(response)
 
     def _resp_to_json(self, response):
         try:
