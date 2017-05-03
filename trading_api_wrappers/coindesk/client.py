@@ -34,13 +34,12 @@ class _BPI(CoinDesk):
         url = self.url_for(PATH_BPI, path_arg=self.currency)
         return self.get(url)
 
-    def historical(self, start, end=None, include_today=None):
+    def historical(self, start, end=None, include_today=False):
         if isinstance(start, datetime):
             start = start.date()
         if isinstance(end, datetime):
             end = end.date()
         today = current_utc_date()
-        include_today = include_today or False
         end = end or today
         # Validate dates
         assert start <= end, "'start' date must <= 'end' date'!"
@@ -92,7 +91,7 @@ class _Rate(CoinDesk):
         rate = response['bpi'][self.currency]['rate_float']
         return rate
 
-    def historical(self, start, end=None, include_today=None):
+    def historical(self, start, end=None, include_today=False):
         response = self._bpi.historical(
             start=start, end=end, include_today=include_today)
         rate_dict = response['bpi']
@@ -105,14 +104,14 @@ class _Rate(CoinDesk):
         rate = rate_dict[str(date_for)]
         return rate
 
-    def since_date(self, date_since, include_today=None):
+    def since_date(self, date_since, include_today=False):
         if isinstance(date_since, datetime):
             date_since = date_since.date()
         rate_dict = self.historical(
             start=date_since, end=None, include_today=include_today)
         return rate_dict
 
-    def last_n_days(self, n_days, include_today=None):
+    def last_n_days(self, n_days, include_today=False):
         start = current_utc_date() - timedelta(days=n_days)
         rate_dict = self.historical(
             start=start, end=None, include_today=include_today)
