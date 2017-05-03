@@ -1,4 +1,5 @@
 import time
+from datetime import datetime, timedelta
 from urllib.parse import urlencode
 
 # local
@@ -45,3 +46,12 @@ def update_dictionary(old_dict: dict, new_dict: dict):
         keys = list(new_dict.keys())
         for k in keys:
             old_dict[k] = new_dict[k]
+
+
+def date_range(start_date, end_date):
+    for n in range(int((end_date - start_date).days)):
+        yield start_date + timedelta(n)
+
+
+def current_utc_date():
+    return datetime.utcnow().date()
