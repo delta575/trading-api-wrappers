@@ -56,7 +56,7 @@ class BitfinexPublicTest(unittest.TestCase):
 
     def test_symbols_returns_data(self):
         response = self.client.symbols()
-        self.assertIn(SYMBOL, response)
+        self.assertIn(SYMBOL.value, response)
 
     def test_symbols_details_returns_data(self):
         response = self.client.symbols_details()

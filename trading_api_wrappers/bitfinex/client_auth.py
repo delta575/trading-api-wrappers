@@ -67,7 +67,10 @@ class BitfinexAuth(BitfinexPublic):
 
     # MOVEMENTS ---------------------------------------------------------------
     # Return your deposit address to make a new deposit.
-    def new_deposit(self, method, wallet_name, renew=0):
+    def new_deposit(self,
+                    method,
+                    wallet_name,
+                    renew=0):
         url, path = self.url_path_for(_p.DEPOSIT_NEW)
         payload = {
             'request': path,
@@ -79,7 +82,12 @@ class BitfinexAuth(BitfinexPublic):
         return self._sign_and_post(url, payload)
 
     # Allow you to move available balances between your wallets.
-    def transfer(self, amount, currency, wallet_from, wallet_to):
+    def transfer(self,
+                 amount,
+                 currency: _c.Currency,
+                 wallet_from,
+                 wallet_to):
+        currency = _c.Currency.check(currency).value
         url, path = self.url_path_for(_p.TRANSFER)
         payload = {
             'request': path,
@@ -92,7 +100,12 @@ class BitfinexAuth(BitfinexPublic):
         return self._sign_and_post(url, payload)
 
     # Allow you to request a withdrawal from one of your wallet.
-    def withdraw(self, currency, wallet, amount, address):
+    def withdraw(self,
+                 currency: _c.Currency,
+                 wallet,
+                 amount,
+                 address):
+        currency = _c.Currency.check(currency).value
         url, path = self.url_path_for(_p.WITHDRAW)
         payload = {
             'request': path,
@@ -111,8 +124,9 @@ class BitfinexAuth(BitfinexPublic):
                     price,
                     side,
                     ord_type,
-                    symbol='btcusd',
+                    symbol: _c.Symbol = _c.Symbol.BTCUSD,
                     params=None):
+        symbol = _c.Symbol.check(symbol).value
         url, path = self.url_path_for(_p.ORDER_NEW)
         payload = {
             'request': path,
@@ -192,11 +206,12 @@ class BitfinexAuth(BitfinexPublic):
     # HISTORICAL DATA ---------------------------------------------------------
     # View your past deposits/withdrawals.
     def balance_history(self,
-                        currency,
+                        currency: _c.Currency,
                         since=None,
                         until=None,
                         limit=None,
                         wallet=None):
+        currency = _c.Currency.check(currency).value
         url, path = self.url_path_for(_p.HISTORY)
         payload = {
             'request': path,
@@ -211,11 +226,12 @@ class BitfinexAuth(BitfinexPublic):
 
     # View your past deposits/withdrawals.
     def movements(self,
-                  currency,
+                  currency: _c.Currency,
                   method=None,
                   since=None,
                   until=None,
                   limit=None):
+        currency = _c.Currency.check(currency).value
         url, path = self.url_path_for(_p.HISTORY_MOVEMENTS)
         payload = {
             'request': path,
@@ -230,11 +246,12 @@ class BitfinexAuth(BitfinexPublic):
 
     # View your past trades.
     def past_trades(self,
-                    symbol,
+                    symbol: _c.Symbol,
                     timestamp,
                     until=None,
                     limit_trades=None,
                     reverse=None):
+        symbol = _c.Symbol.check(symbol).value
         url, path = self.url_path_for(_p.PAST_TRADES)
         payload = {
             'request': path,
@@ -249,7 +266,13 @@ class BitfinexAuth(BitfinexPublic):
 
     # MARGIN FUNDING ----------------------------------------------------------
     # Submit a new Offer.
-    def place_offer(self, currency, amount, rate, period, direction):
+    def place_offer(self,
+                    currency: _c.Currency,
+                    amount,
+                    rate,
+                    period,
+                    direction):
+        currency = _c.Currency.check(currency).value
         url, path = self.url_path_for(_p.OFFER_NEW)
         payload = {
             'request': path,
