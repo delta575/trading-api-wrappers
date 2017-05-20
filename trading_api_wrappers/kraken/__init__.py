@@ -6,7 +6,7 @@ from .client_public import KrakenPublic
 class Kraken(object):
     # Enum Types
     Currency = _c.Currency
-    Symbols = _c.Symbol
+    Symbol = _c.Symbol
     # Clients
     Auth = KrakenAuth
     Public = KrakenPublic
