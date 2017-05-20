@@ -26,13 +26,13 @@ Rename .env.example > .env
 
 Public API:
 
-    from trading_api_wrappers import BitfinexPublic
-    client = BitfinexPublic()
+    from trading_api_wrappers import Bitfinex
+    client = Bitfinex.Public()
 
 Authenticated API:
 
-    from trading_api_wrappers import BitfinexAuth
-    client = BitfinexAuth(API_KEY, API_SECRET)
+    from trading_api_wrappers import Bitfinex
+    client = Bitfinex.Auth(API_KEY, API_SECRET)
 
 Bitfinex API Doc:
 https://bitfinex.readme.io/v1/docs
