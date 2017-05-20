@@ -1,17 +1,9 @@
 # local
+from . import constants as _c
 from ..base import Client
-from .constants import BitfinexServer
+from .server import BitfinexServer
 
-# API Paths
-PATH_TICKER = 'pubticker/%s'
-PATH_STATS = 'stats/%s'
-PATH_TODAY = 'today/%s'
-PATH_LEND_BOOK = 'lendbook/%s'
-PATH_ORDER_BOOK = 'book/%s'
-PATH_TRADES = 'trades/%s'
-PATH_LENDS = 'lends/%s'
-PATH_SYMBOLS = 'symbols'
-PATH_SYMBOLS_DETAILS = 'symbols_details'
+_p = _c.Path
 
 
 class BitfinexPublic(Client):
@@ -51,7 +43,7 @@ class BitfinexPublic(Client):
                                             information was valid
 
         """
-        url = self.url_for(PATH_TICKER, path_arg=symbol)
+        url = self.url_for(_p.TICKER, path_arg=symbol)
         return self.get(url)
 
     def stats(self, symbol):
@@ -73,7 +65,7 @@ class BitfinexPublic(Client):
             volume  [float as str]      Volume in the period
 
         """
-        url = self.url_for(PATH_STATS, path_arg=symbol)
+        url = self.url_for(_p.STATS, path_arg=symbol)
         return self.get(url)
 
     def today(self, symbol):
@@ -96,7 +88,7 @@ class BitfinexPublic(Client):
             low     [float as str]      Today's low price
 
         """
-        url = self.url_for(PATH_TODAY, path_arg=symbol)
+        url = self.url_for(_p.TODAY, path_arg=symbol)
         return self.get(url)
 
     def lend_book(self, currency, limit_bids=None, limit_asks=None):
@@ -140,7 +132,7 @@ class BitfinexPublic(Client):
             'limit_bids': limit_bids,
             'limit_asks': limit_asks,
         }
-        url = self.url_for(PATH_LEND_BOOK, path_arg=currency)
+        url = self.url_for(_p.LEND_BOOK, path_arg=currency)
         return self.get(url, params=parameters)
 
     def order_book(self, symbol, limit_bids=None, limit_asks=None, group=None):
@@ -186,7 +178,7 @@ class BitfinexPublic(Client):
             'limit_asks': limit_asks,
             'group': group,
         }
-        url = self.url_for(PATH_ORDER_BOOK, path_arg=symbol)
+        url = self.url_for(_p.ORDER_BOOK, path_arg=symbol)
         return self.get(url, params=parameters)
 
     def trades(self, symbol, timestamp=None, limit_trades=None):
@@ -223,7 +215,7 @@ class BitfinexPublic(Client):
             'timestamp': timestamp,
             'limit_trades': limit_trades,
         }
-        url = self.url_for(PATH_TRADES, path_arg=symbol)
+        url = self.url_for(_p.TRADES, path_arg=symbol)
         return self.get(url, params=parameters)
 
     def lends(self, currency, timestamp=None, limit_lends=None):
@@ -262,7 +254,7 @@ class BitfinexPublic(Client):
             'timestamp': timestamp,
             'limit_lends': limit_lends,
         }
-        url = self.url_for(PATH_LENDS, path_arg=currency)
+        url = self.url_for(_p.LENDS, path_arg=currency)
         return self.get(url, params=parameters)
 
     def symbols(self):
@@ -274,7 +266,7 @@ class BitfinexPublic(Client):
             list: A list of symbol names as str.
 
         """
-        url = self.url_for(PATH_SYMBOLS)
+        url = self.url_for(_p.SYMBOLS)
         return self.get(url)
 
     def symbols_details(self):
@@ -297,5 +289,5 @@ class BitfinexPublic(Client):
                                                 contracts/pairs
 
         """
-        url = self.url_for(PATH_SYMBOLS_DETAILS)
+        url = self.url_for(_p.SYMBOLS_DETAILS)
         return self.get(url)

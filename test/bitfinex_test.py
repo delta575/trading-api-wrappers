@@ -5,9 +5,7 @@ from datetime import datetime
 from decouple import config
 
 # local
-from trading_api_wrappers import errors
-from trading_api_wrappers.bitfinex import (BitfinexAuth, BitfinexPublic,
-                                           Currencies, Symbols)
+from trading_api_wrappers import errors, Bitfinex
 
 # Bitfinex API Server
 TEST = config('TEST', cast=bool, default=False)
@@ -15,18 +13,18 @@ API_KEY = config('BFX_API_KEY')
 API_SECRET = config('BFX_API_SECRET')
 
 # Default parameters
-SYMBOL = Symbols.BTCUSD
-CURRENCY = Currencies.BTC
+SYMBOL = Bitfinex.Symbol.BTCUSD
+CURRENCY = Bitfinex.Currency.BTC
 TIMESTAMP = datetime(2016, 1, 1).timestamp()
 
 
 class BitfinexPublicTest(unittest.TestCase):
 
     def setUp(self):
-        self.client = BitfinexPublic()
+        self.client = Bitfinex.Public()
 
     def test_instantiate_client(self):
-        self.assertIsInstance(self.client, BitfinexPublic)
+        self.assertIsInstance(self.client, Bitfinex.Public)
 
     def test_ticker_returns_data(self):
         response = self.client.ticker(SYMBOL)
@@ -68,10 +66,10 @@ class BitfinexPublicTest(unittest.TestCase):
 class BitfinexAuthTest(unittest.TestCase):
 
     def setUp(self):
-        self.client = BitfinexAuth(API_KEY, API_SECRET)
+        self.client = Bitfinex.Auth(API_KEY, API_SECRET)
 
     def test_instantiate_client(self):
-        self.assertIsInstance(self.client, BitfinexAuth)
+        self.assertIsInstance(self.client, Bitfinex.Auth)
 
     def test_account_info_returns_data(self):
         response = self.client.account_info()
@@ -101,13 +99,13 @@ class BitfinexAuthTest(unittest.TestCase):
 class BitfinexAuthTestBadApi(unittest.TestCase):
 
     def setUp(self):
-        self.client = BitfinexAuth('BAD_KEY', 'BAD_SECRET')
+        self.client = Bitfinex.Auth('BAD_KEY', 'BAD_SECRET')
 
     def test_instantiate_client(self):
-        self.assertIsInstance(self.client, BitfinexAuth)
+        self.assertIsInstance(self.client, Bitfinex.Auth)
 
     def test_key_secret(self):
-        self.assertRaises(ValueError, lambda: BitfinexAuth())
+        self.assertRaises(ValueError, lambda: Bitfinex.Auth())
 
     def test_account_info_returns_error(self):
         self.assertRaises(errors.InvalidResponse,
