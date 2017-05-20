@@ -1,4 +1,4 @@
-from enum import Enum
+from ..base import _Enum
 
 # Limits
 ORDERS_LIMIT = 300
@@ -19,24 +19,6 @@ class Path(object):
     ORDERS = 'markets/%s/orders'
     SINGLE_ORDER = 'orders/%s'
     WITHDRAWAL = 'currencies/%s/withdrawals'
-
-
-class _Enum(Enum):
-
-    @staticmethod
-    def _format_value(value):
-        return str(value).upper()
-
-    @classmethod
-    def check(cls, value):
-        if value is None:
-            return value
-        if type(value) is cls:
-            return value
-        try:
-            return cls[cls._format_value(value)]
-        except KeyError:
-            return cls._missing_(value)
 
 
 class Currency(_Enum):

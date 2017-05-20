@@ -1,4 +1,5 @@
 import json
+from enum import Enum
 from urllib.parse import urlparse
 
 # pip
@@ -88,3 +89,20 @@ class Client(object):
         url = self.url_for(path, path_arg)
         path = urlparse(url).path
         return url, path
+
+
+class _Enum(Enum):
+    @staticmethod
+    def _format_value(value):
+        return str(value).upper()
+
+    @classmethod
+    def check(cls, value):
+        if value is None:
+            return value
+        if type(value) is cls:
+            return value
+        try:
+            return cls[cls._format_value(value)]
+        except KeyError:
+            return cls._missing_(value)
