@@ -14,6 +14,7 @@ setup(
     license='MIT',
     packages=[
         'trading_api_wrappers',
+        'trading_api_wrappers.bitcoinity',
         'trading_api_wrappers.bitfinex',
         'trading_api_wrappers.coindesk',
         'trading_api_wrappers.kraken',
