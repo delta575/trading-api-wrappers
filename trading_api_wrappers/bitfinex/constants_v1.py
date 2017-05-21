@@ -65,3 +65,21 @@ class Symbol(_Enum):
 class Currency(_Enum):
     USD = 'usd'
     BTC = 'btc'
+
+
+# Bitfinex supported symbols
+class SymbolV2(_Enum):
+    BTCUSD = 'tBTCUSD'
+    LTCUSD = 'tLTCUSD'
+    ETHUSD = 'tETHUSD'
+    ETHBTC = 'tETHBTC'
+    ETCUSD = 'tETCUSD'
+    ETCBTC = 'tETCBTC'
+    BFXUSD = 'tBFXUSD'
+    BFXBTC = 'tBFXBTC'
+    RRTUSD = 'tRRTUSD'
+    RRTBTC = 'tRRTBTC'
+    ZECUSD = 'tZECUSD'
+    ZECBTC = 'tZECBTC'
+    XMRUSD = 'tXMRUSD'
+    XMRBTC = 'tXMRBTC'

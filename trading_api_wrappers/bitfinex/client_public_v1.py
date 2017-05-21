@@ -1,7 +1,7 @@
 # local
-from . import constants as _c
+from . import constants_v1 as _c
 from ..base import Client
-from .server import BitfinexServer
+from .server import BitfinexServerV1 as Server
 
 _p = _c.Path
 
@@ -9,7 +9,7 @@ _p = _c.Path
 class BitfinexPublic(Client):
 
     def __init__(self, timeout=30):
-        Client.__init__(self, BitfinexServer(), timeout)
+        Client.__init__(self, Server(), timeout)
 
     def ticker(self, symbol: _c.Symbol=_c.Symbol.BTCUSD):
         """Gets the innermost bid and asks and information on the most recent trade.

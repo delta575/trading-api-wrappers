@@ -4,9 +4,9 @@ import hmac
 import json
 
 # local
-from . import constants as _c
+from . import constants_v1 as _c
 from ..common import check_keys, clean_parameters, gen_nonce, update_dictionary
-from .client_public import BitfinexPublic
+from .client_public_v1 import BitfinexPublic
 
 _p = _c.Path
 
