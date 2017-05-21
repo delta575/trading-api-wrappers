@@ -3,11 +3,17 @@ from ..base import Server
 # API Server
 PROTOCOL = 'https'
 HOST = 'api.bitfinex.com'
-VERSION = 'v1'
 
 
-# Bitfinex API server
-class BitfinexServer(Server):
+# Bitfinex API V1 server
+class BitfinexServerV1(Server):
 
     def __init__(self):
-        Server.__init__(self, PROTOCOL, HOST, VERSION)
+        Server.__init__(self, PROTOCOL, HOST, version='v1')
+
+
+# Bitfinex API V2 server
+class BitfinexServerV2(Server):
+
+    def __init__(self):
+        Server.__init__(self, PROTOCOL, HOST, version='v2')
