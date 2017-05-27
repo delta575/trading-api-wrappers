@@ -173,8 +173,7 @@ class SURBTCAuth(SURBTCPublic):
             'per': per_page,
             'page': page,
             'state': state.value if state else state,
-            # TODO: API has a typo, 'minimun' must be 'minimum'
-            'minimun_exchanged': minimum_exchanged,
+            'minimum_exchanged': minimum_exchanged,
         }
         url, path = self.url_path_for(_p.ORDERS,
                                       path_arg=market_id.value)
