@@ -1,5 +1,5 @@
-coverage==4.3.4
-pytest==3.0.7
+coverage==4.4.1
+pytest==3.1.0
 python-decouple==3.0
 requests==2.16.0
 tox==2.7.0
