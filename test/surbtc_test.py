@@ -51,9 +51,20 @@ class SURBTCAuthTest(unittest.TestCase):
 
     def test_quotation(self):
         quotation = self.client.quotation(
-            MARKET_ID, SURBTC.Currency.BTC,
-            SURBTC.QuotationType.ASK_GIVEN_SIZE,
-            price_limit=1, amount=1)
+            MARKET_ID, quotation_type=SURBTC.QuotationType.ASK_GIVEN_SIZE,
+            amount=1, limit=1)
+        self.assertIsInstance(quotation, models.Quotation)
+
+    def test_quotation_market(self):
+        quotation = self.client.quotation(
+            MARKET_ID, quotation_type=SURBTC.QuotationType.ASK_GIVEN_SIZE,
+            amount=1)
+        self.assertIsInstance(quotation, models.Quotation)
+
+    def test_quotation_limit(self):
+        quotation = self.client.quotation(
+            MARKET_ID, quotation_type=SURBTC.QuotationType.ASK_GIVEN_SIZE,
+            amount=1, limit=1)
         self.assertIsInstance(quotation, models.Quotation)
 
     def test_fee_percentage(self):
