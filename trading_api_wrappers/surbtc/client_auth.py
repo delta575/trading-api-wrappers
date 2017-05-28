@@ -31,8 +31,8 @@ class SURBTCAuth(SURBTCPublic):
         payload = {
             'quotation': {
                 'type': quotation_type,
-                'limit': str(limit) if limit else None,
                 'amount': str(amount),
+                'limit': str(limit) if limit else None,
             },
         }
         url, path = self.url_path_for(_p.QUOTATION,
@@ -162,7 +162,7 @@ class SURBTCAuth(SURBTCPublic):
             'type': order_type.value,
             'price_type': price_type.value,
             'amount': str(amount),
-            'limit': str(limit),
+            'limit': str(limit) if limit else None,
         }
         return self.new_order_payload(market_id, payload)
 
