@@ -23,25 +23,40 @@ class SURBTCAuth(SURBTCPublic):
 
     def quotation(self,
                   market_id: _c.Market,
-                  currency: _c.Currency,
                   quotation_type: _c.QuotationType,
-                  price_limit: float,
-                  amount: float):
-        market_id = _c.Market.check(market_id)
-        currency = _c.Currency.check(currency)
-        quotation_type = _c.QuotationType.check(quotation_type)
+                  amount: float,
+                  limit: float=None):
+        market_id = _c.Market.check(market_id).value
+        quotation_type = _c.QuotationType.check(quotation_type).value
         payload = {
             'quotation': {
-                'type': quotation_type.value,
-                'limit': str([str(price_limit), currency.value]),
-                'amount': str([str(amount), currency.value])
+                'type': quotation_type,
+                'amount': str(amount),
+                'limit': str(limit) if limit else None,
             },
         }
         url, path = self.url_path_for(_p.QUOTATION,
-                                      path_arg=market_id.value)
+                                      path_arg=market_id)
         headers = self._sign_payload(method='POST', path=path, payload=payload)
         data = self.post(url, headers=headers, data=payload)
         return _m.Quotation.create_from_json(data['quotation'])
+
+    def quotation_market(self,
+                         market_id: _c.Market,
+                         quotation_type: _c.QuotationType,
+                         amount: float):
+        return self.quotation(
+            market_id=market_id, quotation_type=quotation_type,
+            amount=amount, limit=None)
+
+    def quotation_limit(self,
+                        market_id: _c.Market,
+                        quotation_type: _c.QuotationType,
+                        amount: float,
+                        limit: float):
+        return self.quotation(
+            market_id=market_id, quotation_type=quotation_type,
+            amount=amount, limit=limit)
 
     def fee_percentage(self,
                        market_id: _c.Market,
@@ -147,7 +162,7 @@ class SURBTCAuth(SURBTCPublic):
             'type': order_type.value,
             'price_type': price_type.value,
             'amount': str(amount),
-            'limit': str(limit),
+            'limit': str(limit) if limit else None,
         }
         return self.new_order_payload(market_id, payload)
 
@@ -173,8 +188,7 @@ class SURBTCAuth(SURBTCPublic):
             'per': per_page,
             'page': page,
             'state': state.value if state else state,
-            # TODO: API has a typo, 'minimun' must be 'minimum'
-            'minimun_exchanged': minimum_exchanged,
+            'minimum_exchanged': minimum_exchanged,
         }
         url, path = self.url_path_for(_p.ORDERS,
                                       path_arg=market_id.value)
