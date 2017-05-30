@@ -214,7 +214,6 @@ class Order(
         'total_exchanged',
         'traded_amount',
         'type',
-        'weighted_quotation',
     ])
 ):
 
@@ -235,7 +234,6 @@ class Order(
             total_exchanged=Amount.create_from_json(order['total_exchanged']),
             traded_amount=Amount.create_from_json(order['traded_amount']),
             type=order['type'],
-            weighted_quotation=order['weighted_quotation'],
         )
 
 
