@@ -5,7 +5,7 @@ from ..base import Client, Server
 from ..common import current_utc_date, date_range
 
 # API Server
-PROTOCOL = 'https'
+PROTOCOL = 'http'
 HOST = 'api.coindesk.com'
 VERSION = 'v1'
 
