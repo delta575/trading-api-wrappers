@@ -6,7 +6,7 @@ if not (sys.version_info >= (3, 5)):
 
 setup(
     name='trading_api_wrappers',
-    version='0.2.10',
+    version='0.2.11',
     description='Trading API Wrappers for Python 3.5',
     url='https://github.com/delta575/trading-api-wrappers',
     author='Felipe Aránguiz, Sebastián Aránguiz',
