@@ -75,6 +75,13 @@ https://www.surbtc.com/docs/api
 Coindesk API Doc:
 http://www.coindesk.com/api
 
+### CryptoMKT
+
+    from trading_api_wrappers import CryptoMKT
+    client = CryptoMKT()    
+
+*No API Docs for CryptoMKT!*
+
 ## Licence
 
 Copyright (c) 2017 Felipe Aránguiz | Sebastián Aránguiz
