@@ -9,6 +9,7 @@ class CryptoMKT(CryptoMKTPublic):
     # Enum Types
     Currency = _c.Currency
     Market = _c.Market
+    TimeFrame = _c.TimeFrame
 
 
 __all__ = [
