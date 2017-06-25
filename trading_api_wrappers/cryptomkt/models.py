@@ -57,6 +57,6 @@ class LastPriceCandle(
     @classmethod
     def create_from_data(cls, prices: PriceCandles):
         return cls(
-            ask=prices.asks[-1],
-            bid=prices.bids[-1],
+            ask=prices.asks[1],
+            bid=prices.bids[1],
         )
