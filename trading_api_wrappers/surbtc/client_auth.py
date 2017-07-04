@@ -93,28 +93,46 @@ class SURBTCAuth(SURBTCPublic):
                 for transaction in data['trade_transactions']]
 
     # REPORTS -----------------------------------------------------------------
-    def report(self,
-               market_id: _c.Market,
-               report_type: _c.ReportType,
-               start_at: datetime=None,
-               end_at: datetime=None):
-        market_id = _c.Market.check(market_id)
-        report_type = _c.ReportType.check(report_type)
+    def _report(self,
+                market_id: _c.Market,
+                report_type: _c.ReportType,
+                start_at: datetime=None,
+                end_at: datetime=None):
+        market_id = _c.Market.check(market_id).value
+        report_type = _c.ReportType.check(report_type).value
         if isinstance(start_at, datetime):
             start_at = int(start_at.timestamp())
         if isinstance(end_at, datetime):
             end_at = int(end_at.timestamp())
         params = {
-            'report_type': report_type.value,
+            'report_type': report_type,
             'from': start_at,
             'to': end_at,
         }
-        url, path = self.url_path_for(_p.REPORTS,
-                                      path_arg=market_id.value)
+        url, path = self.url_path_for(_p.REPORTS, path_arg=market_id)
         headers = self._sign_payload(method='GET', path=path, params=params)
         data = self.get(url, headers=headers, params=params)
-        # TODO: Report doesn't have a model
         return data
+
+    def report_average_prices(self,
+                              market_id: _c.Market,
+                              start_at: datetime = None,
+                              end_at: datetime = None):
+        data = self._report(
+            market_id=market_id, report_type=_c.ReportType.AVERAGE_PRICES,
+            start_at=start_at, end_at=end_at)
+        return [_m.AveragePrice.create_from_json(report)
+                for report in data['reports']]
+
+    def report_candlestick(self,
+                           market_id: _c.Market,
+                           start_at: datetime = None,
+                           end_at: datetime = None):
+        data = self._report(
+            market_id=market_id, report_type=_c.ReportType.CANDLESTICK,
+            start_at=start_at, end_at=end_at)
+        return [_m.Candlestick.create_from_json(report)
+                for report in data['reports']]
 
     # BALANCES-----------------------------------------------------------------
     def balance(self, currency: _c.Currency):

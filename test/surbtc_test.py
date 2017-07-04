@@ -77,12 +77,21 @@ class SURBTCAuthTest(unittest.TestCase):
         for transaction in trade_transactions:
             self.assertIsInstance(transaction, models.TradeTransaction)
 
-    def test_report(self):
+    def test_report_average_prices(self):
         end = datetime.now()
         start = end - timedelta(days=30)
-        reports = self.client.report(
-            MARKET_ID, SURBTC.ReportType.CANDLESTICK, start, end)
-        self.assertIn('reports', reports.keys())
+        report = self.client.report_average_prices(
+            MARKET_ID, start_at=start, end_at=end)
+        for item in report:
+            self.assertIsInstance(item, models.AveragePrice)
+
+    def test_report_candlestick(self):
+        end = datetime.now()
+        start = end - timedelta(days=30)
+        report = self.client.report_candlestick(
+            MARKET_ID, start_at=start, end_at=end)
+        for item in report:
+            self.assertIsInstance(item, models.Candlestick)
 
     def test_balance(self):
         balance = self.client.balance(SURBTC.Currency.BTC)

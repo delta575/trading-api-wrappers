@@ -411,3 +411,43 @@ class Withdrawal(Transfer):
 class Deposit(Transfer):
     address_key = 'address'
     data_key = 'deposit_data'
+
+
+class AveragePrice(
+    namedtuple('reports', [
+        'datetime',
+        'amount'
+    ])
+):
+
+    @classmethod
+    def create_from_json(cls, report):
+
+        return cls(
+            datetime=report[0],
+            amount=report[1]
+        )
+
+
+class Candlestick(
+    namedtuple('report', [
+        'datetime',
+        'open',
+        'high',
+        'low',
+        'close',
+        'volume'
+    ])
+):
+
+    @classmethod
+    def create_from_json(cls, report):
+
+        return cls(
+            datetime=report[0],
+            open=report[1],
+            high=report[2],
+            low=report[3],
+            close=report[4],
+            volume=report[5],
+        )
