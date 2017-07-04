@@ -106,7 +106,7 @@ class SURBTCAuthTest(unittest.TestCase):
             self.assertIsInstance(deposit, models.Deposit)
 
     def test_simulate_withdrawal(self):
-        simulate_withdrawal = self.client.simulate_withdraw(
+        simulate_withdrawal = self.client.simulate_withdrawal(
             currency=SURBTC.Currency.BTC, amount=0)
         self.assertIsInstance(simulate_withdrawal, models.Withdrawal)
 
