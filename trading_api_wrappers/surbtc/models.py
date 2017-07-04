@@ -8,6 +8,11 @@ def parse_datetime(datetime_str):
         return datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S.%fZ')
 
 
+def float_or_none(value):
+    if value:
+        return float(value)
+
+
 class Amount(
     namedtuple('amount', [
         'amount',
@@ -85,8 +90,8 @@ class Ticker(
             min_ask=Amount.create_from_json(ticker['min_ask']),
             max_bid=Amount.create_from_json(ticker['max_bid']),
             volume=Amount.create_from_json(ticker['volume']),
-            price_variation_24h=float(ticker['price_variation_24h']),
-            price_variation_7d=float(ticker['price_variation_7d']),
+            price_variation_24h=float_or_none(ticker['price_variation_24h']),
+            price_variation_7d=float_or_none(ticker['price_variation_7d']),
         )
 
 
