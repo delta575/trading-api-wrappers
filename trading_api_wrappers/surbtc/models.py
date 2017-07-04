@@ -34,11 +34,13 @@ class PagesMeta(
 
     @classmethod
     def create_from_json(cls, meta):
-        return cls(
-            current_page=meta['current_page'],
-            total_count=meta['total_count'],
-            total_pages=meta['total_pages']
-        )
+        if meta:
+            return cls(
+                current_page=meta['current_page'],
+                total_count=meta['total_count'],
+                total_pages=meta['total_pages']
+            )
+        return meta
 
 
 class Market(

@@ -194,7 +194,7 @@ class SURBTCAuth(SURBTCPublic):
                                       path_arg=market_id.value)
         headers = self._sign_payload(method='GET', path=path, params=params)
         data = self.get(url, headers=headers, params=params)
-        return _m.OrderPages.create_from_json(data['orders'], data['meta'])
+        return _m.OrderPages.create_from_json(data['orders'], data.get('meta'))
 
     def order_details(self, order_id: int):
         url, path = self.url_path_for(_p.SINGLE_ORDER,
