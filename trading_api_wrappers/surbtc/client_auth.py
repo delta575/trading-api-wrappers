@@ -214,18 +214,51 @@ class SURBTCAuth(SURBTCPublic):
         return _m.Order.create_from_json(data['order'])
 
     # PAYMENTS ----------------------------------------------------------------
+    def _transfers(self, currency: _c.Currency, path, model, key):
+        currency = _c.Currency.check(currency).value
+        url, path = self.url_path_for(path, path_arg=currency)
+        headers = self._sign_payload(method='GET', path=path)
+        data = self.get(url, headers=headers)
+        return [model.create_from_json(transfer)
+                for transfer in data[key]]
+
+    def withdrawals(self, currency: _c.Currency):
+        return self._transfers(currency=currency, path=_p.WITHDRAWALS,
+                               model=_m.Withdrawal, key='withdrawals')
+
+    def deposits(self, currency: _c.Currency):
+        return self._transfers(currency=currency, path=_p.DEPOSITS,
+                               model=_m.Deposit, key='deposits')
+
     # TODO: UNTESTED
-    def withdraw(self, amount, currency, target_address=None):
+    def withdrawal(self,
+                   currency: _c.Currency,
+                   amount: float,
+                   target_address,
+                   amount_includes_fee: bool=True,
+                   simulate: bool=False):
+        currency = _c.Currency.check(currency).value
         payload = {
             'withdrawal_data': {
                 'target_address': target_address,
             },
-            'amount': amount,
+            'amount': str(amount),
             'currency': currency,
+            'simulate': simulate,
+            'amount_includes_fee': amount_includes_fee,
         }
-        url, path = self.url_path_for(_p.WITHDRAWAL, path_arg=currency)
+        url, path = self.url_path_for(_p.WITHDRAWALS, path_arg=currency)
         headers = self._sign_payload(method='POST', path=path, payload=payload)
-        return self.post(url, headers=headers, data=payload)
+        data = self.post(url, headers=headers, data=payload)
+        return _m.Withdrawal.create_from_json(data['withdrawal'])
+
+    def simulate_withdrawal(self,
+                            currency: _c.Currency,
+                            amount: float,
+                            amount_includes_fee: bool=True):
+        return self.withdrawal(
+            currency=currency, amount=amount, target_address=None,
+            amount_includes_fee=amount_includes_fee, simulate=True)
 
     # PRIVATE METHODS ---------------------------------------------------------
     def _sign_payload(self, method, path, params=None, payload=None):

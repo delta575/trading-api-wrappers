@@ -18,7 +18,8 @@ class Path(object):
     BALANCES_EVENTS = 'balance_events'
     ORDERS = 'markets/%s/orders'
     SINGLE_ORDER = 'orders/%s'
-    WITHDRAWAL = 'currencies/%s/withdrawals'
+    WITHDRAWALS = 'currencies/%s/withdrawals'
+    DEPOSITS = 'currencies/%s/deposits'
 
 
 class Currency(_Enum):

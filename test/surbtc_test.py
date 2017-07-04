@@ -95,6 +95,21 @@ class SURBTCAuthTest(unittest.TestCase):
             currencies, event_names)
         self.assertIsInstance(balance_events, models.BalanceEventPages)
 
+    def test_withdrawals(self):
+        withdrawals = self.client.withdrawals(currency=SURBTC.Currency.BTC)
+        for withdrawal in withdrawals:
+            self.assertIsInstance(withdrawal, models.Withdrawal)
+
+    def test_deposits(self):
+        deposits = self.client.deposits(currency=SURBTC.Currency.BTC)
+        for deposit in deposits:
+            self.assertIsInstance(deposit, models.Deposit)
+
+    def test_simulate_withdrawal(self):
+        simulate_withdrawal = self.client.simulate_withdraw(
+            currency=SURBTC.Currency.BTC, amount=0)
+        self.assertIsInstance(simulate_withdrawal, models.Withdrawal)
+
     def test_order_pages(self):
         per_page = 10
         order_pages = self.client.order_pages(

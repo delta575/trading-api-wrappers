@@ -4,7 +4,8 @@ from datetime import datetime
 
 
 def parse_datetime(datetime_str):
-    return datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+    if datetime_str:
+        return datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S.%fZ')
 
 
 class Amount(
@@ -353,3 +354,60 @@ class TradeTransaction(
             triggering_order=Order.create_from_json(
                 transaction['triggering_order']),
         )
+
+
+class TransferData(
+    namedtuple('transfer', [
+        'type',
+        'address',
+        'tx_hash',
+    ])
+):
+
+    @classmethod
+    def create_from_json(cls, transfer, address_key):
+        return cls(
+            type=transfer['type'],
+            address=transfer[address_key],
+            tx_hash=transfer['tx_hash']
+        )
+
+
+class Transfer(
+    namedtuple('transfer', [
+        'id',
+        'created_at',
+        # 'updated_at', Missing from response?
+        'amount',
+        'fee',
+        'currency',
+        'state',
+        'data',
+    ])
+):
+    address_key = None
+    data_key = None
+
+    @classmethod
+    def create_from_json(cls, transfer):
+        return cls(
+            id=transfer['id'],
+            created_at=parse_datetime(transfer.get('created_at')),
+            amount=Amount.create_from_json(transfer['amount']),
+            # Fee is only returned on withdrawals
+            fee=Amount.create_from_json(transfer.get('fee')),
+            currency=transfer['currency'],
+            state=transfer['state'],
+            data=TransferData.create_from_json(
+                transfer[cls.data_key], cls.address_key),
+        )
+
+
+class Withdrawal(Transfer):
+    address_key = 'target_address'
+    data_key = 'withdrawal_data'
+
+
+class Deposit(Transfer):
+    address_key = 'address'
+    data_key = 'deposit_data'
