@@ -77,12 +77,21 @@ class SURBTCAuthTest(unittest.TestCase):
         for transaction in trade_transactions:
             self.assertIsInstance(transaction, models.TradeTransaction)
 
-    def test_report(self):
+    def test_report_average_prices(self):
         end = datetime.now()
         start = end - timedelta(days=30)
-        reports = self.client.report(
-            MARKET_ID, SURBTC.ReportType.CANDLESTICK, start, end)
-        self.assertIn('reports', reports.keys())
+        report = self.client.report_average_prices(
+            MARKET_ID, start_at=start, end_at=end)
+        for item in report:
+            self.assertIsInstance(item, models.AveragePrice)
+
+    def test_report_candlestick(self):
+        end = datetime.now()
+        start = end - timedelta(days=30)
+        report = self.client.report_candlestick(
+            MARKET_ID, start_at=start, end_at=end)
+        for item in report:
+            self.assertIsInstance(item, models.Candlestick)
 
     def test_balance(self):
         balance = self.client.balance(SURBTC.Currency.BTC)
@@ -94,6 +103,21 @@ class SURBTCAuthTest(unittest.TestCase):
         balance_events = self.client.balance_event_pages(
             currencies, event_names)
         self.assertIsInstance(balance_events, models.BalanceEventPages)
+
+    def test_withdrawals(self):
+        withdrawals = self.client.withdrawals(currency=SURBTC.Currency.BTC)
+        for withdrawal in withdrawals:
+            self.assertIsInstance(withdrawal, models.Withdrawal)
+
+    def test_deposits(self):
+        deposits = self.client.deposits(currency=SURBTC.Currency.BTC)
+        for deposit in deposits:
+            self.assertIsInstance(deposit, models.Deposit)
+
+    def test_simulate_withdrawal(self):
+        simulate_withdrawal = self.client.simulate_withdrawal(
+            currency=SURBTC.Currency.BTC, amount=0)
+        self.assertIsInstance(simulate_withdrawal, models.Withdrawal)
 
     def test_order_pages(self):
         per_page = 10

@@ -4,7 +4,13 @@ from datetime import datetime
 
 
 def parse_datetime(datetime_str):
-    return datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+    if datetime_str:
+        return datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+
+
+def float_or_none(value):
+    if value:
+        return float(value)
 
 
 class Amount(
@@ -34,11 +40,13 @@ class PagesMeta(
 
     @classmethod
     def create_from_json(cls, meta):
-        return cls(
-            current_page=meta['current_page'],
-            total_count=meta['total_count'],
-            total_pages=meta['total_pages']
-        )
+        if meta:
+            return cls(
+                current_page=meta['current_page'],
+                total_count=meta['total_count'],
+                total_pages=meta['total_pages']
+            )
+        return meta
 
 
 class Market(
@@ -82,8 +90,8 @@ class Ticker(
             min_ask=Amount.create_from_json(ticker['min_ask']),
             max_bid=Amount.create_from_json(ticker['max_bid']),
             volume=Amount.create_from_json(ticker['volume']),
-            price_variation_24h=float(ticker['price_variation_24h']),
-            price_variation_7d=float(ticker['price_variation_7d']),
+            price_variation_24h=float_or_none(ticker['price_variation_24h']),
+            price_variation_7d=float_or_none(ticker['price_variation_7d']),
         )
 
 
@@ -350,4 +358,101 @@ class TradeTransaction(
             bid_order=Order.create_from_json(transaction['bid']),
             triggering_order=Order.create_from_json(
                 transaction['triggering_order']),
+        )
+
+
+class TransferData(
+    namedtuple('transfer', [
+        'type',
+        'address',
+        'tx_hash',
+    ])
+):
+
+    @classmethod
+    def create_from_json(cls, transfer, address_key):
+        return cls(
+            type=transfer['type'],
+            address=transfer[address_key],
+            tx_hash=transfer['tx_hash']
+        )
+
+
+class Transfer(
+    namedtuple('transfer', [
+        'id',
+        'created_at',
+        # 'updated_at', Missing from response?
+        'amount',
+        'fee',
+        'currency',
+        'state',
+        'data',
+    ])
+):
+    address_key = None
+    data_key = None
+
+    @classmethod
+    def create_from_json(cls, transfer):
+        return cls(
+            id=transfer['id'],
+            created_at=parse_datetime(transfer.get('created_at')),
+            amount=Amount.create_from_json(transfer['amount']),
+            # Fee is only returned on withdrawals
+            fee=Amount.create_from_json(transfer.get('fee')),
+            currency=transfer['currency'],
+            state=transfer['state'],
+            data=TransferData.create_from_json(
+                transfer[cls.data_key], cls.address_key),
+        )
+
+
+class Withdrawal(Transfer):
+    address_key = 'target_address'
+    data_key = 'withdrawal_data'
+
+
+class Deposit(Transfer):
+    address_key = 'address'
+    data_key = 'deposit_data'
+
+
+class AveragePrice(
+    namedtuple('reports', [
+        'datetime',
+        'amount'
+    ])
+):
+
+    @classmethod
+    def create_from_json(cls, report):
+
+        return cls(
+            datetime=report[0],
+            amount=report[1]
+        )
+
+
+class Candlestick(
+    namedtuple('report', [
+        'datetime',
+        'open',
+        'high',
+        'low',
+        'close',
+        'volume'
+    ])
+):
+
+    @classmethod
+    def create_from_json(cls, report):
+
+        return cls(
+            datetime=report[0],
+            open=report[1],
+            high=report[2],
+            low=report[3],
+            close=report[4],
+            volume=report[5],
         )

@@ -18,18 +18,21 @@ class Path(object):
     BALANCES_EVENTS = 'balance_events'
     ORDERS = 'markets/%s/orders'
     SINGLE_ORDER = 'orders/%s'
-    WITHDRAWAL = 'currencies/%s/withdrawals'
+    WITHDRAWALS = 'currencies/%s/withdrawals'
+    DEPOSITS = 'currencies/%s/deposits'
 
 
 class Currency(_Enum):
     BTC = 'BTC'
     CLP = 'CLP'
     COP = 'COP'
+    ETH = 'ETH'
 
 
 class Market(_Enum):
     BTC_CLP = 'BTC-CLP'
     BTC_COP = 'BTC-COP'
+    ETH_CLP = 'ETH-CLP'
 
     @staticmethod
     def _format_value(value):

@@ -93,28 +93,46 @@ class SURBTCAuth(SURBTCPublic):
                 for transaction in data['trade_transactions']]
 
     # REPORTS -----------------------------------------------------------------
-    def report(self,
-               market_id: _c.Market,
-               report_type: _c.ReportType,
-               start_at: datetime=None,
-               end_at: datetime=None):
-        market_id = _c.Market.check(market_id)
-        report_type = _c.ReportType.check(report_type)
+    def _report(self,
+                market_id: _c.Market,
+                report_type: _c.ReportType,
+                start_at: datetime=None,
+                end_at: datetime=None):
+        market_id = _c.Market.check(market_id).value
+        report_type = _c.ReportType.check(report_type).value
         if isinstance(start_at, datetime):
             start_at = int(start_at.timestamp())
         if isinstance(end_at, datetime):
             end_at = int(end_at.timestamp())
         params = {
-            'report_type': report_type.value,
+            'report_type': report_type,
             'from': start_at,
             'to': end_at,
         }
-        url, path = self.url_path_for(_p.REPORTS,
-                                      path_arg=market_id.value)
+        url, path = self.url_path_for(_p.REPORTS, path_arg=market_id)
         headers = self._sign_payload(method='GET', path=path, params=params)
         data = self.get(url, headers=headers, params=params)
-        # TODO: Report doesn't have a model
         return data
+
+    def report_average_prices(self,
+                              market_id: _c.Market,
+                              start_at: datetime = None,
+                              end_at: datetime = None):
+        data = self._report(
+            market_id=market_id, report_type=_c.ReportType.AVERAGE_PRICES,
+            start_at=start_at, end_at=end_at)
+        return [_m.AveragePrice.create_from_json(report)
+                for report in data['reports']]
+
+    def report_candlestick(self,
+                           market_id: _c.Market,
+                           start_at: datetime = None,
+                           end_at: datetime = None):
+        data = self._report(
+            market_id=market_id, report_type=_c.ReportType.CANDLESTICK,
+            start_at=start_at, end_at=end_at)
+        return [_m.Candlestick.create_from_json(report)
+                for report in data['reports']]
 
     # BALANCES-----------------------------------------------------------------
     def balance(self, currency: _c.Currency):
@@ -194,7 +212,7 @@ class SURBTCAuth(SURBTCPublic):
                                       path_arg=market_id.value)
         headers = self._sign_payload(method='GET', path=path, params=params)
         data = self.get(url, headers=headers, params=params)
-        return _m.OrderPages.create_from_json(data['orders'], data['meta'])
+        return _m.OrderPages.create_from_json(data['orders'], data.get('meta'))
 
     def order_details(self, order_id: int):
         url, path = self.url_path_for(_p.SINGLE_ORDER,
@@ -214,18 +232,51 @@ class SURBTCAuth(SURBTCPublic):
         return _m.Order.create_from_json(data['order'])
 
     # PAYMENTS ----------------------------------------------------------------
+    def _transfers(self, currency: _c.Currency, path, model, key):
+        currency = _c.Currency.check(currency).value
+        url, path = self.url_path_for(path, path_arg=currency)
+        headers = self._sign_payload(method='GET', path=path)
+        data = self.get(url, headers=headers)
+        return [model.create_from_json(transfer)
+                for transfer in data[key]]
+
+    def withdrawals(self, currency: _c.Currency):
+        return self._transfers(currency=currency, path=_p.WITHDRAWALS,
+                               model=_m.Withdrawal, key='withdrawals')
+
+    def deposits(self, currency: _c.Currency):
+        return self._transfers(currency=currency, path=_p.DEPOSITS,
+                               model=_m.Deposit, key='deposits')
+
     # TODO: UNTESTED
-    def withdraw(self, amount, currency, target_address=None):
+    def withdrawal(self,
+                   currency: _c.Currency,
+                   amount: float,
+                   target_address,
+                   amount_includes_fee: bool=True,
+                   simulate: bool=False):
+        currency = _c.Currency.check(currency).value
         payload = {
             'withdrawal_data': {
                 'target_address': target_address,
             },
-            'amount': amount,
+            'amount': str(amount),
             'currency': currency,
+            'simulate': simulate,
+            'amount_includes_fee': amount_includes_fee,
         }
-        url, path = self.url_path_for(_p.WITHDRAWAL, path_arg=currency)
+        url, path = self.url_path_for(_p.WITHDRAWALS, path_arg=currency)
         headers = self._sign_payload(method='POST', path=path, payload=payload)
-        return self.post(url, headers=headers, data=payload)
+        data = self.post(url, headers=headers, data=payload)
+        return _m.Withdrawal.create_from_json(data['withdrawal'])
+
+    def simulate_withdrawal(self,
+                            currency: _c.Currency,
+                            amount: float,
+                            amount_includes_fee: bool=True):
+        return self.withdrawal(
+            currency=currency, amount=amount, target_address=None,
+            amount_includes_fee=amount_includes_fee, simulate=True)
 
     # PRIVATE METHODS ---------------------------------------------------------
     def _sign_payload(self, method, path, params=None, payload=None):
