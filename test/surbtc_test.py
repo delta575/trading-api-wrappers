@@ -115,10 +115,11 @@ class SURBTCAuthTest(unittest.TestCase):
         self.assertIsInstance(simulate_withdrawal, models.Withdrawal)
 
     def test_order_pages(self):
-        per_page = 10
+        page, per_page = 2, 10
         order_pages = self.client.order_pages(
-            MARKET_ID, page=1, per_page=per_page)
+            MARKET_ID, page=page, per_page=per_page)
         self.assertIsInstance(order_pages, models.OrderPages)
+        self.assertEqual(order_pages.meta.current_page, page)
         self.assertEqual(len(order_pages.orders), per_page)
 
     def test_order_details(self):
