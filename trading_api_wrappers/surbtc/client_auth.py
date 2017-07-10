@@ -58,22 +58,6 @@ class SURBTCAuth(SURBTCPublic):
             market_id=market_id, quotation_type=quotation_type,
             amount=amount, limit=limit)
 
-    def fee_percentage(self,
-                       market_id: _c.Market,
-                       order_type: _c.OrderType,
-                       market_order: bool=False):
-        market_id = _c.Market.check(market_id)
-        order_type = _c.OrderType.check(order_type)
-        params = {
-            'type': order_type.value,
-            'market_order': market_order,
-        }
-        url, path = self.url_path_for(_p.FEE_PERCENTAGE,
-                                      path_arg=market_id.value)
-        headers = self._sign_payload(method='GET', path=path, params=params)
-        data = self.get(url, headers=headers, params=params)
-        return _m.FeePercentage.create_from_json(data['fee_percentage'])
-
     def trade_transaction_pages(self,
                                 market_id: _c.Market,
                                 page: int=None,

@@ -67,11 +67,6 @@ class SURBTCAuthTest(unittest.TestCase):
             amount=1, limit=1)
         self.assertIsInstance(quotation, models.Quotation)
 
-    def test_fee_percentage(self):
-        fee_percentage = self.client.fee_percentage(
-            MARKET_ID, SURBTC.OrderType.ASK, market_order=False)
-        self.assertIsInstance(fee_percentage, models.FeePercentage)
-
     def test_trade_transaction_pages(self):
         trade_transactions = self.client.trade_transaction_pages(MARKET_ID)
         for transaction in trade_transactions:
