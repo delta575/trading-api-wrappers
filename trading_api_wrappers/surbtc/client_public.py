@@ -37,3 +37,18 @@ class SURBTCPublic(Client):
         url = self.url_for(_p.ORDER_BOOK, path_arg=market_id.value)
         data = self.get(url)
         return _m.OrderBook.create_from_json(data['order_book'])
+
+    def trade_transaction_pages(self,
+                                market_id: _c.Market,
+                                page: int=None,
+                                per_page: int=None):
+        market_id = _c.Market.check(market_id)
+        params = {
+            'page': page,
+            'per': per_page,
+        }
+        url, path = self.url_path_for(_p.TRADE_TRANSACTIONS,
+                                      path_arg=market_id.value)
+        data = self.get(url, params=params)
+        return _m.TradeTransactionPages.create_from_json(
+            data['trade_transactions'], data.get('meta'))

@@ -40,6 +40,14 @@ class SURBTCPublicTest(unittest.TestCase):
         order_book = self.client.order_book(MARKET_ID)
         self.assertIsInstance(order_book, models.OrderBook)
 
+    def test_trade_transaction_pages(self):
+        page, per_page = 2, 10
+        trade_trans_pages = self.client.trade_transaction_pages(
+            MARKET_ID, page=page, per_page=per_page)
+        self.assertIsInstance(trade_trans_pages, models.TradeTransactionPages)
+        self.assertEqual(trade_trans_pages.meta.current_page, page)
+        self.assertEqual(len(trade_trans_pages.trade_transactions), per_page)
+
 
 class SURBTCAuthTest(unittest.TestCase):
 
@@ -66,16 +74,6 @@ class SURBTCAuthTest(unittest.TestCase):
             MARKET_ID, quotation_type=SURBTC.QuotationType.ASK_GIVEN_SIZE,
             amount=1, limit=1)
         self.assertIsInstance(quotation, models.Quotation)
-
-    def test_fee_percentage(self):
-        fee_percentage = self.client.fee_percentage(
-            MARKET_ID, SURBTC.OrderType.ASK, market_order=False)
-        self.assertIsInstance(fee_percentage, models.FeePercentage)
-
-    def test_trade_transaction_pages(self):
-        trade_transactions = self.client.trade_transaction_pages(MARKET_ID)
-        for transaction in trade_transactions:
-            self.assertIsInstance(transaction, models.TradeTransaction)
 
     def test_report_average_prices(self):
         end = datetime.now()
@@ -120,10 +118,11 @@ class SURBTCAuthTest(unittest.TestCase):
         self.assertIsInstance(simulate_withdrawal, models.Withdrawal)
 
     def test_order_pages(self):
-        per_page = 10
+        page, per_page = 2, 10
         order_pages = self.client.order_pages(
-            MARKET_ID, page=1, per_page=per_page)
+            MARKET_ID, page=page, per_page=per_page)
         self.assertIsInstance(order_pages, models.OrderPages)
+        self.assertEqual(order_pages.meta.current_page, page)
         self.assertEqual(len(order_pages.orders), per_page)
 
     def test_order_details(self):

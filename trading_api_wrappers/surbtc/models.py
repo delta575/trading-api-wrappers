@@ -42,9 +42,9 @@ class PagesMeta(
     def create_from_json(cls, meta):
         if meta:
             return cls(
-                current_page=meta['current_page'],
-                total_count=meta['total_count'],
-                total_pages=meta['total_pages']
+                current_page=int(meta['current_page']),
+                total_count=int(meta['total_count']),
+                total_pages=int(meta['total_pages']),
             )
         return meta
 
@@ -358,6 +358,22 @@ class TradeTransaction(
             bid_order=Order.create_from_json(transaction['bid']),
             triggering_order=Order.create_from_json(
                 transaction['triggering_order']),
+        )
+
+
+class TradeTransactionPages(
+    namedtuple('trade_transaction_pages', [
+        'trade_transactions',
+        'meta',
+    ])
+):
+
+    @classmethod
+    def create_from_json(cls, transactions, pages_meta):
+        return cls(
+            trade_transactions=[TradeTransaction.create_from_json(transaction)
+                                for transaction in transactions],
+            meta=PagesMeta.create_from_json(pages_meta),
         )
 
 
