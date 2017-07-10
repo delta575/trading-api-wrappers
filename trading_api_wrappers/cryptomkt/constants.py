@@ -22,7 +22,7 @@ class Market(_Enum):
 
     @staticmethod
     def _format_value(value):
-        return f'{value[:3]}_{value[3:]}'.upper()
+        return '{0}_{1}'.format(value[:3], value[3:]).upper()
 
 
 class TimeFrame(_Enum):
