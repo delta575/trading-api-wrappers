@@ -361,6 +361,22 @@ class TradeTransaction(
         )
 
 
+class TradeTransactionPages(
+    namedtuple('trade_transaction_pages', [
+        'trade_transactions',
+        'meta',
+    ])
+):
+
+    @classmethod
+    def create_from_json(cls, transactions, pages_meta):
+        return cls(
+            trade_transactions=[TradeTransaction.create_from_json(transaction)
+                                for transaction in transactions],
+            meta=PagesMeta.create_from_json(pages_meta),
+        )
+
+
 class TransferData(
     namedtuple('transfer', [
         'type',

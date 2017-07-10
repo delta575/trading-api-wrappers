@@ -58,24 +58,6 @@ class SURBTCAuth(SURBTCPublic):
             market_id=market_id, quotation_type=quotation_type,
             amount=amount, limit=limit)
 
-    def trade_transaction_pages(self,
-                                market_id: _c.Market,
-                                page: int=None,
-                                per_page: int=None):
-        market_id = _c.Market.check(market_id)
-        # TODO: Pagination isn't working, it always returns 25 items
-        params = {
-            'page': page,
-            'per': per_page,
-        }
-        url, path = self.url_path_for(_p.TRADE_TRANSACTIONS,
-                                      path_arg=market_id.value)
-        headers = self._sign_payload(method='GET', path=path, params=params)
-        data = self.get(url, headers=headers, params=params)
-        # TODO: Response doesn't contain a meta field
-        return [_m.TradeTransaction.create_from_json(transaction)
-                for transaction in data['trade_transactions']]
-
     # REPORTS -----------------------------------------------------------------
     def _report(self,
                 market_id: _c.Market,
