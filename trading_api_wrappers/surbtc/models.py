@@ -349,10 +349,10 @@ class TradeTransaction(
             created_at=parse_datetime(transaction['created_at']),
             updated_at=parse_datetime(transaction['updated_at']),
             amount_sold=Amount.create_from_json(
-                [transaction['amount_sold'],
+                [transaction['amount_sold'] / 1e8,
                  transaction['amount_sold_currency']]),
             price_paid=Amount.create_from_json(
-                [transaction['price_paid'],
+                [transaction['price_paid'] / 1e2,
                  transaction['price_paid_currency']]),
             ask_order=Order.create_from_json(transaction['ask']),
             bid_order=Order.create_from_json(transaction['bid']),
