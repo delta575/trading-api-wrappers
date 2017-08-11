@@ -36,7 +36,7 @@ class Market(_Enum):
     BTC_PEN = 'BTC-PEN'
     ETH_BTC = 'ETH-BTC'
     ETH_CLP = 'ETH-CLP'
-    ETH_COP = 'ETH-BTC'
+    ETH_COP = 'ETH-COP'
     ETH_PEN = 'ETH-PEN'
 
     @staticmethod
