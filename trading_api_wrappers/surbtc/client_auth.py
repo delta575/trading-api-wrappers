@@ -218,7 +218,7 @@ class SURBTCAuth(SURBTCPublic):
     def withdrawal(self,
                    currency: _c.Currency,
                    amount: float,
-                   target_address,
+                   target_address: str=None,
                    amount_includes_fee: bool=True,
                    simulate: bool=False):
         currency = _c.Currency.check(currency).value
