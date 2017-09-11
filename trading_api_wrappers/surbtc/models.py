@@ -389,8 +389,8 @@ class TransferData(
     def create_from_json(cls, transfer, address_key):
         return cls(
             type=transfer['type'],
-            address=transfer[address_key],
-            tx_hash=transfer['tx_hash']
+            address=transfer.get(address_key),
+            tx_hash=transfer.get('tx_hash'),
         )
 
 
