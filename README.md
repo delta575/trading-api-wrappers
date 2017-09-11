@@ -65,7 +65,7 @@ Authenticated API:
     client = SURBTC.Auth(API_KEY, API_SECRET)
 
 SURBTC API Doc:
-https://api.surbtc.com/
+http://api.surbtc.com/
 
 ### CoinDesk
 
