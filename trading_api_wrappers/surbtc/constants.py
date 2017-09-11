@@ -27,14 +27,17 @@ class Currency(_Enum):
     CLP = 'CLP'
     COP = 'COP'
     ETH = 'ETH'
+    PEN = 'PEN'
 
 
 class Market(_Enum):
     BTC_CLP = 'BTC-CLP'
     BTC_COP = 'BTC-COP'
+    BTC_PEN = 'BTC-PEN'
     ETH_BTC = 'ETH-BTC'
     ETH_CLP = 'ETH-CLP'
-    ETH_COP = 'ETH-BTC'
+    ETH_COP = 'ETH-COP'
+    ETH_PEN = 'ETH-PEN'
 
     @staticmethod
     def _format_value(value):
