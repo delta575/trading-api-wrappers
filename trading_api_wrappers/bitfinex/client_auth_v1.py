@@ -101,16 +101,15 @@ class BitfinexAuth(BitfinexPublic):
 
     # Allow you to request a withdrawal from one of your wallet.
     def withdraw(self,
-                 currency: _c.Currency,
+                 w_type,
                  wallet,
                  amount,
                  address):
-        currency = _c.Currency.check(currency).value
         url, path = self.url_path_for(_p.WITHDRAW)
         payload = {
             'request': path,
             'nonce': gen_nonce(),
-            'withdraw_type': currency,
+            'withdraw_type': w_type,
             'walletselected': wallet,
             'amount': str(amount),
             'address': address,

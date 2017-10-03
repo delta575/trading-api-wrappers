@@ -65,6 +65,7 @@ class Symbol(_Enum):
 class Currency(_Enum):
     USD = 'usd'
     BTC = 'btc'
+    ETH = 'eth'
 
 
 # Bitfinex supported symbols
