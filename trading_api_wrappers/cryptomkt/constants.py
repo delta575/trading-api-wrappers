@@ -3,7 +3,17 @@ from ..base import _Enum
 
 # API paths
 class Path(object):
-    PRICES = '%s/%s.json'
+    MARKETS = 'market'
+    TICKER = "ticker"
+    ORDER_BOOK = 'book'
+    TRADES = 'trades'
+    ORDERS = 'orders'
+    ACTIVE_ORDER = 'orders/active'
+    EXCECUTED_ORDERS = 'orders/executed'
+    NEW_ORDER = 'orders/create'
+    ORDER_STATUS = 'orders/status'
+    CANCEL_ORDER = 'orders/cancel'
+    BALANCE = 'balance'
 
 
 class Currency(_Enum):
@@ -12,6 +22,10 @@ class Currency(_Enum):
     CLP = 'CLP'
     ETH = 'ETH'
     EUR = 'EUR'
+
+class OrderBook(_Enum):
+    BUY = 'buy'
+    SELL = 'sell'
 
 
 class Market(_Enum):
