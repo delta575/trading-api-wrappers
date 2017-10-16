@@ -80,7 +80,8 @@ http://www.coindesk.com/api
     from trading_api_wrappers import CryptoMKT
     client = CryptoMKT()    
 
-*No API Docs for CryptoMKT!*
+CryptoMKT API Doc:
+https://developers.cryptomkt.com/
 
 ## Licence
 
