@@ -77,8 +77,10 @@ http://www.coindesk.com/api
 
 ### CryptoMKT
 
+Public API:
+
     from trading_api_wrappers import CryptoMKT
-    client = CryptoMKT()    
+    client = CryptoMKT.Public()
 
 CryptoMKT API Doc:
 https://developers.cryptomkt.com/
