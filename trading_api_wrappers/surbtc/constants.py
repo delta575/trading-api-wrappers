@@ -23,6 +23,7 @@ class Path(object):
 
 
 class Currency(_Enum):
+    BCH = 'BCH'
     BTC = 'BTC'
     CLP = 'CLP'
     COP = 'COP'
@@ -31,6 +32,10 @@ class Currency(_Enum):
 
 
 class Market(_Enum):
+    BCH_BTC = 'BCH-BTC'
+    BCH_CLP = 'BCH-CLP'
+    BCH_COP = 'BCH-COP'
+    BCH_PEN = 'BCH-PEN'
     BTC_CLP = 'BTC-CLP'
     BTC_COP = 'BTC-COP'
     BTC_PEN = 'BTC-PEN'
