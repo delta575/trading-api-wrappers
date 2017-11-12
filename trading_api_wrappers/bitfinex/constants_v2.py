@@ -14,6 +14,8 @@ class Path(object):
 
 # Bitfinex supported symbols
 class Symbol(_Enum):
+    BCHUSD = 'tBCHUSD'
+    BCHBTC = 'tBCHBTC'
     BTCUSD = 'tBTCUSD'
     LTCUSD = 'tLTCUSD'
     ETHUSD = 'tETHUSD'
@@ -32,8 +34,10 @@ class Symbol(_Enum):
 
 # Bitfinex supported currencies
 class Currency(_Enum):
-    USD = 'usd'
+    BCH = 'bch'
     BTC = 'btc'
+    ETH = 'eth'
+    USD = 'usd'
 
 
 # Bitfinex supported precisions

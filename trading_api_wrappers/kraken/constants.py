@@ -39,6 +39,7 @@ class Path(object):
 
 # Kraken supported symbols
 class Symbol(_Enum):
+    BCHUSD = 'BCHUSD'
     DASHEUR = 'DASHEUR'
     DASHUSD = 'DASHUSD'
     DASHXBT = 'DASHXBT'
