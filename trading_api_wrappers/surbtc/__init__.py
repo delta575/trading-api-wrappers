@@ -2,6 +2,7 @@ from . import constants as _c
 from . import models as _m
 from .client_auth import SURBTCAuth
 from .client_public import SURBTCPublic
+from .client_standard import SURBTCStandard
 
 
 class SURBTC(object):
@@ -19,6 +20,7 @@ class SURBTC(object):
     # Clients
     Auth = SURBTCAuth
     Public = SURBTCPublic
+    Standard = SURBTCStandard
 
 
 __all__ = [

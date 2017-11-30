@@ -1,6 +1,7 @@
 from . import constants as _c
 from .client_auth import KrakenAuth
 from .client_public import KrakenPublic
+from .client_standard import KrakenStandard
 
 
 class Kraken(object):
@@ -10,6 +11,7 @@ class Kraken(object):
     # Clients
     Auth = KrakenAuth
     Public = KrakenPublic
+    Standard = KrakenStandard
 
 
 __all__ = [

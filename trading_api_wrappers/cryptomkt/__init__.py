@@ -1,6 +1,7 @@
 from . import constants as _c
 from . import models as _m
 from .client_public import CryptoMKTPublic
+from .client_standard import CryptoMKTStandard
 
 
 class CryptoMKT(CryptoMKTPublic):
@@ -13,6 +14,7 @@ class CryptoMKT(CryptoMKTPublic):
     TimeFrame = _c.TimeFrame
     # Clients
     Public = CryptoMKTPublic
+    Standard = CryptoMKTStandard
 
 
 __all__ = [
