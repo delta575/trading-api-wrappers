@@ -53,3 +53,31 @@ class SURBTCStandard(StandardClient):
             )
             for dep in deposits
         ]
+
+    def get_orders(self, base, quote, state=None):
+        market = self.get_pair_mapping(base, quote)
+        orders = self.client.order_pages(market_id=market, page=1, per_page=300, state=state)
+        for order in orders.orders:
+            yield (
+                order.id,
+                order.created_at.isoformat(),
+                order.account_id,
+                base,
+                quote,
+                order.price_type,
+                order.limit.currency if order.limit else None,
+                order.limit.amount if order.limit else None,
+                order.state,
+                order.original_amount.currency,
+                order.original_amount.amount,
+                order.traded_amount.currency,
+                order.traded_amount.amount,
+                order.traded_amount.currency,
+                order.traded_amount.amount,
+                order.amount.currency,
+                order.amount.amount,
+                order.paid_fee.currency,
+                order.paid_fee.amount,
+                order.total_exchanged.currency,
+                order.total_exchanged.amount
+            )
