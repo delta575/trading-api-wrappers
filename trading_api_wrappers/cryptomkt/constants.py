@@ -1,19 +1,24 @@
 from ..base import _Enum
 
+# Limits
+ORDERS_LIMIT = 100
+
 
 # API paths
 class Path(object):
     MARKETS = 'market'
-    TICKER = "ticker"
+    TICKER = 'ticker'
     ORDER_BOOK = 'book'
     TRADES = 'trades'
     ORDERS = 'orders'
-    ACTIVE_ORDER = 'orders/active'
-    EXCECUTED_ORDERS = 'orders/executed'
-    NEW_ORDER = 'orders/create'
+    ACTIVE_ORDERS = 'orders/active'
+    EXECUTED_ORDERS = 'orders/executed'
+    CREATE_ORDER = 'orders/create'
     ORDER_STATUS = 'orders/status'
     CANCEL_ORDER = 'orders/cancel'
     BALANCE = 'balance'
+    CREATE_PAYMENT = 'payment/new_order'
+    PAYMENT_STATUS = 'payment/status'
 
 
 class Currency(_Enum):
@@ -23,16 +28,17 @@ class Currency(_Enum):
     ETH = 'ETH'
     EUR = 'EUR'
 
-class OrderBook(_Enum):
+
+class OrderType(_Enum):
     BUY = 'buy'
     SELL = 'sell'
 
 
 class Market(_Enum):
-    ETH_ARS = 'ethars'
-    ETH_BRL = 'ethbrl'
-    ETH_CLP = 'ethclp'
-    ETH_EUR = 'etheur'
+    ETH_ARS = 'ETHARS'
+    # ETH_BRL = 'ETHBRL' Not supported yet
+    ETH_CLP = 'ETHCLP'
+    ETH_EUR = 'ETHEUR'
 
     @staticmethod
     def _format_value(value):
