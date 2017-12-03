@@ -34,9 +34,16 @@ class SURBTCStandard(StandardClient):
         )
         return [
             (
-                wdraw.id, wdraw.created_at.isoformat(), wdraw.state,
-                currency, wdraw.amount.amount, wdraw.data.address,
-                wdraw.data.tx_hash, wdraw.fee.amount
+                "surbtc-w-%s" % wdraw.id,
+                wdraw.created_at.isoformat(),
+                "surbtc",
+                wdraw.id,
+                wdraw.state,
+                currency,
+                wdraw.amount.amount,
+                wdraw.data.address,
+                wdraw.data.tx_hash,
+                wdraw.fee.amount
             )
             for wdraw in withdrawals
         ]
@@ -47,8 +54,14 @@ class SURBTCStandard(StandardClient):
         )
         return [
             (
-                dep.id, dep.created_at.isoformat(), dep.state,
-                currency, dep.amount.amount, dep.data.address,
+                "surbtc-d-%s" % dep.id,
+                dep.created_at.isoformat(),
+                "surbtc",
+                dep.id,
+                dep.state,
+                currency,
+                dep.amount.amount,
+                dep.data.address,
                 dep.data.tx_hash, dep.fee.amount
             )
             for dep in deposits
@@ -59,11 +72,14 @@ class SURBTCStandard(StandardClient):
         orders = self.client.order_pages(market_id=market, page=1, per_page=300, state=state)
         for order in orders.orders:
             yield (
-                order.id,
+                "surbtc-o-%s-%s" % (order.account_id, order.id),
                 order.created_at.isoformat(),
+                "surbtc",
                 order.account_id,
+                order.id,
                 base,
                 quote,
+                order.type,
                 order.price_type,
                 order.limit.currency if order.limit else None,
                 order.limit.amount if order.limit else None,
