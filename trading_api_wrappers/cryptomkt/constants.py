@@ -1,42 +1,43 @@
-from ..base import _Enum
+from ..base import _Enum, _Market, _Currency
+
+# Limits
+ORDERS_LIMIT = 100
 
 
 # API paths
 class Path(object):
     MARKETS = 'market'
-    TICKER = "ticker"
+    TICKER = 'ticker'
     ORDER_BOOK = 'book'
     TRADES = 'trades'
     ORDERS = 'orders'
-    ACTIVE_ORDER = 'orders/active'
-    EXCECUTED_ORDERS = 'orders/executed'
-    NEW_ORDER = 'orders/create'
+    ACTIVE_ORDERS = 'orders/active'
+    EXECUTED_ORDERS = 'orders/executed'
+    CREATE_ORDER = 'orders/create'
     ORDER_STATUS = 'orders/status'
     CANCEL_ORDER = 'orders/cancel'
     BALANCE = 'balance'
+    CREATE_PAYMENT = 'payment/new_order'
+    PAYMENT_STATUS = 'payment/status'
 
 
-class Currency(_Enum):
-    ARS = 'ARS'
-    BRL = 'BRL'
-    CLP = 'CLP'
-    ETH = 'ETH'
-    EUR = 'EUR'
+class Currency(_Currency):
+    ARS = dict(value='ARS')
+    BRL = dict(value='BRL')
+    CLP = dict(value='CLP')
+    ETH = dict(value='ETH', decimals=18)
+    EUR = dict(value='EUR')
 
-class OrderBook(_Enum):
+
+class OrderType(_Enum):
     BUY = 'buy'
     SELL = 'sell'
 
 
-class Market(_Enum):
-    ETH_ARS = 'ethars'
-    ETH_BRL = 'ethbrl'
-    ETH_CLP = 'ethclp'
-    ETH_EUR = 'etheur'
-
-    @staticmethod
-    def _format_value(value):
-        return '{0}_{1}'.format(value[:3], value[3:]).upper()
+class Market(_Market):
+    ETH_ARS = dict(value='ETHARS', base=Currency.ETH, quote=Currency.ARS)
+    ETH_CLP = dict(value='ETHCLP', base=Currency.ETH, quote=Currency.CLP)
+    ETH_EUR = dict(value='ETHEUR', base=Currency.ETH, quote=Currency.EUR)
 
 
 class TimeFrame(_Enum):
