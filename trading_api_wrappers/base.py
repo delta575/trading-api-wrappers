@@ -106,3 +106,39 @@ class _Enum(Enum):
             return cls[cls._format_value(value)]
         except KeyError:
             return cls._missing_(value)
+
+    def __str__(self):
+        return self.value
+
+
+class _Currency(_Enum):
+    @property
+    def value(self):
+        return super(_Currency, self).value['value']
+
+    @property
+    def decimals(self):
+        return super(_Currency, self).value.get('decimals', 2)
+
+
+class _Market(_Enum):
+    @staticmethod
+    def _format_value(value):
+        value = str(value).replace('-', '')
+        value = '{0}_{1}'.format(value[:3], value[3:])
+        return value.upper()
+
+    @property
+    def value(self):
+        return super(_Market, self).value['value']
+
+    @property
+    def base(self):
+        return super(_Market, self).value['base']
+
+    @property
+    def quote(self):
+        return super(_Market, self).value['quote']
+
+    def __str__(self):
+        return self.name.replace('_', '').upper()
