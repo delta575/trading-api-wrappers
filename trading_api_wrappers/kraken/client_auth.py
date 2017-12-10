@@ -1,6 +1,8 @@
 import base64
 import hashlib
 import hmac
+import sys
+from time import sleep
 from urllib.parse import urlencode
 
 # local
@@ -175,7 +177,7 @@ class KrakenAuth(KrakenPublic):
             'asset': asset,
         }
         url, path = self.url_path_for(_p.DEPOSIT_METHODS)
-        return self._sign_and_post(url, path, payload)
+        return self._sign_and_post(url, path, payload, retry=3)
 
     # Get deposit addresses
     def deposit_addresses(self, asset, method, asset_class='currency',
@@ -197,7 +199,7 @@ class KrakenAuth(KrakenPublic):
             'method': method,
         }
         url, path = self.url_path_for(_p.DEPOSIT_STATUS)
-        return self._sign_and_post(url, path, payload)
+        return self._sign_and_post(url, path, payload, retry=3)
 
     # Get withdrawal information
     def withdraw_info(self, asset, amount, key, asset_class='currency'):
@@ -208,7 +210,7 @@ class KrakenAuth(KrakenPublic):
             'key': key,
         }
         url, path = self.url_path_for(_p.WITHDRAW_INFO)
-        return self._sign_and_post(url, path, payload)
+        return self._sign_and_post(url, path, payload, retry=3)
 
     # Withdraw funds
     def withdraw(self, asset, amount, key, asset_class='currency'):
@@ -219,7 +221,7 @@ class KrakenAuth(KrakenPublic):
             'key': key,
         }
         url, path = self.url_path_for(_p.WITHDRAW)
-        return self._sign_and_post(url, path, payload)
+        return self._sign_and_post(url, path, payload, retry=3)
 
     # Get status of recent withdrawals
     def withdraw_status(self, asset, method, asset_class='currency'):
@@ -229,7 +231,7 @@ class KrakenAuth(KrakenPublic):
             'method': method,
         }
         url, path = self.url_path_for(_p.WITHDRAW_STATUS)
-        return self._sign_and_post(url, path, payload)
+        return self._sign_and_post(url, path, payload, retry=3)
 
     # Request withdrawal cancellation
     def withdraw_cancel(self, asset, refid, asset_class='currency'):
@@ -265,7 +267,17 @@ class KrakenAuth(KrakenPublic):
         return encoded_data
 
     # Packs and sign the payload and send the request with POST.
-    def _sign_and_post(self, url, path, payload):
-        payload = clean_parameters(payload)
-        signed_payload = self._sign_payload(path, payload)
-        return self.post(url, headers=signed_payload, data=payload)
+    def _sign_and_post(self, url, path, payload, retry=0, retry_delay=5):
+        clean_payload = clean_parameters(payload)
+        signed_payload = self._sign_payload(path, clean_payload)
+        try:
+            return self.post(url, headers=signed_payload, data=clean_payload)
+        except:
+            if retry > 0:
+                sleep(retry_delay)
+                print("retrying", file=sys.stderr)
+                return self._sign_and_post(
+                    url, path, payload, retry - 1, retry_delay=retry_delay * 1.5
+                )
+            else:
+                raise

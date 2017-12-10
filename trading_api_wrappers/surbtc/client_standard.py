@@ -62,7 +62,8 @@ class SURBTCStandard(StandardClient):
                 currency,
                 dep.amount.amount,
                 dep.data.address,
-                dep.data.tx_hash, dep.fee.amount
+                dep.data.tx_hash,
+                dep.fee.amount
             )
             for dep in deposits
         ]
