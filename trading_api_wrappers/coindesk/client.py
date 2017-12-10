@@ -25,6 +25,7 @@ class CoinDesk(Client):
     def rate(self, currency):
         return _Rate(self, currency)
 
+
 class _BPI(CoinDesk):
     def __init__(self, parent, currency):
         super().__init__(timeout=parent.TIMEOUT)
