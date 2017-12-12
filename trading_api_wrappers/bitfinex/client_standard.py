@@ -26,10 +26,11 @@ class BitfinexStandard(StandardClient):
         orderbook = self.client.order_book(market)
         return self.standarize_orderbook(orderbook)
 
-    def format_movements(self, row):
+    @staticmethod
+    def format_movements(row, currency):
         return (
             "bitfinex-w-%s" % row['id'],
-            datetime.fromtimestamp(row['timestamp_created']).isoformat(),
+            datetime.fromtimestamp(float(row['timestamp_created'])).isoformat(),
             "bitfinex",
             row['id'],
             row['status'],
@@ -39,22 +40,23 @@ class BitfinexStandard(StandardClient):
             row.get('txid', ''),
             row.get('fee', 0),
         )
+
     def get_withdrawals(self, currency):
         withdrawals = self.client.movements(
             currency=self.get_currency_mapping(currency)
         )
         return [
-            self.format_movements(wdraw)
+            self.format_movements(wdraw, currency)
             for wdraw in withdrawals
             if wdraw['type'] == 'WITHDRAWAL'
         ]
 
     def get_deposits(self, currency):
-        deposits = self.client.deposits(
+        withdrawals = self.client.movements(
             currency=self.get_currency_mapping(currency)
         )
         return [
-            self.format_movements(wdraw)
+            self.format_movements(wdraw, currency)
             for wdraw in withdrawals
             if wdraw['type'] == 'DEPOSIT'
         ]
