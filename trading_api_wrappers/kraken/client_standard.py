@@ -38,13 +38,9 @@ class KrakenStandard(StandardClient):
 
     def get_withdrawals(self, currency):
         kraken_currency = self.get_currency_mapping(currency)
-        methods = self.client.deposit_methods(kraken_currency)['result']
-        withdrawals = []
-        for row_method in methods:
-            method = row_method["method"]
-            withdrawals += self.client.withdraw_status(
-                kraken_currency, method, asset_class='currency'
-            )['result']
+        withdrawals = self.client.withdraw_status(
+            kraken_currency, asset_class='currency'
+        )['result']
         return [
             (
                 "kraken-w-%s" % wdraw['refid'],

@@ -224,12 +224,13 @@ class KrakenAuth(KrakenPublic):
         return self._sign_and_post(url, path, payload, retry=3)
 
     # Get status of recent withdrawals
-    def withdraw_status(self, asset, method, asset_class='currency'):
+    def withdraw_status(self, asset, method=None, asset_class='currency'):
         payload = {
             'aclass': asset_class,
             'asset': asset,
-            'method': method,
         }
+        if method is not None:
+            payload['method'] = method
         url, path = self.url_path_for(_p.WITHDRAW_STATUS)
         return self._sign_and_post(url, path, payload, retry=3)
 
