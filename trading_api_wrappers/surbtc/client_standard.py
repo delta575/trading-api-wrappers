@@ -1,5 +1,9 @@
+import pytz
+
 from ..base import StandardClient
 from .client_auth import SURBTCAuth
+
+UTC_TIMEZONE = pytz.timezone('utc')
 
 class SURBTCStandard(StandardClient):
     def __init__(self, key=False, secret=False, timeout=30):
@@ -35,7 +39,7 @@ class SURBTCStandard(StandardClient):
         return [
             (
                 "surbtc-w-%s" % wdraw.id,
-                wdraw.created_at.isoformat(),
+                wdraw.created_at.replace(tzinfo=UTC_TIMEZONE).isoformat(),
                 "surbtc",
                 wdraw.id,
                 wdraw.state,
@@ -55,7 +59,7 @@ class SURBTCStandard(StandardClient):
         return [
             (
                 "surbtc-d-%s" % dep.id,
-                dep.created_at.isoformat(),
+                dep.created_at.replace(tzinfo=UTC_TIMEZONE).isoformat(),
                 "surbtc",
                 dep.id,
                 dep.state,
@@ -74,7 +78,7 @@ class SURBTCStandard(StandardClient):
         for order in orders.orders:
             yield (
                 "surbtc-o-%s-%s" % (order.account_id, order.id),
-                order.created_at.isoformat(),
+                order.created_at.replace(tzinfo=UTC_TIMEZONE).isoformat(),
                 "surbtc",
                 order.account_id,
                 order.id,
@@ -89,12 +93,39 @@ class SURBTCStandard(StandardClient):
                 order.original_amount.amount,
                 order.traded_amount.currency,
                 order.traded_amount.amount,
-                order.traded_amount.currency,
-                order.traded_amount.amount,
                 order.amount.currency,
                 order.amount.amount,
                 order.paid_fee.currency,
                 order.paid_fee.amount,
                 order.total_exchanged.currency,
                 order.total_exchanged.amount
+            )
+
+    def get_trades(self, base, quote, state=None):
+        market = self.get_pair_mapping(base, quote)
+        trades = self.client.trade_transaction_pages(market_id=market)
+        for trade in trades.trade_transactions:
+            yield (
+                "surbtc-o-%s-%s" % (trade.account_id, trade.id),
+                trade.created_at.replace(tzinfo=UTC_TIMEZONE).isoformat(),
+                "surbtc",
+                trade.account_id,
+                trade.id,
+                base,
+                quote,
+                trade.type,
+                trade.price_type,
+                trade.limit.currency if trade.limit else None,
+                trade.limit.amount if trade.limit else None,
+                trade.state,
+                trade.original_amount.currency,
+                trade.original_amount.amount,
+                trade.traded_amount.currency,
+                trade.traded_amount.amount,
+                trade.amount.currency,
+                trade.amount.amount,
+                trade.paid_fee.currency,
+                trade.paid_fee.amount,
+                trade.total_exchanged.currency,
+                trade.total_exchanged.amount
             )
