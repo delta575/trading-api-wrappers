@@ -39,7 +39,7 @@ class SURBTCStandard(StandardClient):
         return [
             (
                 "surbtc-w-%s" % wdraw.id,
-                wdraw.created_at.replace(tzinfo=UTC_TIMEZONE).isoformat(),
+                wdraw.created_at.replace(tzinfo=UTC_TIMEZONE).isoformat().split(".")[0],
                 "surbtc",
                 wdraw.id,
                 wdraw.state,
@@ -59,7 +59,7 @@ class SURBTCStandard(StandardClient):
         return [
             (
                 "surbtc-d-%s" % dep.id,
-                dep.created_at.replace(tzinfo=UTC_TIMEZONE).isoformat(),
+                dep.created_at.replace(tzinfo=UTC_TIMEZONE).isoformat().split(".")[0],
                 "surbtc",
                 dep.id,
                 dep.state,
@@ -78,7 +78,7 @@ class SURBTCStandard(StandardClient):
         for order in orders.orders:
             yield (
                 "surbtc-o-%s-%s" % (order.account_id, order.id),
-                order.created_at.replace(tzinfo=UTC_TIMEZONE).isoformat(),
+                order.created_at.replace(tzinfo=UTC_TIMEZONE).isoformat().split(".")[0],
                 "surbtc",
                 order.account_id,
                 order.id,
@@ -109,7 +109,7 @@ class SURBTCStandard(StandardClient):
                 "surbtc-t-%s-%s" % (trade.market_id, trade.id),
                 trade.id,
                 trade.market_id,
-                trade.created_at.replace(tzinfo=UTC_TIMEZONE).isoformat(),
+                trade.created_at.replace(tzinfo=UTC_TIMEZONE).isoformat().split(".")[0],
                 "surbtc",
                 trade.ask_order.id,
                 trade.ask_order.account_id,
