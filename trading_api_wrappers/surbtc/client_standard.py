@@ -1,7 +1,10 @@
 import pytz
+from datetime import datetime
+from hashlib import md5
 
 from ..base import StandardClient
 from .client_auth import SURBTCAuth
+from . import constants
 
 UTC_TIMEZONE = pytz.timezone('utc')
 
@@ -101,31 +104,28 @@ class SURBTCStandard(StandardClient):
                 order.total_exchanged.amount
             )
 
-    def get_trades(self, base, quote, state=None):
-        market = self.get_pair_mapping(base, quote)
-        trades = self.client.trade_transaction_pages(market_id=market)
-        for trade in trades.trade_transactions:
+    def get_trades(self, base, quote, timestamp=None):
+        market_id = self.get_pair_mapping(base, quote)
+        params = {}
+        if timestamp is not None:
+            params['timestamp'] = timestamp
+
+        url, path = self.client.url_path_for(constants.Path.TRADES, path_arg=market_id)
+        data = self.client.get(url, params=params)
+
+        for trade in data['trades']['entries']:
+            timestamp_ = (1.0*int(trade[0]))/1000
+            date_iso = datetime.utcfromtimestamp(timestamp_).isoformat()
+            trade_id = md5((",".join([str(x) for x in trade])).encode('utf-8')).hexdigest()[:9]
             yield (
-                "surbtc-t-%s-%s" % (trade.market_id, trade.id),
-                trade.id,
-                trade.market_id,
-                trade.created_at.replace(tzinfo=UTC_TIMEZONE).isoformat().split(".")[0],
+                "surbtc-t-%s-%s" % (market_id, trade_id),
+                trade_id,
+                market_id,
+                date_iso,
                 "surbtc",
-                trade.ask_order.id,
-                trade.ask_order.account_id,
-                trade.ask_order.original_amount.amount,
-                trade.ask_order.original_amount.currency,
-                trade.ask_order.price_type,
-                trade.bid_order.id,
-                trade.bid_order.account_id,
-                trade.bid_order.original_amount.amount,
-                trade.bid_order.original_amount.currency,
-                trade.bid_order.price_type,
-                trade.triggering_order.id,
-                trade.triggering_order.account_id,
-                trade.triggering_order.total_exchanged.amount,
-                trade.triggering_order.total_exchanged.currency,
-                trade.triggering_order.traded_amount.amount,
-                trade.triggering_order.traded_amount.currency,
-                trade.triggering_order.type
+                base,
+                float(trade[1]),
+                quote,
+                float(trade[2]),
+                trade[3]
             )

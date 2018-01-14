@@ -13,6 +13,7 @@ class Path(object):
     QUOTATION = 'markets/%s/quotations'
     FEE_PERCENTAGE = 'markets/%s/fee_percentage'
     TRADE_TRANSACTIONS = 'markets/%s/trade_transactions'
+    TRADES = 'markets/%s/trades'
     REPORTS = 'markets/%s/reports'
     BALANCES = 'balances/%s'
     BALANCES_EVENTS = 'balance_events'
