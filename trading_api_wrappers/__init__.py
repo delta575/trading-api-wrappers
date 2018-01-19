@@ -4,6 +4,7 @@ from .cryptomkt import CryptoMKT
 from .coindesk import CoinDesk
 from .kraken import Kraken
 from .surbtc import SURBTC
+from .bitstamp import Bitstamp
 
 __all__ = [
     Bitcoinity,
@@ -13,4 +14,5 @@ __all__ = [
     CryptoMKT,
     Kraken,
     SURBTC,
+    Bitstamp
 ]
