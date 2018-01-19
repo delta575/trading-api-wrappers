@@ -28,7 +28,8 @@ class Path(object):
     ORDER_CANCEL = 'order/cancel'
     ORDER_CANCEL_ALL = 'order/cancel/all'
     ORDER_STATUS = 'order/status'
-    ORDERS = 'orders'
+    ORDERS_ACTIVE = 'orders'
+    ORDER_HISTORY = 'order/hist'
     # Positions
     POSITIONS = 'positions'
     POSITION_CLAIM = 'position/claim'

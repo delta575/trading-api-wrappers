@@ -92,7 +92,7 @@ class BitfinexAuthTest(unittest.TestCase):
         self.assertIn('amount', response[0].keys())
 
     def test_past_trades_returns_data(self):
-        response = self.client.past_trades(SYMBOL, TIMESTAMP)
+        response = self.client.past_trades(SYMBOL)
         self.assertIn('amount', response[0].keys())
 
 

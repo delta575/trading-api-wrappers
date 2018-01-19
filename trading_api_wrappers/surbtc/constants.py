@@ -1,4 +1,4 @@
-from ..base import _Enum
+from ..base import _Enum, _Market, _Currency
 
 # Limits
 ORDERS_LIMIT = 300
@@ -23,31 +23,27 @@ class Path(object):
     DEPOSITS = 'currencies/%s/deposits'
 
 
-class Currency(_Enum):
-    BCH = 'BCH'
-    BTC = 'BTC'
-    CLP = 'CLP'
-    COP = 'COP'
-    ETH = 'ETH'
-    PEN = 'PEN'
+class Currency(_Currency):
+    BCH = dict(value='BCH', decimals=8)
+    BTC = dict(value='BTC', decimals=8)
+    CLP = dict(value='CLP')
+    COP = dict(value='COP')
+    ETH = dict(value='ETH', decimals=18)
+    PEN = dict(value='PEN')
 
 
-class Market(_Enum):
-    BCH_BTC = 'BCH-BTC'
-    BCH_CLP = 'BCH-CLP'
-    BCH_COP = 'BCH-COP'
-    BCH_PEN = 'BCH-PEN'
-    BTC_CLP = 'BTC-CLP'
-    BTC_COP = 'BTC-COP'
-    BTC_PEN = 'BTC-PEN'
-    ETH_BTC = 'ETH-BTC'
-    ETH_CLP = 'ETH-CLP'
-    ETH_COP = 'ETH-COP'
-    ETH_PEN = 'ETH-PEN'
-
-    @staticmethod
-    def _format_value(value):
-        return str(value).replace('-', '_').upper()
+class Market(_Market):
+    BCH_BTC = dict(value='BCH-BTC', base=Currency.BCH, quote=Currency.BTC)
+    BCH_CLP = dict(value='BCH-CLP', base=Currency.BCH, quote=Currency.CLP)
+    BCH_COP = dict(value='BCH-COP', base=Currency.BCH, quote=Currency.COP)
+    BCH_PEN = dict(value='BCH-PEN', base=Currency.BCH, quote=Currency.PEN)
+    BTC_CLP = dict(value='BTC-CLP', base=Currency.BTC, quote=Currency.CLP)
+    BTC_COP = dict(value='BTC-COP', base=Currency.BTC, quote=Currency.COP)
+    BTC_PEN = dict(value='BTC-PEN', base=Currency.BTC, quote=Currency.PEN)
+    ETH_BTC = dict(value='ETH-BTC', base=Currency.ETH, quote=Currency.BTC)
+    ETH_CLP = dict(value='ETH-CLP', base=Currency.ETH, quote=Currency.CLP)
+    ETH_COP = dict(value='ETH-COP', base=Currency.ETH, quote=Currency.COP)
+    ETH_PEN = dict(value='ETH-PEN', base=Currency.ETH, quote=Currency.PEN)
 
 
 class QuotationType(_Enum):

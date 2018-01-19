@@ -1,5 +1,5 @@
 import time
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from urllib.parse import urlencode
 
 # local
@@ -55,3 +55,24 @@ def date_range(start_date, end_date):
 
 def current_utc_date():
     return datetime.utcnow().date()
+
+
+def format_date_iso(date_value):
+    if date is None:
+        return None
+    if isinstance(date_value, datetime):
+        date_value = date_value.date()
+    if isinstance(date_value, date):
+        date_value = date_value.isoformat()
+    return date_value
+
+
+def format_datetime_iso(date_value):
+    if date is None:
+        return None
+    if isinstance(date_value, date):
+        date_value = datetime(
+            date_value.year, date_value.month, date_value.day)
+    if isinstance(date_value, datetime):
+        date_value = date_value.isoformat()
+    return date_value

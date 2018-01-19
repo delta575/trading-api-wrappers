@@ -3,13 +3,27 @@ from datetime import datetime
 
 
 def parse_datetime(datetime_str):
-    return datetime.strptime(datetime_str, '%Y-%m-%d %H:%M')
+    if datetime_str:
+        return datetime.strptime(datetime_str, '%Y-%m-%d %H:%M')
+
 
 def parse_iso_datetime(datetime_str):
-    return datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S.%f')
+    if datetime_str:
+        return datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S.%f')
+
+
+def check_null(value):
+    return value if value != 'null' else None
+
 
 def int_or_null(value):
-    return int(value) if value != 'null' else None
+    value = check_null(value)
+    return int(value) if value else None
+
+
+def float_or_null(value):
+    value = check_null(value)
+    return float(value) if value else None
 
 
 class Pagination(
@@ -20,7 +34,6 @@ class Pagination(
         'next'
     ])
 ):
-
     @classmethod
     def create_from_json(cls, meta):
         if meta:
@@ -33,62 +46,6 @@ class Pagination(
         return meta
 
 
-class PriceCandle(
-    namedtuple('price', [
-        'candle_id',
-        'open_price',
-        'high_price',
-        'low_price',
-        'close_price',
-        'volume_sum',
-        'candle_date',
-        'tick_count',
-    ])
-):
-    @classmethod
-    def create_from_json(cls, price):
-        return cls(
-            candle_id=int(price['candle_id']),
-            open_price=float(price['open_price']),
-            high_price=float(price['hight_price']),  # Typo in API
-            low_price=float(price['low_price']),
-            close_price=float(price['close_price']),
-            volume_sum=float(price['volume_sum']),
-            candle_date=parse_datetime(price['candle_date']),
-            tick_count=int(price['tick_count']),
-        )
-
-
-class PriceCandles(
-    namedtuple('prices', [
-        'asks',
-        'bids',
-    ])
-):
-    @classmethod
-    def create_from_json(cls, prices):
-        return cls(
-            asks=[PriceCandle.create_from_json(value)
-                  for value in prices['prices_ask']['values']],
-            bids=[PriceCandle.create_from_json(entry)
-                  for entry in prices['prices_bid']['values']],
-        )
-
-
-class LastPriceCandle(
-    namedtuple('last_price', [
-        'ask',
-        'bid',
-    ])
-):
-    @classmethod
-    def create_from_data(cls, prices: PriceCandles):
-        return cls(
-            ask=prices.asks[1],
-            bid=prices.bids[1],
-        )
-
-
 class Ticker(
     namedtuple('ticker', [
         'high',
@@ -98,28 +55,29 @@ class Ticker(
         'last_price',
         'volume',
         'market',
-        'timestamp'
+        'timestamp',
     ])
 ):
-
     @classmethod
     def create_from_json(cls, ticker):
+        ticker = ticker[0]
         return cls(
-            high=float(ticker[0]['high']),
-            low=float(ticker[0]['low']),
-            ask=float(ticker[0]['ask']),
-            bid=float(ticker[0]['bid']),
-            last_price=float(ticker[0]['last_price']),
-            volume=float(ticker[0]['volume']),
-            market=ticker[0]['market'],
-            timestamp=parse_iso_datetime(ticker[0]['timestamp'])
+            high=float(ticker['high']),
+            low=float(ticker['low']),
+            ask=float(ticker['ask']),
+            bid=float(ticker['bid']),
+            last_price=float(ticker['last_price']),
+            volume=float(ticker['volume']),
+            market=ticker['market'],
+            timestamp=parse_iso_datetime(ticker['timestamp']),
         )
+
 
 class OrderBookEntry(
     namedtuple('book_entry', [
         'price',
         'amount',
-        'timestamp'
+        'timestamp',
     ])
 ):
     @classmethod
@@ -137,14 +95,14 @@ class OrderBook(
         'pagination',
     ])
 ):
-
     @classmethod
-    def create_from_json(cls, book, pagination):
+    def create_from_json(cls, order_book, pagination):
         return cls(
             order_book=[OrderBookEntry.create_from_json(book_entry)
-                        for book_entry in book],
+                        for book_entry in order_book],
             pagination=Pagination.create_from_json(pagination),
         )
+
 
 class TradesEntry(
     namedtuple('trades_entry', [
@@ -152,7 +110,7 @@ class TradesEntry(
         'timestamp',
         'price',
         'amount',
-        'market'
+        'market',
     ])
 ):
     @classmethod
@@ -162,7 +120,7 @@ class TradesEntry(
             timestamp=parse_iso_datetime(trades_entry['timestamp']),
             price=float(trades_entry['price']),
             amount=float(trades_entry['amount']),
-            market=trades_entry['market']
+            market=trades_entry['market'],
         )
 
 
@@ -172,11 +130,122 @@ class Trades(
         'pagination',
     ])
 ):
-
     @classmethod
     def create_from_json(cls, trades, pagination):
         return cls(
             trades=[TradesEntry.create_from_json(trades_entry)
-                        for trades_entry in trades],
+                    for trades_entry in trades],
+            pagination=Pagination.create_from_json(pagination),
+        )
+
+
+class WalletBalance(
+    namedtuple('wallet_balance', [
+        'available',
+        'balance',
+        'wallet',
+    ])
+):
+    @classmethod
+    def create_from_json(cls, balance):
+        return cls(
+            available=float(balance['available']),
+            balance=float(balance['balance']),
+            wallet=balance['wallet'],
+        )
+
+
+class Balance(
+    namedtuple('balance', [
+        'ARS',
+        'CLP',
+        'ETH',
+    ])
+):
+    @classmethod
+    def create_from_json(cls, balance):
+        return cls(
+            ARS=cls.get_wallet_balance(balance, 'ARS'),
+            CLP=cls.get_wallet_balance(balance, 'CLP'),
+            ETH=cls.get_wallet_balance(balance, 'ETH'),
+        )
+
+    @staticmethod
+    def get_wallet_balance(balance, wallet: str):
+        wallet = [b for b in balance if b['wallet'] == wallet]
+        return WalletBalance.create_from_json(wallet[0]) if wallet else None
+
+
+class OrderAmount(
+    namedtuple('wallet_balance', [
+        'original',
+        'remaining',
+        'executed',
+    ])
+):
+    @classmethod
+    def create_from_json(cls, amount):
+        return cls(
+            original=float(amount['original']),
+            remaining=float_or_null(amount.get('remaining')),
+            executed=float_or_null(amount.get('executed')),
+        )
+
+
+class Order(
+    namedtuple('order', [
+        'id',
+        'status',
+        'type',
+        'price',
+        'amount',
+        'execution_price',
+        'avg_execution_price',
+        'market',
+        'created_at',
+        'updated_at',
+        'executed_at',
+    ])
+):
+    @classmethod
+    def create_from_json(cls, order):
+        return cls(
+            # Order ID
+            id=order['id'],
+            # Order status, 'active' or 'executed'
+            status=order['status'],
+            # Order type, 'buy' or 'sell'
+            type=order['type'],
+            # Order limit price
+            price=float(order['price']),
+            # Order amount
+            amount=OrderAmount.create_from_json(order['amount']),
+            # Order execution price
+            execution_price=float_or_null(
+                order.get('execution_price')),
+            # Order weighted average execution, 0 if not executed
+            avg_execution_price=float_or_null(
+                order.get('avg_execution_price')),
+            # Market pair
+            market=order['market'],
+            # Order creation timestamp
+            created_at=parse_iso_datetime(order['created_at']),
+            # Order update timestamp. Only on active orders
+            updated_at=parse_iso_datetime(order.get('created_at')),
+            # Order execution timestamp. Only on executed orders
+            executed_at=parse_iso_datetime(order.get('executed_at')),
+        )
+
+
+class Orders(
+    namedtuple('orders', [
+        'orders',
+        'pagination',
+    ])
+):
+    @classmethod
+    def create_from_json(cls, orders, pagination):
+        return cls(
+            orders=[Order.create_from_json(order) for order in orders],
             pagination=Pagination.create_from_json(pagination),
         )
