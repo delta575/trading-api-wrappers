@@ -5,26 +5,26 @@ from datetime import datetime, timedelta
 from decouple import config
 
 # local
-from trading_api_wrappers import SURBTC, errors
-from trading_api_wrappers.surbtc import models
+from trading_api_wrappers import Buda, errors
+from trading_api_wrappers.buda import models
 
-TEST = config('SURBTC_TEST', cast=bool, default=True)
-API_KEY = config('SURBTC_API_KEY')
-API_SECRET = config('SURBTC_API_SECRET')
-MARKET_ID = SURBTC.Market.BTC_CLP
+TEST = config('BUDA_TEST', cast=bool, default=True)
+API_KEY = config('BUDA_API_KEY')
+API_SECRET = config('BUDA_API_SECRET')
+MARKET_ID = Buda.Market.BTC_CLP
 
 
-class SURBTCPublicTest(unittest.TestCase):
+class BudaPublicTest(unittest.TestCase):
 
     def setUp(self):
-        self.client = SURBTC.Public(TEST)
+        self.client = Buda.Public(TEST)
 
     def test_instantiate_client(self):
-        self.assertIsInstance(self.client, SURBTC.Public)
+        self.assertIsInstance(self.client, Buda.Public)
 
     def test_markets(self):
         markets = self.client.markets()
-        self.assertEqual(len(markets), len(SURBTC.Market))
+        self.assertEqual(len(markets), len(Buda.Market))
         for market in markets:
             self.assertIsInstance(market, models.Market)
 
@@ -49,29 +49,29 @@ class SURBTCPublicTest(unittest.TestCase):
         self.assertEqual(len(trade_trans_pages.trade_transactions), per_page)
 
 
-class SURBTCAuthTest(unittest.TestCase):
+class BudaAuthTest(unittest.TestCase):
 
     def setUp(self):
-        self.client = SURBTC.Auth(API_KEY, API_SECRET, TEST)
+        self.client = Buda.Auth(API_KEY, API_SECRET, TEST)
 
     def test_instantiate_client(self):
-        self.assertIsInstance(self.client, SURBTC.Auth)
+        self.assertIsInstance(self.client, Buda.Auth)
 
     def test_quotation(self):
         quotation = self.client.quotation(
-            MARKET_ID, quotation_type=SURBTC.QuotationType.ASK_GIVEN_SIZE,
+            MARKET_ID, quotation_type=Buda.QuotationType.ASK_GIVEN_SIZE,
             amount=1, limit=1)
         self.assertIsInstance(quotation, models.Quotation)
 
     def test_quotation_market(self):
         quotation = self.client.quotation(
-            MARKET_ID, quotation_type=SURBTC.QuotationType.ASK_GIVEN_SIZE,
+            MARKET_ID, quotation_type=Buda.QuotationType.ASK_GIVEN_SIZE,
             amount=1)
         self.assertIsInstance(quotation, models.Quotation)
 
     def test_quotation_limit(self):
         quotation = self.client.quotation(
-            MARKET_ID, quotation_type=SURBTC.QuotationType.ASK_GIVEN_SIZE,
+            MARKET_ID, quotation_type=Buda.QuotationType.ASK_GIVEN_SIZE,
             amount=1, limit=1)
         self.assertIsInstance(quotation, models.Quotation)
 
@@ -92,29 +92,29 @@ class SURBTCAuthTest(unittest.TestCase):
             self.assertIsInstance(item, models.Candlestick)
 
     def test_balance(self):
-        balance = self.client.balance(SURBTC.Currency.BTC)
+        balance = self.client.balance(Buda.Currency.BTC)
         self.assertIsInstance(balance, models.Balance)
 
     def test_balances_event_pages(self):
-        currencies = [item for item in SURBTC.Currency]
-        event_names = [item for item in SURBTC.BalanceEvent]
+        currencies = [item for item in Buda.Currency]
+        event_names = [item for item in Buda.BalanceEvent]
         balance_events = self.client.balance_event_pages(
             currencies, event_names)
         self.assertIsInstance(balance_events, models.BalanceEventPages)
 
     def test_withdrawals(self):
-        withdrawals = self.client.withdrawals(currency=SURBTC.Currency.BTC)
+        withdrawals = self.client.withdrawals(currency=Buda.Currency.BTC)
         for withdrawal in withdrawals:
             self.assertIsInstance(withdrawal, models.Withdrawal)
 
     def test_deposits(self):
-        deposits = self.client.deposits(currency=SURBTC.Currency.BTC)
+        deposits = self.client.deposits(currency=Buda.Currency.BTC)
         for deposit in deposits:
             self.assertIsInstance(deposit, models.Deposit)
 
     def test_simulate_withdrawal(self):
         simulate_withdrawal = self.client.simulate_withdrawal(
-            currency=SURBTC.Currency.BTC, amount=0)
+            currency=Buda.Currency.BTC, amount=0)
         self.assertIsInstance(simulate_withdrawal, models.Withdrawal)
 
     def test_order_pages(self):
@@ -136,7 +136,7 @@ class SURBTCAuthTest(unittest.TestCase):
     def test_new_order_cancel_order(self):
         # New order
         new_order = self.client.new_order(
-            MARKET_ID, SURBTC.OrderType.ASK, SURBTC.OrderPriceType.LIMIT,
+            MARKET_ID, Buda.OrderType.ASK, Buda.OrderPriceType.LIMIT,
             amount=0.001, limit=100000)
         # Cancel order
         canceled_order = self.client.cancel_order(new_order.id)
@@ -145,18 +145,18 @@ class SURBTCAuthTest(unittest.TestCase):
         self.assertIsInstance(canceled_order, models.Order)
 
 
-class SURBTCAuthTestBadApi(unittest.TestCase):
+class BudaAuthTestBadApi(unittest.TestCase):
 
     def setUp(self):
-        self.client = SURBTC.Auth('BAD_KEY', 'BAD_SECRET')
+        self.client = Buda.Auth('BAD_KEY', 'BAD_SECRET')
 
     def test_instantiate_client(self):
-        self.assertIsInstance(self.client, SURBTC.Auth)
+        self.assertIsInstance(self.client, Buda.Auth)
 
     def test_key_secret(self):
         self.assertRaises(ValueError,
-                          lambda: SURBTC.Auth())
+                          lambda: Buda.Auth())
 
     def test_balance_returns_error(self):
         self.assertRaises(errors.InvalidResponse,
-                          lambda: self.client.balance(SURBTC.Currency.CLP))
+                          lambda: self.client.balance(Buda.Currency.CLP))

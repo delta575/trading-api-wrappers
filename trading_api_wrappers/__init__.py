@@ -1,5 +1,6 @@
 from .bitcoinity import Bitcoinity
 from .bitfinex import Bitfinex, BitfinexV2
+from .buda import Buda
 from .cryptomkt import CryptoMKT
 from .coindesk import CoinDesk
 from .coinmarketcap import CoinMarketCap
@@ -11,6 +12,7 @@ __all__ = [
     Bitcoinity,
     Bitfinex,
     BitfinexV2,
+    Buda,
     CoinDesk,
     CryptoMKT,
     CoinMarketCap,

@@ -1,26 +1,31 @@
-from . import constants as _c
-from . import models as _m
-from .client_auth import SURBTCAuth
-from .client_public import SURBTCPublic
+import warnings
+
+from trading_api_wrappers.buda import Buda, BudaAuth, BudaPublic
+
+__all__ = [
+    'SURBTC',
+]
+
+deprecation_warning = (
+    'SurBTC.com has changed to Buda.com, please use the `buda` package.',
+    PendingDeprecationWarning)
 
 
-class SURBTC(object):
-    # Models
-    models = _m
-    # Enum Types
-    BalanceEvent = _c.BalanceEvent
-    Currency = _c.Currency
-    Market = _c.Market
-    OrderState = _c.OrderState
-    OrderType = _c.OrderType
-    OrderPriceType = _c.OrderPriceType
-    QuotationType = _c.QuotationType
-    ReportType = _c.ReportType
-    # Clients
+class SURBTCAuth(BudaAuth):
+    def __init__(self, *args, **kwargs):
+        warnings.warn(*deprecation_warning)
+        super(SURBTCAuth, self).__init__(*args, **kwargs)
+
+
+class SURBTCPublic(BudaPublic):
+    def __init__(self, *args, **kwargs):
+        warnings.warn(*deprecation_warning)
+        super(SURBTCPublic, self).__init__(*args, **kwargs)
+
+
+class SURBTC(Buda):
     Auth = SURBTCAuth
     Public = SURBTCPublic
 
-
-__all__ = [
-    SURBTC,
-]
+    def __init__(self):
+        warnings.warn(*deprecation_warning)

@@ -2,17 +2,17 @@
 from . import constants as _c
 from . import models as _m
 from ..base import Client
-from .server import SURBTCServer
+from .server import BudaServer
 
 _p = _c.Path
 
 
-class SURBTCPublic(Client):
+class BudaPublic(Client):
 
     error_key = 'message'
 
     def __init__(self, test=False, timeout=30):
-        Client.__init__(self, SURBTCServer(test), timeout)
+        super(BudaPublic, self).__init__(BudaServer(test), timeout)
 
     def markets(self):
         url, path = self.url_path_for(_p.MARKETS)

@@ -8,15 +8,15 @@ from datetime import datetime
 from . import constants as _c
 from . import models as _m
 from ..common import build_route, check_keys, gen_nonce
-from .client_public import SURBTCPublic
+from .client_public import BudaPublic
 
 _p = _c.Path
 
 
-class SURBTCAuth(SURBTCPublic):
+class BudaAuth(BudaPublic):
 
     def __init__(self, key=False, secret=False, test=False, timeout=30):
-        SURBTCPublic.__init__(self, test, timeout)
+        super(BudaAuth, self).__init__(test, timeout)
         check_keys(key, secret)
         self.KEY = str(key)
         self.SECRET = str(secret)

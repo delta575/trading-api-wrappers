@@ -8,7 +8,7 @@ Tested on Python 3.6
 
 - [Bitfinex](https://www.bitfinex.com)
 - [Kraken](https://www.kraken.com)
-- [SURBTC](https://www.surbtc.com)
+- [Buda](https://www.buda.com)
 - [CoinDesk](https://www.coindesk.com)
 - [CryptoMKT](https://www.cryptomkt.com)
 
@@ -68,24 +68,24 @@ client = Kraken.Auth(API_KEY, API_SECRET)
 Kraken API Doc:
 https://www.kraken.com/help/api
 
-### SURBTC
+### Buda
 
 Public API:
 
 ```python
-from trading_api_wrappers import SURBTC
-client = SURBTC.Public()
+from trading_api_wrappers import Buda
+client = Buda.Public()
 ```    
 
 Authenticated API:
 
 ```python
-from trading_api_wrappers import SURBTC
-client = SURBTC.Auth(API_KEY, API_SECRET)
+from trading_api_wrappers import Buda
+client = Buda.Auth(API_KEY, API_SECRET)
 ```
 
-SURBTC API Doc:
-https://api.surbtc.com
+Buda API Doc:
+https://api.buda.com
 
 ### CoinDesk
 
