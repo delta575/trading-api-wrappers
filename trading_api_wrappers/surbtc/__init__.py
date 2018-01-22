@@ -22,7 +22,11 @@ class SURBTC(object):
     Public = SURBTCPublic
     Standard = SURBTCStandard
 
+class Buda(SURBTC):
+    pass
+
 
 __all__ = [
     SURBTC,
+    Buda
 ]

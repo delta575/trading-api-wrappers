@@ -5,7 +5,7 @@ from .coindesk import CoinDesk
 from .coinmarketcap import CoinMarketCap
 from .kraken import Kraken
 from .oxr import OXR
-from .surbtc import SURBTC
+from .surbtc import SURBTC, Buda
 from .bitstamp import Bitstamp
 
 __all__ = [
@@ -18,5 +18,6 @@ __all__ = [
     Kraken,
     OXR,
     SURBTC,
+    Buda,
     Bitstamp
 ]

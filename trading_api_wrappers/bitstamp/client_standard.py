@@ -13,3 +13,7 @@ class BitstampStandard(StandardClient):
         self.client = BitstampAuth(
             key=str(key), secret=str(secret), customer_id=customer_id, timeout=timeout
         )
+
+    @staticmethod
+    def get_pair_mapping(base, quote):
+        return "%s%s" % (base.lower(), quote.lower())

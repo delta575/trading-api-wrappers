@@ -17,19 +17,42 @@ class BitstampAuth(BitstampPublic):
         self.customer_id = str(customer_id)
 
     # Private user data -------------------------------------------------------
-    # Get account balance.
     def balance(self):
-        url, path = self.url_path_for('balance/')
-        payload = {
-            'nonce': 0
-        }
+        url, path = self.url_path_for('v2/balance/')
+        payload = {'nonce': 0}
         return self._sign_and_post(url, path, payload)
+
+    def cancel_all_orders(self):
+        url, path = self.url_path_for('cancel_all_orders/')
+        payload = {'nonce': 0}
+        return self._sign_and_post(url, path, payload)
+
+    def buy_limit_order(self, currency_pair, amount, price):
+        url, path = self.url_path_for('/v2/buy/%s/' % currency_pair)
+        payload = {'amount': amount, 'price': price}
+        return self._sign_and_post(url, path, payload)
+
+    def buy_market_order(self, currency_pair, amount):
+        url, path = self.url_path_for('v2/buy/market/%s/' % currency_pair)
+        payload = {'amount': amount}
+        return self._sign_and_post(url, path, payload)
+
+    def withdrawal(self, currency, address, amount):
+        url, path = self.url_path_for('v2/%s_withdrawal/' % currency.lower())
+        payload = {'amount': amount, 'address': address}
+        return self._sign_and_post(url, path, payload)
+
+    def withdrawal_requests(self):
+        url, path = self.url_path_for('v2/withdrawal-requests/')
+        payload = {'nonce': 0}
+        return self._sign_and_post(url, path, payload)
+
 
     # PRIVATE METHODS ---------------------------------------------------------
     def _sign_payload(self, path, data=None):
+        data['key'] = self.key
         data['nonce'] = gen_nonce()
         msg = str(data['nonce']) + self.customer_id + self.key
-        data['key'] = self.key
         signature = hmac.new(
             self.secret.encode('utf-8'),
             msg=msg.encode('utf-8'),
