@@ -38,7 +38,13 @@ class BitstampAuth(BitstampPublic):
         return self._sign_and_post(url, path, payload)
 
     def withdrawal(self, currency, address, amount):
-        url, path = self.url_path_for('v2/%s_withdrawal/' % currency.lower())
+        if currency.lower() == 'btc':
+            target_url = 'bitcoin_withdrawal/'
+        elif currency.lower() == 'eth':
+            target_url = 'v2/eth_withdrawal/'
+        else:
+            raise Exception()
+        url, path = self.url_path_for(target_url)
         payload = {'amount': amount, 'address': address}
         return self._sign_and_post(url, path, payload)
 
