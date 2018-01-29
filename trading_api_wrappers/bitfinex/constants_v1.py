@@ -71,6 +71,7 @@ class Currency(_Enum):
     BTC = 'btc'
     ETH = 'eth'
     BCH = 'bch'
+    BFX = 'bfx'
 
 
 # Bitfinex supported symbols
