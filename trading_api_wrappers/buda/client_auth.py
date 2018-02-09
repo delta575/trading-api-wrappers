@@ -33,10 +33,8 @@ class BudaAuth(BudaPublic):
                 'limit': str(limit) if limit else None,
             },
         }
-        url, path = self.url_path_for('markets/%s/quotations',
-                                      path_arg=market_id)
-        headers = self._sign_payload(method='POST', path=path, payload=payload)
-        data = self.post(url, headers=headers, data=payload)
+        url, path = self.url_path_for('markets/%s/quotations', market_id)
+        data = self._sign_and_post(url, path, payload=payload)
         return _m.Quotation.create_from_json(data['quotation'])
 
     def quotation_market(self,
@@ -73,9 +71,8 @@ class BudaAuth(BudaPublic):
             'from': start_at,
             'to': end_at,
         }
-        url, path = self.url_path_for('markets/%s/reports', path_arg=market_id)
-        headers = self._sign_payload(method='GET', path=path, params=params)
-        data = self.get(url, headers=headers, params=params)
+        url, path = self.url_path_for('markets/%s/reports', market_id)
+        data = self._sign_and_get(url, path, params=params)
         return data
 
     def report_average_prices(self,
@@ -100,10 +97,9 @@ class BudaAuth(BudaPublic):
 
     # BALANCES-----------------------------------------------------------------
     def balance(self, currency: _c.Currency):
-        currency = _c.Currency.check(currency)
-        url, path = self.url_path_for('balances/%s', path_arg=currency.value)
-        headers = self._sign_payload(method='GET', path=path)
-        data = self.get(url, headers=headers)
+        currency = _c.Currency.check(currency).value
+        url, path = self.url_path_for('balances/%s', currency)
+        data = self._sign_and_get(url, path)
         return _m.Balance.create_from_json(data['balance'])
 
     def balance_event_pages(self,
@@ -124,8 +120,7 @@ class BudaAuth(BudaPublic):
             'relevant': relevant,
         }
         url, path = self.url_path_for('balance_events')
-        headers = self._sign_payload(method='GET', path=path, params=params)
-        data = self.get(url, headers=headers, params=params)
+        data = self._sign_and_get(url, path, params=params)
         # TODO: Response only contains a 'total_count' field instead of meta
         return _m.BalanceEventPages.create_from_json(
             data['balance_events'], data['total_count'], page)
@@ -149,11 +144,9 @@ class BudaAuth(BudaPublic):
         return self.new_order_payload(market_id, payload)
 
     def new_order_payload(self, market_id: _c.Market, payload):
-        market_id = _c.Market.check(market_id)
-        url, path = self.url_path_for('markets/%s/orders',
-                                      path_arg=market_id.value)
-        headers = self._sign_payload(method='POST', path=path, payload=payload)
-        data = self.post(url, headers=headers, data=payload)
+        market_id = _c.Market.check(market_id).value
+        url, path = self.url_path_for('markets/%s/orders', market_id)
+        data = self._sign_and_post(url, path, payload=payload)
         return _m.Order.create_from_json(data['order'])
 
     def order_pages(self,
@@ -173,35 +166,28 @@ class BudaAuth(BudaPublic):
             'state': state.value if state else state,
             'minimum_exchanged': minimum_exchanged,
         }
-        url, path = self.url_path_for('markets/%s/orders',
-                                      path_arg=market_id.value)
-        headers = self._sign_payload(method='GET', path=path, params=params)
-        data = self.get(url, headers=headers, params=params)
+        url, path = self.url_path_for('markets/%s/orders', market_id.value)
+        data = self._sign_and_get(url, path, params=params)
         return _m.OrderPages.create_from_json(data['orders'], data.get('meta'))
 
     def order_details(self, order_id: int):
-        url, path = self.url_path_for('orders/%s',
-                                      path_arg=order_id)
-        headers = self._sign_payload(method='GET', path=path)
-        data = self.get(url, headers=headers)
+        url, path = self.url_path_for('orders/%s', order_id)
+        data = self._sign_and_get(url, path)
         return _m.Order.create_from_json(data['order'])
 
     def cancel_order(self, order_id: int):
         payload = {
             'state': _c.OrderState.CANCELING.value,
         }
-        url, path = self.url_path_for('orders/%s',
-                                      path_arg=order_id)
-        headers = self._sign_payload(method='PUT', path=path, payload=payload)
-        data = self.put(url, headers=headers, data=payload)
+        url, path = self.url_path_for('orders/%s', order_id)
+        data = self._sign_and_put(url, path, payload=payload)
         return _m.Order.create_from_json(data['order'])
 
     # PAYMENTS ----------------------------------------------------------------
     def _transfers(self, currency: _c.Currency, path, model, key):
         currency = _c.Currency.check(currency).value
-        url, path = self.url_path_for(path, path_arg=currency)
-        headers = self._sign_payload(method='GET', path=path)
-        data = self.get(url, headers=headers)
+        url, path = self.url_path_for(path, currency)
+        data = self._sign_and_get(url, path)
         return [model.create_from_json(transfer)
                 for transfer in data[key]]
 
@@ -232,10 +218,8 @@ class BudaAuth(BudaPublic):
             'simulate': simulate,
             'amount_includes_fee': amount_includes_fee,
         }
-        url, path = self.url_path_for('currencies/%s/withdrawals',
-                                      path_arg=currency)
-        headers = self._sign_payload(method='POST', path=path, payload=payload)
-        data = self.post(url, headers=headers, data=payload)
+        url, path = self.url_path_for('currencies/%s/withdrawals', currency)
+        data = self._sign_and_post(url, path, payload=payload)
         return _m.Withdrawal.create_from_json(data['withdrawal'])
 
     def simulate_withdrawal(self,
@@ -255,12 +239,12 @@ class BudaAuth(BudaPublic):
         if payload:
             j = json.dumps(payload).encode('utf-8')
             encoded_body = base64.standard_b64encode(j).decode('utf-8')
-            string = method + ' ' + route + ' ' + encoded_body + ' ' + nonce
+            msg = ' '.join([method, route, encoded_body, nonce])
         else:
-            string = method + ' ' + route + ' ' + nonce
+            msg = ' '.join([method, route, nonce])
 
         h = hmac.new(key=self.SECRET.encode('utf-8'),
-                     msg=string.encode('utf-8'),
+                     msg=msg.encode('utf-8'),
                      digestmod=hashlib.sha384)
 
         signature = h.hexdigest()
@@ -271,3 +255,15 @@ class BudaAuth(BudaPublic):
             'X-SBTC-SIGNATURE': signature,
             'Content-Type': 'application/json',
         }
+
+    def _sign_and_post(self, url, path, params=None, payload=None):
+        signed_payload = self._sign_payload('POST', path, params, payload)
+        return self.post(url, headers=signed_payload, data=payload)
+
+    def _sign_and_put(self, url, path, params=None, payload=None):
+        signed_payload = self._sign_payload('PUT', path, params, payload)
+        return self.put(url, headers=signed_payload, data=payload)
+
+    def _sign_and_get(self, url, path, params=None, payload=None):
+        signed_payload = self._sign_payload('GET', path, params, payload)
+        return self.get(url, headers=signed_payload, params=params)
