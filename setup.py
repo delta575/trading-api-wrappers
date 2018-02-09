@@ -2,7 +2,7 @@ import sys
 from setuptools import setup
 
 if not (sys.version_info >= (3, 6)):
-    sys.exit('Sorry, only Python 3.6 or later is supported')
+    sys.exit('Only Python 3.6 or later is supported')
 
 setup(
     name='trading_api_wrappers',
@@ -19,11 +19,11 @@ setup(
         'trading_api_wrappers.bitstamp',
         'trading_api_wrappers.buda',
         'trading_api_wrappers.coindesk',
-        'trading_api_wrappers.cryptomkt',
         'trading_api_wrappers.coinmarketcap',
+        'trading_api_wrappers.cryptomkt',
         'trading_api_wrappers.kraken',
         'trading_api_wrappers.oxr',
-        'trading_api_wrappers.surbtc'
+        'trading_api_wrappers.surbtc',
     ],
     package_dir={
         'trading_api_wrappers': 'trading_api_wrappers',
