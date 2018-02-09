@@ -6,22 +6,13 @@ from ..common import format_date_iso, format_datetime_iso
 PROTOCOL = 'https'
 HOST = 'openexchangerates.org/api/'
 
-# API Paths
-CURRENCIES = 'currencies.json'
-LATEST = 'latest.json'
-HISTORICAL = 'historical/%s.json'
-TIME_SERIES = 'time-series.json'
-CONVERT = 'convert/%s/%s/%s'
-OHLC = 'ohlc.json'
-
 
 class OXR(Client):
 
     error_key = 'error'
 
     def __init__(self, app_id: str, timeout: int=120):
-        server = Server(PROTOCOL, HOST)
-        Client.__init__(self, server, timeout)
+        super().__init__(Server(PROTOCOL, HOST), timeout)
         self.APP_ID = str(app_id)
 
     def currencies(self):
@@ -30,7 +21,7 @@ class OXR(Client):
         Exchange Rates API, along with their full names.
         ref. https://oxr.readme.io/docs/currencies-json
         """
-        url = self.url_for(CURRENCIES)
+        url = self.url_for('currencies.json')
         data = self.get(url)
         return data
 
@@ -41,7 +32,7 @@ class OXR(Client):
         Get latest data.
         ref. https://oxr.readme.io/docs/latest-json
         """
-        url = self.url_for(LATEST)
+        url = self.url_for('latest.json')
         data = self._get_exchange_rates(url, base, symbols)
         return data
 
@@ -54,7 +45,7 @@ class OXR(Client):
         ref. https://oxr.readme.io/docs/historical-json
         """
         date_for = format_date_iso(date_for)
-        url = self.url_for(HISTORICAL, path_arg=date_for)
+        url = self.url_for('historical/%s.json', date_for)
         data = self._get_exchange_rates(url, base, symbols)
         return data
 
@@ -71,7 +62,7 @@ class OXR(Client):
             'start': format_date_iso(start),
             'end': format_date_iso(end),
         }
-        url = self.url_for(TIME_SERIES)
+        url = self.url_for('time-series.json')
         data = self._get_exchange_rates(url, base, symbols, params)
         return data
 
@@ -84,7 +75,7 @@ class OXR(Client):
         API rates.
         ref. https://oxr.readme.io/docs/convert
         """
-        url = self.url_for(CONVERT, path_arg=(value, from_symbol, to_symbol))
+        url = self.url_for('convert/%s/%s/%s', (value, from_symbol, to_symbol))
         data = self._get_exchange_rates(url)
         return data
 
@@ -101,7 +92,7 @@ class OXR(Client):
             'start_time': format_datetime_iso(start_time),
             'period': period,
         }
-        url = self.url_for(OHLC)
+        url = self.url_for('ohlc.json')
         data = self._get_exchange_rates(url, base, symbols, params)
         return data
 
