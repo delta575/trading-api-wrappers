@@ -43,18 +43,14 @@ class BudaPublic(Client):
             return data
         return _m.OrderBook.create_from_json(data['order_book'])
 
-    def trade_transaction_pages(self,
-                                market_id: str,
-                                page: int=None,
-                                per_page: int=None):
+    def trades(self,
+               market_id: str,
+               timestamp: int=None):
         params = {
-            'page': page,
-            'per': per_page,
+            'timestamp': timestamp,
         }
-        url, path = self.url_path_for('markets/%s/trade_transactions',
-                                      market_id)
+        url, path = self.url_path_for('markets/%s/trades', market_id)
         data = self.get(url, params=params)
         if self.return_json:
             return data
-        return _m.TradeTransactionPages.create_from_json(
-            data['trade_transactions'], data.get('meta'))
+        return _m.Trades.create_from_json(data['trades'])

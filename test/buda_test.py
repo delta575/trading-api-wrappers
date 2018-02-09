@@ -40,13 +40,11 @@ class BudaPublicTest(unittest.TestCase):
         order_book = self.client.order_book(MARKET_ID)
         self.assertIsInstance(order_book, models.OrderBook)
 
-    def test_trade_transaction_pages(self):
-        page, per_page = 2, 10
-        trade_trans_pages = self.client.trade_transaction_pages(
-            MARKET_ID, page=page, per_page=per_page)
-        self.assertIsInstance(trade_trans_pages, models.TradeTransactionPages)
-        self.assertEqual(trade_trans_pages.meta.current_page, page)
-        self.assertEqual(len(trade_trans_pages.trade_transactions), per_page)
+    def test_trades(self):
+        timestamp = int((datetime.now() - timedelta(days=30)).timestamp())
+        trades = self.client.trades(MARKET_ID, timestamp=timestamp)
+        self.assertIsInstance(trades, models.Trades)
+        self.assertEqual(trades.timestamp, timestamp)
 
 
 class BudaAuthTest(unittest.TestCase):
