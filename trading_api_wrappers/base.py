@@ -52,31 +52,25 @@ class Client(object):
             data=data,
             verify=True,
             timeout=self.TIMEOUT)
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            raise errors.InvalidResponse(response) from e
         json_resp = self._resp_to_json(response)
-        self._check_response(response, json_resp)
         return json_resp
 
     def _encode_data(self, data):
         data = json.dumps(data) if data else data
         return data
 
-    def _check_response(self, response: requests.Response, message: dict):
-        try:
-            has_error = bool(message.get(self.error_key))
-        except AttributeError:
-            has_error = False
-        try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            raise errors.InvalidResponse(response) from e
-        if has_error:
-            raise errors.InvalidResponse(response)
-
     def _resp_to_json(self, response):
         try:
             json_resp = response.json()
         except json.decoder.JSONDecodeError as e:
             raise errors.DecodeError() from e
+        if isinstance(json_resp, dict):
+            if bool(json_resp.get(self.error_key, False)):
+                raise errors.InvalidResponse(response)
         return json_resp
 
     def url_for(self, path, path_arg=None):
