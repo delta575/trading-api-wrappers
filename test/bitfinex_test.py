@@ -7,8 +7,6 @@ from decouple import config
 # local
 from trading_api_wrappers import errors, Bitfinex
 
-# Bitfinex API Server
-TEST = config('TEST', cast=bool, default=False)
 API_KEY = config('BFX_API_KEY')
 API_SECRET = config('BFX_API_SECRET')
 

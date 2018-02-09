@@ -16,11 +16,11 @@ class Bitfinex(object):
 
 class BitfinexV2(object):
     # Enum Types
-    # Currency = _c2.Currency
     BookPrecision = _c2.BookPrecision
     Symbol = _c2.Symbol
     # Clients
-    # Auth = BitfinexAuth
+    # TODO: Implement Bitfinex v2 Auth client
+    # Auth = BitfinexAuthV2
     Public = BitfinexPublicV2
 
 
