@@ -95,7 +95,7 @@ class BitfinexAuth(BitfinexPublic):
             'type': str(ord_type),
             'ocoorder': False,
         }
-        payload.update(params)
+        payload.update(params or {})
         return self._sign_and_post('order/new', payload)
 
     # Submit a new order.
