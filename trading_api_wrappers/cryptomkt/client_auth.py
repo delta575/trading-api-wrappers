@@ -5,100 +5,110 @@ import time
 # local
 from . import constants as _c
 from . import models as _m
-from ..common import check_keys, clean_parameters
 from .client_public import CryptoMKTPublic
-
-_p = _c.Path
+from ..common import check_keys, clean_parameters
 
 
 class CryptoMKTAuth(CryptoMKTPublic):
 
-    def __init__(self, key=False, secret=False, timeout=30):
-        CryptoMKTPublic.__init__(self, timeout)
+    def __init__(self, key: str=False, secret: str=False, timeout: int=30,
+                 return_json=False):
+        super().__init__(timeout, return_json)
         check_keys(key, secret)
         self.KEY = str(key)
         self.SECRET = str(secret)
 
     # BALANCE------------------------------------------------------------------
     def balance(self):
-        url, path = self.url_path_for(_p.BALANCE)
+        url, path = self.url_path_for('balance')
         headers = self._sign_payload(path=path)
         data = self.get(url, headers=headers)
+        if self.return_json:
+            return data
         return _m.Balance.create_from_json(data['data'])
 
-    def wallet_balance(self, currency: _c.Currency):
-        currency = _c.Currency.check(currency).value
+    def wallet_balance(self, currency: str):
         balance = self.balance()
-        return getattr(balance, currency)
+        return getattr(balance, str(currency))
 
     # ORDERS-------------------------------------------------------------------
     def active_orders(self,
-                      market_id: _c.Market,
+                      market_id: str,
                       page: int=None,
                       limit: int=_c.ORDERS_LIMIT):
         params = {
-            'market': _c.Market.check(market_id).value,
+            'market': str(market_id),
             'page': page,
             'limit': limit,
         }
-        url, path = self.url_path_for(_p.ACTIVE_ORDERS)
+        url, path = self.url_path_for('orders/active')
         headers = self._sign_payload(path=path)
         data = self.get(url, headers=headers, params=params)
+        if self.return_json:
+            return data
         return _m.Orders.create_from_json(data['data'], data['pagination'])
 
     def executed_orders(self,
-                        market_id: _c.Market,
+                        market_id: str,
                         page: int=None,
                         limit: int=_c.ORDERS_LIMIT):
         params = {
-            'market': _c.Market.check(market_id).value,
+            'market': str(market_id),
             'page': page,
             'limit': limit,
         }
-        url, path = self.url_path_for(_p.EXECUTED_ORDERS)
+        url, path = self.url_path_for('orders/executed')
         headers = self._sign_payload(path=path)
         data = self.get(url, headers=headers, params=params)
+        if self.return_json:
+            return data
         return _m.Orders.create_from_json(data['data'], data['pagination'])
 
     def create_order(self,
-                     market_id: _c.Market,
-                     order_type: _c.OrderType,
+                     market_id: str,
+                     order_type: str,
                      amount: float,
                      price: float):
         payload = {
-            'market': _c.Market.check(market_id).value,
-            'type': _c.OrderType.check(order_type).value,
-            'amount': str(amount),
-            'price': str(price),
+            'market': str(market_id),
+            'type': str(order_type),
+            'amount': amount,
+            'price': price,
         }
-        url, path = self.url_path_for(_p.CREATE_ORDER)
+        url, path = self.url_path_for('orders/create')
         headers = self._sign_payload(path=path, payload=payload)
         data = self.post(url, headers=headers, data=payload)
+        if self.return_json:
+            return data
         return _m.Order.create_from_json(data['data'])
 
     def order_status(self, order_id: str):
         params = {
             'id': order_id,
         }
-        url, path = self.url_path_for(_p.ORDER_STATUS)
+        url, path = self.url_path_for('orders/status')
         headers = self._sign_payload(path=path)
         data = self.get(url, headers=headers, params=params)
+        if self.return_json:
+            return data
         return _m.Order.create_from_json(data['data'])
 
     def cancel_order(self, order_id: str):
         payload = {
             'id': order_id,
         }
-        url, path = self.url_path_for(_p.CANCEL_ORDER)
+        url, path = self.url_path_for('orders/cancel')
         headers = self._sign_payload(path=path, payload=payload)
         data = self.post(url, headers=headers, data=payload)
+        if self.return_json:
+            return data
         return _m.Order.create_from_json(data['data'])
 
     # PAYMENTS-----------------------------------------------------------------
     # TODO: Not tested
     def create_payment(self,
                        amount: float,
-                       currency: _c.Currency,
+                       currency: str,
                        account_email: str,
                        external_id: str=None,
                        callback_url: str=None,
@@ -107,7 +117,7 @@ class CryptoMKTAuth(CryptoMKTPublic):
                        refund_email: str=None):
         payload = {
             'to_receive': amount,
-            'to_receive_currency': _c.Currency.check(currency).value,
+            'to_receive_currency': str(currency),
             'payment_receiver': account_email,
             'external_id': external_id,
             'callback_url': callback_url,
@@ -116,9 +126,11 @@ class CryptoMKTAuth(CryptoMKTPublic):
             'refund_email': refund_email,
         }
         payload = clean_parameters(payload)
-        url, path = self.url_path_for(_p.CREATE_PAYMENT)
+        url, path = self.url_path_for('payment/new_order')
         headers = self._sign_payload(path=path, payload=payload)
         data = self.post(url, headers=headers, data=payload)
+        if self.return_json:
+            return data
         return data
 
     # TODO: Not tested
@@ -126,13 +138,13 @@ class CryptoMKTAuth(CryptoMKTPublic):
         params = {
             'id': payment_id,
         }
-        url, path = self.url_path_for(_p.PAYMENT_STATUS)
+        url, path = self.url_path_for('payment/status')
         headers = self._sign_payload(path=path)
         data = self.get(url, headers=headers, params=params)
         return data
 
     # PRIVATE METHODS ---------------------------------------------------------
-    def _sign_payload(self, path, payload=None):
+    def _sign_payload(self, path: str, payload: dict=None):
 
         timestamp = str(int(time.time()))
         msg = timestamp + path

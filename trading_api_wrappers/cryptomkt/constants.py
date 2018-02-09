@@ -4,23 +4,6 @@ from ..base import _Enum, _Market, _Currency
 ORDERS_LIMIT = 100
 
 
-# API paths
-class Path(object):
-    MARKETS = 'market'
-    TICKER = 'ticker'
-    ORDER_BOOK = 'book'
-    TRADES = 'trades'
-    ORDERS = 'orders'
-    ACTIVE_ORDERS = 'orders/active'
-    EXECUTED_ORDERS = 'orders/executed'
-    CREATE_ORDER = 'orders/create'
-    ORDER_STATUS = 'orders/status'
-    CANCEL_ORDER = 'orders/cancel'
-    BALANCE = 'balance'
-    CREATE_PAYMENT = 'payment/new_order'
-    PAYMENT_STATUS = 'payment/status'
-
-
 class Currency(_Currency):
     ARS = dict(value='ARS')
     BRL = dict(value='BRL')
