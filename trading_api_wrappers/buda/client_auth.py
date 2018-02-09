@@ -10,8 +10,6 @@ from . import models as _m
 from ..common import build_route, check_keys, gen_nonce
 from .client_public import BudaPublic
 
-_p = _c.Path
-
 
 class BudaAuth(BudaPublic):
 
@@ -35,7 +33,7 @@ class BudaAuth(BudaPublic):
                 'limit': str(limit) if limit else None,
             },
         }
-        url, path = self.url_path_for(_p.QUOTATION,
+        url, path = self.url_path_for('markets/%s/quotations',
                                       path_arg=market_id)
         headers = self._sign_payload(method='POST', path=path, payload=payload)
         data = self.post(url, headers=headers, data=payload)
@@ -75,7 +73,7 @@ class BudaAuth(BudaPublic):
             'from': start_at,
             'to': end_at,
         }
-        url, path = self.url_path_for(_p.REPORTS, path_arg=market_id)
+        url, path = self.url_path_for('markets/%s/reports', path_arg=market_id)
         headers = self._sign_payload(method='GET', path=path, params=params)
         data = self.get(url, headers=headers, params=params)
         return data
@@ -103,7 +101,7 @@ class BudaAuth(BudaPublic):
     # BALANCES-----------------------------------------------------------------
     def balance(self, currency: _c.Currency):
         currency = _c.Currency.check(currency)
-        url, path = self.url_path_for(_p.BALANCES, path_arg=currency.value)
+        url, path = self.url_path_for('balances/%s', path_arg=currency.value)
         headers = self._sign_payload(method='GET', path=path)
         data = self.get(url, headers=headers)
         return _m.Balance.create_from_json(data['balance'])
@@ -125,7 +123,7 @@ class BudaAuth(BudaPublic):
             'per': per_page,
             'relevant': relevant,
         }
-        url, path = self.url_path_for(_p.BALANCES_EVENTS)
+        url, path = self.url_path_for('balance_events')
         headers = self._sign_payload(method='GET', path=path, params=params)
         data = self.get(url, headers=headers, params=params)
         # TODO: Response only contains a 'total_count' field instead of meta
@@ -152,7 +150,8 @@ class BudaAuth(BudaPublic):
 
     def new_order_payload(self, market_id: _c.Market, payload):
         market_id = _c.Market.check(market_id)
-        url, path = self.url_path_for(_p.ORDERS, path_arg=market_id.value)
+        url, path = self.url_path_for('markets/%s/orders',
+                                      path_arg=market_id.value)
         headers = self._sign_payload(method='POST', path=path, payload=payload)
         data = self.post(url, headers=headers, data=payload)
         return _m.Order.create_from_json(data['order'])
@@ -174,14 +173,14 @@ class BudaAuth(BudaPublic):
             'state': state.value if state else state,
             'minimum_exchanged': minimum_exchanged,
         }
-        url, path = self.url_path_for(_p.ORDERS,
+        url, path = self.url_path_for('markets/%s/orders',
                                       path_arg=market_id.value)
         headers = self._sign_payload(method='GET', path=path, params=params)
         data = self.get(url, headers=headers, params=params)
         return _m.OrderPages.create_from_json(data['orders'], data.get('meta'))
 
     def order_details(self, order_id: int):
-        url, path = self.url_path_for(_p.SINGLE_ORDER,
+        url, path = self.url_path_for('orders/%s',
                                       path_arg=order_id)
         headers = self._sign_payload(method='GET', path=path)
         data = self.get(url, headers=headers)
@@ -191,7 +190,7 @@ class BudaAuth(BudaPublic):
         payload = {
             'state': _c.OrderState.CANCELING.value,
         }
-        url, path = self.url_path_for(_p.SINGLE_ORDER,
+        url, path = self.url_path_for('orders/%s',
                                       path_arg=order_id)
         headers = self._sign_payload(method='PUT', path=path, payload=payload)
         data = self.put(url, headers=headers, data=payload)
@@ -207,11 +206,13 @@ class BudaAuth(BudaPublic):
                 for transfer in data[key]]
 
     def withdrawals(self, currency: _c.Currency):
-        return self._transfers(currency=currency, path=_p.WITHDRAWALS,
+        return self._transfers(currency=currency,
+                               path='currencies/%s/withdrawals',
                                model=_m.Withdrawal, key='withdrawals')
 
     def deposits(self, currency: _c.Currency):
-        return self._transfers(currency=currency, path=_p.DEPOSITS,
+        return self._transfers(currency=currency,
+                               path='currencies/%s/deposits',
                                model=_m.Deposit, key='deposits')
 
     # TODO: UNTESTED
@@ -231,7 +232,8 @@ class BudaAuth(BudaPublic):
             'simulate': simulate,
             'amount_includes_fee': amount_includes_fee,
         }
-        url, path = self.url_path_for(_p.WITHDRAWALS, path_arg=currency)
+        url, path = self.url_path_for('currencies/%s/withdrawals',
+                                      path_arg=currency)
         headers = self._sign_payload(method='POST', path=path, payload=payload)
         data = self.post(url, headers=headers, data=payload)
         return _m.Withdrawal.create_from_json(data['withdrawal'])
