@@ -16,6 +16,7 @@ setup(
         'trading_api_wrappers',
         'trading_api_wrappers.bitcoinity',
         'trading_api_wrappers.bitfinex',
+        'trading_api_wrappers.bitstamp',
         'trading_api_wrappers.buda',
         'trading_api_wrappers.coindesk',
         'trading_api_wrappers.cryptomkt',
