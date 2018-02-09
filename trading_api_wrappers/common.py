@@ -41,13 +41,6 @@ def clean_parameters(parameters: dict):
         return {k: v for k, v in parameters.items() if v is not None}
 
 
-def update_dictionary(old_dict: dict, new_dict: dict):
-    if new_dict:
-        keys = list(new_dict.keys())
-        for k in keys:
-            old_dict[k] = new_dict[k]
-
-
 def date_range(start_date, end_date):
     for n in range(int((end_date - start_date).days)):
         yield start_date + timedelta(n)
