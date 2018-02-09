@@ -3,6 +3,10 @@ from . import models as _m
 from .client_auth import CryptoMKTAuth
 from .client_public import CryptoMKTPublic
 
+__all__ = [
+    'CryptoMKT',
+]
+
 
 class CryptoMKT(object):
     # Models
@@ -14,8 +18,3 @@ class CryptoMKT(object):
     # Clients
     Auth = CryptoMKTAuth
     Public = CryptoMKTPublic
-
-
-__all__ = [
-    CryptoMKT,
-]

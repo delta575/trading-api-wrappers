@@ -2,6 +2,10 @@ from . import constants as _c
 from .client_auth import BitstampAuth
 from .client_public import BitstampPublic
 
+__all__ = [
+    'Bitstamp',
+]
+
 
 class Bitstamp(object):
     # Enum Types
@@ -10,8 +14,3 @@ class Bitstamp(object):
     # Clients
     Auth = BitstampAuth
     Public = BitstampPublic
-
-
-__all__ = [
-    'Bitstamp',
-]

@@ -3,6 +3,10 @@ from . import models as _m
 from .client_auth import BudaAuth
 from .client_public import BudaPublic
 
+__all__ = [
+    'Buda',
+]
+
 
 class Buda(object):
     # Models
@@ -19,8 +23,3 @@ class Buda(object):
     # Clients
     Auth = BudaAuth
     Public = BudaPublic
-
-
-__all__ = [
-    Buda,
-]
