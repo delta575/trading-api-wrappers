@@ -4,17 +4,14 @@ import hmac
 from urllib.parse import urlencode
 
 # local
-from . import constants as _c
-from ..common import check_keys, clean_parameters, gen_nonce
 from .client_public import KrakenPublic
-
-_p = _c.Path
+from ..common import check_keys, clean_parameters, gen_nonce
 
 
 class KrakenAuth(KrakenPublic):
 
-    def __init__(self, key=False, secret=False, timeout=30):
-        KrakenPublic.__init__(self, timeout)
+    def __init__(self, key: str=False, secret: str=False, timeout: int=30):
+        super().__init__(timeout)
         check_keys(key, secret)
         self.KEY = str(key)
         self.SECRET = str(secret)
@@ -22,34 +19,39 @@ class KrakenAuth(KrakenPublic):
     # Private user data -------------------------------------------------------
     # Get account balance.
     def balance(self):
-        url, path = self.url_path_for(_p.BALANCE)
-        payload = {
-            'nonce': 0
-        }
-        return self._sign_and_post(url, path, payload)
+        url, path = self.url_path_for('private/Balance')
+        return self._sign_and_post(url, path, payload={})
 
     # Get trade balance.
-    def trade_balance(self, asset=_c.Currency.ZUSD.value,
-                      asset_class='currency'):
+    def trade_balance(self,
+                      asset: str=None,
+                      asset_class: str=None):
         payload = {
-            'asset': asset,
-            'aclass': asset_class,
+            'asset': str(asset) if asset else None,
+            'aclass': str(asset_class) if asset_class else None,
         }
-        url, path = self.url_path_for(_p.TRADE_BALANCE)
+        url, path = self.url_path_for('private/TradeBalance')
         return self._sign_and_post(url, path, payload)
 
     # Get open orders.
-    def open_orders(self, include_trades=False, userref=None):
+    def open_orders(self,
+                    include_trades: bool=None,
+                    userref: str=None):
         payload = {
             'trades': include_trades,
             'userref': userref,
         }
-        url, path = self.url_path_for(_p.OPEN_ORDERS)
+        url, path = self.url_path_for('private/OpenOrders')
         return self._sign_and_post(url, path, payload)
 
     # Get closed orders.
-    def closed_orders(self, include_trades=False, userref=None, start=None,
-                      end=None, ofs=None, closetime='both'):
+    def closed_orders(self,
+                      include_trades: bool=None,
+                      userref: str=None,
+                      start: int=None,
+                      end: int=None,
+                      ofs: int=None,
+                      closetime: int=None):
         payload = {
             'trades': include_trades,
             'userref': userref,
@@ -58,91 +60,121 @@ class KrakenAuth(KrakenPublic):
             'ofs': ofs,
             'closetime': closetime,
         }
-        url, path = self.url_path_for(_p.CLOSED_ORDERS)
+        url, path = self.url_path_for('private/ClosedOrders')
         return self._sign_and_post(url, path, payload)
 
     # Query orders info.
-    def query_orders(self, txid=None, include_trades=False, userref=None):
+    def query_orders(self,
+                     txid: list,
+                     include_trades: bool=None,
+                     userref: str=None):
         payload = {
+            'txid': txid,
             'trades': include_trades,
             'userref': userref,
-            'txid': txid,
         }
-        url, path = self.url_path_for(_p.QUERY_ORDERS)
+        url, path = self.url_path_for('private/QueryOrders')
         return self._sign_and_post(url, path, payload)
 
     # Get trades history.
-    def trades_history(self, trade_type='all', include_trades=False,
-                       start=None, end=None, ofs=None):
+    def trades_history(self,
+                       trade_type: str=None,
+                       include_trades: bool=None,
+                       start: int=None,
+                       end: int=None,
+                       ofs: int=None):
         payload = {
-            'type': trade_type,
+            'type': str(trade_type) if trade_type else None,
             'trades': include_trades,
             'start': start,
             'end': end,
             'ofs': ofs,
         }
-        url, path = self.url_path_for(_p.TRADES_HISTORY)
+        url, path = self.url_path_for('private/TradesHistory')
         return self._sign_and_post(url, path, payload)
 
     # Query trades info.
-    def query_trades(self, txid, include_trades=False):
+    def query_trades(self,
+                     txid: list,
+                     include_trades: bool=None):
         payload = {
             'txid': txid,
             'trades': include_trades,
         }
-        url, path = self.url_path_for(_p.QUERY_TRADES)
+        url, path = self.url_path_for('private/QueryTrades')
         return self._sign_and_post(url, path, payload)
 
     # Query trades info.
-    def open_positions(self, txid=None, include_pl=False):
+    def open_positions(self,
+                       txid: list,
+                       include_pl: bool=None):
         payload = {
             'txid': txid,
             'docalcs': include_pl,
         }
-        url, path = self.url_path_for(_p.OPEN_POSITIONS)
+        url, path = self.url_path_for('private/OpenPositions')
         return self._sign_and_post(url, path, payload)
 
     # Get ledgers info.
-    def ledgers(self, asset_class='currency', asset='all', ledger_type='all',
-                start=None, end=None, ofs=None):
+    def ledgers(self,
+                asset_class: str=None,
+                asset: str=None,
+                ledger_type: str=None,
+                start: int=None,
+                end: int=None,
+                ofs: int=None):
         payload = {
-            'aclass': asset_class,
-            'asset': asset,
-            'type': ledger_type,
+            'aclass': str(asset_class) if asset_class else None,
+            'asset': str(asset) if asset else None,
+            'type': str(ledger_type) if ledger_type else None,
             'start': start,
             'end': end,
             'ofs': ofs,
         }
-        url, path = self.url_path_for(_p.LEDGERS)
+        url, path = self.url_path_for('private/Ledgers')
         return self._sign_and_post(url, path, payload)
 
     # Query ledgers.
-    def query_ledgers(self, ledger_id):
+    def query_ledgers(self, ledger_id: str):
         payload = {
             'id': ledger_id,
         }
-        url, path = self.url_path_for(_p.QUERY_LEDGERS)
+        url, path = self.url_path_for('private/QueryLedgers')
         return self._sign_and_post(url, path, payload)
 
     # Get trade volume.
-    def trade_volume(self, pair=None, fee_info=None):
+    def trade_volume(self,
+                     pair: str=None,
+                     fee_info: bool=None):
         payload = {
-            'pair': pair,
+            'pair': str(pair) if pair else None,
             'fee-info': fee_info,
         }
-        url, path = self.url_path_for(_p.TRADE_VOLUME)
+        url, path = self.url_path_for('private/TradeVolume')
         return self._sign_and_post(url, path, payload)
 
     # Private user trading  ---------------------------------------------------
     # Add standard order
-    def add_order(self, pair, direction, order_type, price, volume,
-                  price2=None, leverage=None, oflags=None, starttm=0,
-                  expiretm=0, userref=None, validate=None, c_ordertype=None,
-                  c_price=None, c_price2=None):
+    def add_order(self,
+                  pair: str,
+                  direction: str,
+                  order_type: str,
+                  volume: float,
+                  price: float=None,
+                  price2: float=None,
+                  leverage: float=None,
+                  oflags: list=None,
+                  starttm: int=None,
+                  expiretm: int=None,
+                  userref: str=None,
+                  validate: bool=None,
+                  c_ordertype: str=None,
+                  c_price: float=None,
+                  c_price2: float=None):
         payload = {
-            'pair': pair,
-            'type': direction,
-            'ordertype': order_type,
+            'pair': str(pair),
+            'type': str(direction),
+            'ordertype': str(order_type),
             'price': price,
             'price2': price2,
             'volume': volume,
@@ -152,97 +184,119 @@ class KrakenAuth(KrakenPublic):
             'expiretm': expiretm,
             'userref': userref,
             'validate': validate,
-            'close[ordertype]': c_ordertype,
+            'close[ordertype]': str(c_ordertype) if order_type else None,
             'close[price]': c_price,
             'close[price2]': c_price2,
         }
-        url, path = self.url_path_for(_p.ADD_ORDER)
+        url, path = self.url_path_for('private/AddOrder')
         return self._sign_and_post(url, path, payload)
 
     # Cancel open order
-    def cancel_order(self, txid):
+    def cancel_order(self, txid: str):
         payload = {
             'txid': txid,
         }
-        url, path = self.url_path_for(_p.CANCEL_ORDER)
+        url, path = self.url_path_for('private/CancelOrder')
         return self._sign_and_post(url, path, payload)
 
     # Private user funding  ---------------------------------------------------
     # Get deposit methods.
-    def deposit_methods(self, asset, asset_class='currency'):
+    def deposit_methods(self,
+                        asset: str,
+                        asset_class: str=None):
         payload = {
-            'aclass': asset_class,
-            'asset': asset,
+            'asset': str(asset),
+            'aclass': str(asset_class) if asset_class else None,
         }
-        url, path = self.url_path_for(_p.DEPOSIT_METHODS)
+        url, path = self.url_path_for('private/DepositMethods')
         return self._sign_and_post(url, path, payload)
 
     # Get deposit addresses
-    def deposit_addresses(self, asset, method, asset_class='currency',
-                          new=False):
+    def deposit_addresses(self,
+                          asset: str,
+                          method: str,
+                          asset_class: str=None,
+                          new: bool=None):
         payload = {
-            'aclass': asset_class,
-            'asset': asset,
-            'method': method,
+            'asset': str(asset),
+            'method': str(method),
+            'aclass': str(asset_class) if asset_class else None,
             'new': new,
         }
-        url, path = self.url_path_for(_p.DEPOSIT_ADDRESSES)
+        url, path = self.url_path_for('private/DepositAddresses')
         return self._sign_and_post(url, path, payload)
 
     # Get status of recent deposits
-    def deposit_status(self, asset, method, asset_class='currency'):
+    def deposit_status(self,
+                       asset: str,
+                       method: str,
+                       asset_class: str=None):
         payload = {
-            'aclass': asset_class,
-            'asset': asset,
-            'method': method,
+            'asset': str(asset),
+            'method': str(method),
+            'aclass': str(asset_class) if asset_class else None,
         }
-        url, path = self.url_path_for(_p.DEPOSIT_STATUS)
+        url, path = self.url_path_for('private/DepositStatus')
         return self._sign_and_post(url, path, payload)
 
     # Get withdrawal information
-    def withdraw_info(self, asset, amount, key, asset_class='currency'):
+    def withdraw_info(self,
+                      asset: str,
+                      amount: float,
+                      key: str,
+                      asset_class: str=None):
         payload = {
-            'aclass': asset_class,
-            'asset': asset,
+            'asset': str(asset),
+            'aclass': str(asset_class) if asset_class else None,
             'amount': amount,
             'key': key,
         }
-        url, path = self.url_path_for(_p.WITHDRAW_INFO)
+        url, path = self.url_path_for('private/WithdrawInfo')
         return self._sign_and_post(url, path, payload)
 
     # Withdraw funds
-    def withdraw(self, asset, amount, key, asset_class='currency'):
+    def withdraw(self,
+                 asset: str,
+                 amount: float,
+                 key: str,
+                 asset_class: str=None):
         payload = {
-            'aclass': asset_class,
-            'asset': asset,
+            'asset': str(asset),
+            'aclass': str(asset_class) if asset_class else None,
             'amount': amount,
             'key': key,
         }
-        url, path = self.url_path_for(_p.WITHDRAW)
+        url, path = self.url_path_for('private/Withdraw')
         return self._sign_and_post(url, path, payload)
 
     # Get status of recent withdrawals
-    def withdraw_status(self, asset, method, asset_class='currency'):
+    def withdraw_status(self,
+                        asset: str,
+                        method: str,
+                        asset_class: str=None):
         payload = {
-            'aclass': asset_class,
-            'asset': asset,
-            'method': method,
+            'asset': str(asset),
+            'method': str(method),
+            'aclass': str(asset_class) if asset_class else None,
         }
-        url, path = self.url_path_for(_p.WITHDRAW_STATUS)
+        url, path = self.url_path_for('private/WithdrawStatus')
         return self._sign_and_post(url, path, payload)
 
     # Request withdrawal cancellation
-    def withdraw_cancel(self, asset, refid, asset_class='currency'):
+    def withdraw_cancel(self,
+                        asset: str,
+                        refid: str,
+                        asset_class: str=None):
         payload = {
-            'aclass': asset_class,
-            'asset': asset,
+            'asset': str(asset),
+            'aclass': str(asset_class) if asset_class else None,
             'refid': refid,
         }
-        url, path = self.url_path_for(_p.WITHDRAW_CANCEL)
+        url, path = self.url_path_for('private/WithdrawCancel')
         return self._sign_and_post(url, path, payload)
 
     # PRIVATE METHODS ---------------------------------------------------------
-    def _sign_payload(self, path, data=None):
+    def _sign_payload(self, path: str, data: dict=None):
         data['nonce'] = gen_nonce()
         encoded_data = self._encode_data(data)
 
@@ -257,7 +311,7 @@ class KrakenAuth(KrakenPublic):
 
         return {
             'API-Key': self.KEY,
-            'API-Sign': sig_digest.decode()
+            'API-Sign': sig_digest.decode(),
         }
 
     def _encode_data(self, data):
@@ -265,7 +319,7 @@ class KrakenAuth(KrakenPublic):
         return encoded_data
 
     # Packs and sign the payload and send the request with POST.
-    def _sign_and_post(self, url, path, payload):
+    def _sign_and_post(self, url: str, path: str, payload: dict):
         payload = clean_parameters(payload)
         signed_payload = self._sign_payload(path, payload)
         return self.post(url, headers=signed_payload, data=payload)

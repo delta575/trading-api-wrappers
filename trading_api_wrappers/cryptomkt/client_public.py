@@ -6,47 +6,50 @@ from . import models as _m
 from ..base import Client
 from .server import CryptoMKTServer
 
-_p = _c.Path
-
 
 class CryptoMKTPublic(Client):
 
     error_key = 'message'
 
-    def __init__(self, timeout=30):
-        Client.__init__(self, CryptoMKTServer(), timeout)
+    def __init__(self, timeout: int=30, return_json=False):
+        super().__init__(CryptoMKTServer(), timeout)
+        self.return_json = return_json
 
     def markets(self):
-        url = self.url_for(_p.MARKETS)
+        url = self.url_for('market')
         data = self.get(url)
         return data['data']
 
-    def ticker(self, market_id: _c.Market):
-        url = self.url_for(_p.TICKER)
+    def ticker(self, market_id: str):
+        url = self.url_for('ticker')
         params = {
-            'market': _c.Market.check(market_id).value
+            'market': str(market_id)
         }
         data = self.get(url, params=params)
+        if self.return_json:
+            return data
         return _m.Ticker.create_from_json(data['data'])
 
     def order_book(self,
-                   market_id: _c.Market,
-                   order_type: _c.OrderType,
+                   market_id: str,
+                   order_type: str,
                    page: int=None,
                    limit: int=_c.ORDERS_LIMIT):
         params = {
-            'market': _c.Market.check(market_id).value,
-            'type': _c.OrderType.check(order_type).value,
+            'market': str(market_id),
+            'type': str(order_type),
             'page': page,
             'limit': limit
         }
-        url = self.url_for(_p.ORDER_BOOK)
+        url = self.url_for('book')
         data = self.get(url, params=params)
+        if self.return_json:
+            return data
         return _m.OrderBook.create_from_json(
             data['data'], data['pagination'])
 
     def trades(self,
-               market_id: _c.Market,
+               market_id: str,
                start: datetime=None,
                end: datetime=None,
                page: int=None,
@@ -56,13 +59,15 @@ class CryptoMKTPublic(Client):
         if isinstance(end, datetime):
             end = end.strftime('%Y-%m-%d')
         params = {
-            'market': _c.Market.check(market_id).value,
+            'market': str(market_id),
             'start': start,
             'end': end,
             'page': page,
-            'limit': limit
+            'limit': limit,
         }
-        url = self.url_for(_p.TRADES)
+        url = self.url_for('trades')
         data = self.get(url, params=params)
+        if self.return_json:
+            return data
         return _m.Trades.create_from_json(
             data['data'], data.get('pagination'))

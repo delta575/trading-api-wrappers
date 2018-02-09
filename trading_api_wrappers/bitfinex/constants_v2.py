@@ -1,17 +1,6 @@
 from ..base import _Enum
 
 
-# API paths
-class Path(object):
-    # Public
-    TICKER = 'ticker/%s'
-    TICKERS = 'tickers'
-    TRADES = 'trades/%s/hist'
-    BOOKS = 'book/%s'
-    STATS = 'stats1/%s'
-    CANDLES = 'candles/trade:%s'
-
-
 # Bitfinex supported symbols
 class Symbol(_Enum):
     BCHUSD = 'tBCHUSD'

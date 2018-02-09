@@ -10,4 +10,4 @@ VERSION = '0'
 class KrakenServer(Server):
 
     def __init__(self):
-        Server.__init__(self, PROTOCOL, HOST, VERSION)
+        super().__init__(PROTOCOL, HOST, VERSION)

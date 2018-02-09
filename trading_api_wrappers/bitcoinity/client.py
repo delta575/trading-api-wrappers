@@ -4,22 +4,21 @@ from ..base import Client, Server
 # API Server
 PROTOCOL = 'https'
 HOST = 'bitcoinity.org'
-VERSION = ''
-
-# API Paths
-PATH_TICKER = 'markets/get_ticker'
 
 
 class Bitcoinity(Client):
     def __init__(self, timeout=15):
-        server = Server(PROTOCOL, HOST, VERSION)
-        Client.__init__(self, server, timeout)
+        super().__init__(Server(PROTOCOL, HOST), timeout)
 
-    def ticker(self, currency, exchange, span):
-        parameters = {
+    def ticker(self,
+               currency: str,
+               exchange: str,
+               span: str):
+        params = {
             'currency': currency,
             'exchange': exchange,
-            'span': span
+            'span': span,
         }
-        url = self.url_for(PATH_TICKER)
-        return self.get(url, params=parameters)
+        url = self.url_for('markets/get_ticker')
+        data = self.get(url, params=params)
+        return data

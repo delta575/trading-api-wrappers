@@ -1,25 +1,7 @@
-from ..base import _Enum, _Market, _Currency
+from ..base import _Enum, _Currency, _Market
 
 # Limits
 ORDERS_LIMIT = 300
-
-
-# API paths
-class Path(object):
-    MARKETS = 'markets'
-    MARKET_DETAILS = 'markets/%s'
-    TICKER = "markets/%s/ticker"
-    ORDER_BOOK = 'markets/%s/order_book'
-    QUOTATION = 'markets/%s/quotations'
-    FEE_PERCENTAGE = 'markets/%s/fee_percentage'
-    TRADE_TRANSACTIONS = 'markets/%s/trade_transactions'
-    REPORTS = 'markets/%s/reports'
-    BALANCES = 'balances/%s'
-    BALANCES_EVENTS = 'balance_events'
-    ORDERS = 'markets/%s/orders'
-    SINGLE_ORDER = 'orders/%s'
-    WITHDRAWALS = 'currencies/%s/withdrawals'
-    DEPOSITS = 'currencies/%s/deposits'
 
 
 class Currency(_Currency):

@@ -1,42 +1,6 @@
 from ..base import _Enum
 
 
-# API paths
-class Path(object):
-    # Public
-    SERVER_TIME = 'public/Time'
-    ASSETS = 'public/Assets'
-    ASSET_PAIRS = 'public/AssetPairs'
-    TICKER = 'public/Ticker'
-    OHCL = 'public/OHCL'
-    ORDER_BOOK = 'public/Depth'
-    TRADES = 'public/Trades'
-    SPREAD = 'public/Spread'
-    # Private user data
-    BALANCE = 'private/Balance'
-    TRADE_BALANCE = 'private/TradeBalance'
-    OPEN_ORDERS = 'private/OpenOrders'
-    CLOSED_ORDERS = 'private/ClosedOrders'
-    QUERY_ORDERS = 'private/QueryOrders'
-    TRADES_HISTORY = 'private/TradesHistory'
-    QUERY_TRADES = 'private/QueryTrades'
-    OPEN_POSITIONS = 'private/OpenPositions'
-    LEDGERS = 'private/Ledgers'
-    QUERY_LEDGERS = 'private/QueryLedgers'
-    TRADE_VOLUME = 'private/TradeVolume'
-    # Private user trading
-    ADD_ORDER = 'private/AddOrder'
-    CANCEL_ORDER = 'private/CancelOrder'
-    # Private user funding
-    DEPOSIT_METHODS = 'private/DepositMethods'
-    DEPOSIT_ADDRESSES = 'private/DepositAddresses'
-    DEPOSIT_STATUS = 'private/DepositStatus'
-    WITHDRAW_INFO = 'private/WithdrawInfo'
-    WITHDRAW = 'private/Withdraw'
-    WITHDRAW_STATUS = 'private/WithdrawStatus'
-    WITHDRAW_CANCEL = 'private/WithdrawCancel'
-
-
 # Kraken supported symbols
 class Symbol(_Enum):
     BCHUSD = 'BCHUSD'

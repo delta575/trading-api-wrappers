@@ -1,64 +1,72 @@
 # local
-from . import constants as _c
-from ..base import Client
 from .server import KrakenServer
-
-_p = _c.Path
+from ..base import Client
 
 
 class KrakenPublic(Client):
 
     error_key = 'error'
 
-    def __init__(self, timeout=30):
-        Client.__init__(self, KrakenServer(), timeout)
+    def __init__(self, timeout: int=30):
+        super().__init__(KrakenServer(), timeout)
 
     def server_time(self):
-        url = self.url_for(_p.SERVER_TIME)
+        url = self.url_for('public/Time')
         return self.get(url)
 
     def assets(self):
-        url = self.url_for(_p.ASSETS)
+        url = self.url_for('public/Assets')
         return self.get(url)
 
     def asset_pairs(self):
-        url = self.url_for(_p.ASSET_PAIRS)
+        url = self.url_for('public/AssetPairs')
         return self.get(url)
 
-    def ticker(self, symbol):
-        parameters = {'pair': symbol}
-        url = self.url_for(_p.TICKER)
-        return self.get(url, params=parameters)
+    def ticker(self, symbol: str):
+        params = {
+            'pair': str(symbol),
+        }
+        url = self.url_for('public/Ticker')
+        return self.get(url, params=params)
 
-    def ohcl(self, symbol, interval=None, since=None):
-        parameters = {
-            'pair': symbol,
+    def ohcl(self,
+             symbol: str,
+             interval: int=None,
+             since: str=None):
+        params = {
+            'pair': str(symbol),
             'interval': interval,
-            'since': since
+            'since': since,
         }
-        url = self.url_for(_p.OHCL)
-        return self.get(url, params=parameters)
+        url = self.url_for('public/OHCL')
+        return self.get(url, params=params)
 
-    def order_book(self, symbol, count=None):
-        parameters = {
-            'pair': symbol,
-            'count': count
+    def order_book(self,
+                   symbol: str,
+                   count: int=None):
+        params = {
+            'pair': str(symbol),
+            'count': count,
         }
-        url = self.url_for(_p.ORDER_BOOK)
-        return self.get(url, params=parameters)
+        url = self.url_for('public/Depth')
+        return self.get(url, params=params)
 
-    def trades(self, symbol, since=None):
-        parameters = {
-            'pair': symbol,
-            'since': since
+    def trades(self,
+               symbol: str,
+               since: str=None):
+        params = {
+            'pair': str(symbol),
+            'since': since,
         }
-        url = self.url_for(_p.TRADES)
-        return self.get(url, params=parameters)
+        url = self.url_for('public/Trades')
+        return self.get(url, params=params)
 
-    def spread(self, symbol, since=None):
-        parameters = {
-            'pair': symbol,
-            'since': since
+    def spread(self,
+               symbol: str,
+               since: str=None):
+        params = {
+            'pair': str(symbol),
+            'since': since,
         }
-        url = self.url_for(_p.SPREAD)
-        return self.get(url, params=parameters)
+        url = self.url_for('public/Spread')
+        return self.get(url, params=params)

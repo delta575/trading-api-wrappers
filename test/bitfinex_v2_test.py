@@ -5,7 +5,7 @@ from datetime import datetime
 from decouple import config
 
 # local
-from trading_api_wrappers import errors, BitfinexV2 as Bitfinex
+from trading_api_wrappers import BitfinexV2 as Bitfinex
 from trading_api_wrappers.bitfinex import models_v2 as models
 
 # Bitfinex API Server

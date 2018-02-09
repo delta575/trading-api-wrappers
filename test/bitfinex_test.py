@@ -7,8 +7,6 @@ from decouple import config
 # local
 from trading_api_wrappers import errors, Bitfinex
 
-# Bitfinex API Server
-TEST = config('TEST', cast=bool, default=False)
 API_KEY = config('BFX_API_KEY')
 API_SECRET = config('BFX_API_SECRET')
 
@@ -92,7 +90,7 @@ class BitfinexAuthTest(unittest.TestCase):
         self.assertIn('amount', response[0].keys())
 
     def test_past_trades_returns_data(self):
-        response = self.client.past_trades(SYMBOL, TIMESTAMP)
+        response = self.client.past_trades(SYMBOL)
         self.assertIn('amount', response[0].keys())
 
 

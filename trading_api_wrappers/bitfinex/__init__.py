@@ -4,6 +4,11 @@ from .client_auth_v1 import BitfinexAuth
 from .client_public_v1 import BitfinexPublic
 from .client_public_v2 import BitfinexPublic as BitfinexPublicV2
 
+__all__ = [
+    'Bitfinex',
+    'BitfinexV2',
+]
+
 
 class Bitfinex(object):
     # Enum Types
@@ -16,15 +21,9 @@ class Bitfinex(object):
 
 class BitfinexV2(object):
     # Enum Types
-    # Currency = _c2.Currency
     BookPrecision = _c2.BookPrecision
     Symbol = _c2.Symbol
     # Clients
-    # Auth = BitfinexAuth
+    # TODO: Implement Bitfinex v2 Auth client
+    # Auth = BitfinexAuthV2
     Public = BitfinexPublicV2
-
-
-__all__ = [
-    Bitfinex,
-    BitfinexV2,
-]

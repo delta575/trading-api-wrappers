@@ -8,6 +8,11 @@ def parse_datetime(datetime_str):
         return datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M:%S.%fZ')
 
 
+def int_or_none(value):
+    if value:
+        return int(value)
+
+
 def float_or_none(value):
     if value:
         return float(value)
@@ -374,6 +379,43 @@ class TradeTransactionPages(
             trade_transactions=[TradeTransaction.create_from_json(transaction)
                                 for transaction in transactions],
             meta=PagesMeta.create_from_json(pages_meta),
+        )
+
+
+class TradeEntry(
+    namedtuple('trade_transaction_pages', [
+        'timestamp',
+        'amount',
+        'price',
+        'direction',
+    ])
+):
+
+    @classmethod
+    def create_from_json(cls, entry):
+        return cls(
+            timestamp=int(entry[0]),
+            amount=float(entry[1]),
+            price=float(entry[2]),
+            direction=entry[3],
+        )
+
+
+class Trades(
+    namedtuple('trade_transaction_pages', [
+        'timestamp',
+        'last_timestamp',
+        'entries'
+    ])
+):
+
+    @classmethod
+    def create_from_json(cls, trades):
+        return cls(
+            timestamp=int(trades['timestamp']),
+            last_timestamp=int_or_none(trades['last_timestamp']),
+            entries=[TradeEntry.create_from_json(entry)
+                     for entry in trades['entries']],
         )
 
 

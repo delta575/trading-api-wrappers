@@ -5,15 +5,8 @@ PROTOCOL = 'https'
 HOST = 'api.bitfinex.com'
 
 
-# Bitfinex API V1 server
-class BitfinexServerV1(Server):
+# Bitfinex API server
+class BitfinexServer(Server):
 
-    def __init__(self):
-        Server.__init__(self, PROTOCOL, HOST, version='v1')
-
-
-# Bitfinex API V2 server
-class BitfinexServerV2(Server):
-
-    def __init__(self):
-        Server.__init__(self, PROTOCOL, HOST, version='v2')
+    def __init__(self, version: int):
+        super().__init__(PROTOCOL, HOST, version=f'v{version}')

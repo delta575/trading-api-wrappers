@@ -31,7 +31,7 @@ def build_parameters(parameters):
 def build_route(path, params=None):
     built_params = build_parameters(params)
     if built_params:
-        return '{0:s}?{1:s}'.format(path, built_params)
+        return f'{path}?{built_params}'
     else:
         return path
 
@@ -39,13 +39,6 @@ def build_route(path, params=None):
 def clean_parameters(parameters: dict):
     if parameters:
         return {k: v for k, v in parameters.items() if v is not None}
-
-
-def update_dictionary(old_dict: dict, new_dict: dict):
-    if new_dict:
-        keys = list(new_dict.keys())
-        for k in keys:
-            old_dict[k] = new_dict[k]
 
 
 def date_range(start_date, end_date):
