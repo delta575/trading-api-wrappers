@@ -6,11 +6,16 @@
 Trading API Wrappers.
 Tested on Python 3.6
 
+Supported APIs:
+
 - [Bitfinex](https://www.bitfinex.com)
-- [Kraken](https://www.kraken.com)
+- [Bitstamp](https://www.bitstamp.net)
 - [Buda](https://www.buda.com)
 - [CoinDesk](https://www.coindesk.com)
+- [CoinMarketCap](https://coinmarketcap.com)
 - [CryptoMKT](https://www.cryptomkt.com)
+- [Kraken](https://www.kraken.com)
+- [OpenExchangeRates](https://openexchangerates.org)
 
 ## Dev setup
 
@@ -49,24 +54,24 @@ client = Bitfinex.Auth(API_KEY, API_SECRET)
 Bitfinex API Doc:
 https://bitfinex.readme.io/v1/docs
 
-### Kraken
+### Bitstamp
 
 Public API:
 
 ```python
-from trading_api_wrappers import Kraken
-client = Kraken.Public()
-```
+from trading_api_wrappers import Bitstamp
+client = Bitstamp.Public()
+```    
 
 Authenticated API:
 
 ```python
-from trading_api_wrappers import Kraken
-client = Kraken.Auth(API_KEY, API_SECRET)
-```    
+from trading_api_wrappers import Bitstamp
+client = Bitstamp.Auth(API_KEY, API_SECRET, CUSTOMER_ID)
+```
 
-Kraken API Doc:
-https://www.kraken.com/help/api
+Bitstamp API Doc:
+https://www.bitstamp.net/api
 
 ### Buda
 
@@ -87,6 +92,25 @@ client = Buda.Auth(API_KEY, API_SECRET)
 Buda API Doc:
 https://api.buda.com
 
+### Kraken
+
+Public API:
+
+```python
+from trading_api_wrappers import Kraken
+client = Kraken.Public()
+```
+
+Authenticated API:
+
+```python
+from trading_api_wrappers import Kraken
+client = Kraken.Auth(API_KEY, API_SECRET)
+```    
+
+Kraken API Doc:
+https://www.kraken.com/help/api
+
 ### CoinDesk
 
 ```python
@@ -94,8 +118,18 @@ from trading_api_wrappers import CoinDesk
 client = CoinDesk()
 ```
       
-Coindesk API Doc:
+CoinDesk API Doc:
 https://www.coindesk.com/api
+
+### CoinMarketCap
+
+```python
+from trading_api_wrappers import CoinMarketCap
+client = CoinMarketCap()
+```
+      
+CoinMarketCap API Doc:
+https://coinmarketcap.com/api
 
 ### CryptoMKT
 
@@ -115,6 +149,17 @@ client = CryptoMKT.Auth(API_KEY, API_SECRET)
 
 CryptoMKT API Doc:
 https://developers.cryptomkt.com
+
+### OpenExchangeRates
+
+```python
+from trading_api_wrappers import OXR
+client = OXR(APP_ID)
+```
+      
+OpenExchangeRates API Doc:
+https://docs.openexchangerates.org
+
 
 ## Licence
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
