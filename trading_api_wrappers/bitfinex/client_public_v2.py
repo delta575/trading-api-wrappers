@@ -61,7 +61,7 @@ class BitfinexPublic(Client):
         parameters = {
             'len': length,
         }
-        path_arg = '{0}/{1}'.format(symbol, precision)
+        path_arg = f'{symbol}/{precision}'
         url = self.url_for(_p.BOOKS, path_arg=path_arg)
         data = self.get(url, params=parameters)
         return [_m.TradingBook.create_from_json(book)
@@ -84,7 +84,7 @@ class BitfinexPublic(Client):
         parameters = {
             'sort': sort,
         }
-        path_arg = '{0}:{1}:{2}:{3}/{4}'.format(key, size, symbol, side, section)
+        path_arg = f'{key}:{size}:{symbol}:{side}/{section}'
         url = self.url_for(_p.STATS, path_arg=path_arg)
         data = self.get(url, params=parameters)
         if section == 'last':
@@ -132,7 +132,7 @@ class BitfinexPublic(Client):
             'end': end,
             'sort': sort,
         }
-        path_arg = '{0}:{1}/{2}'.format(time_frame, symbol, section)
+        path_arg = f'{time_frame}:{symbol}/{section}'
         url = self.url_for(_p.CANDLES, path_arg=path_arg)
         data = self.get(url, params=parameters)
         if section == 'last':

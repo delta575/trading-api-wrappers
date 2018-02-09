@@ -12,9 +12,9 @@ from . import errors
 class Server(object):
 
     def __init__(self, protocol, host, version=None):
-        url = '{0:s}://{1:s}'.format(protocol, host)
+        url = f'{protocol}://{host}'
         if version:
-            url = '{0:s}/{1:s}'.format(url, version)
+            url = f'{url}/{version}'
 
         self.PROTOCOL = protocol
         self.HOST = host
@@ -74,7 +74,7 @@ class Client(object):
         return json_resp
 
     def url_for(self, path, path_arg=None):
-        url = '{0:s}/{1:s}'.format(self.SERVER.URL, path)
+        url = f'{self.SERVER.URL}/{path}'
         if path_arg:
             url = url % path_arg
         return url
@@ -119,7 +119,7 @@ class _Market(_Enum):
     @staticmethod
     def _format_value(value):
         value = str(value).replace('-', '')
-        value = '{0}_{1}'.format(value[:3], value[3:])
+        value = f'{value[:3]}_{value[3:]}'
         return value.upper()
 
     @property

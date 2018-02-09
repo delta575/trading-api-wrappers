@@ -1,13 +1,13 @@
 import sys
 from setuptools import setup
 
-if not (sys.version_info >= (3, 5)):
-    sys.exit('Sorry, only Python 3.5 or later is supported')
+if not (sys.version_info >= (3, 6)):
+    sys.exit('Sorry, only Python 3.6 or later is supported')
 
 setup(
     name='trading_api_wrappers',
     version='0.5.0',
-    description='Trading API Wrappers for Python 3.5',
+    description='Trading API Wrappers for Python 3.6',
     url='https://github.com/delta575/trading-api-wrappers',
     author='Felipe Aránguiz, Sebastián Aránguiz',
     authoremail='faranguiz575@gmail.com, sarang575@gmail.com',

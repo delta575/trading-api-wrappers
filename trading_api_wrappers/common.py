@@ -31,7 +31,7 @@ def build_parameters(parameters):
 def build_route(path, params=None):
     built_params = build_parameters(params)
     if built_params:
-        return '{0:s}?{1:s}'.format(path, built_params)
+        return f'{path}?{built_params}'
     else:
         return path
 

@@ -68,7 +68,7 @@ class _BPI(CoinDesk):
         historical_bpi = response['bpi']
         for d in date_range(start, end):
             assert historical_bpi[str(d)], (
-                '{0} is not present in BPI!'.format(d))
+                f'{d} is not present in BPI!')
 
         return response
 
@@ -76,8 +76,8 @@ class _BPI(CoinDesk):
         if not date:
             return
         current_date = current_utc_date()
-        msg = ("({0}) must be a date <= current date "
-               "({1})".format(date, current_date))
+        msg = (f"({date}) must be a date <= current date "
+               f"({current_date})")
         assert date <= current_date, msg
 
 

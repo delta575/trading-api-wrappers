@@ -39,7 +39,7 @@ class CoinMarketCap(Client):
 
     def price(self, currency, convert: str=None):
         ticker = self.ticker(currency, convert)
-        return float(ticker['price_{0}'.format(convert or 'usd').lower()])
+        return float(ticker[f"price_{convert or 'usd'}".lower()])
 
     def stats(self, convert: str=None):
         params = {

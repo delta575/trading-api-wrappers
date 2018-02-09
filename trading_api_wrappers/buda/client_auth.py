@@ -166,7 +166,7 @@ class BudaAuth(BudaPublic):
         market_id = _c.Market.check(market_id)
         state = _c.OrderState.check(state)
         if per_page and per_page > _c.ORDERS_LIMIT:
-            msg = "Param 'per_page' must be <= {0}".format(_c.ORDERS_LIMIT)
+            msg = f"Param 'per_page' must be <= {_c.ORDERS_LIMIT}"
             raise ValueError(msg)
         params = {
             'per': per_page,
