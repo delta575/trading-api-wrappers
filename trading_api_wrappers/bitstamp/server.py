@@ -9,4 +9,4 @@ HOST = 'www.bitstamp.net/api'
 class BitstampServer(Server):
 
     def __init__(self):
-        Server.__init__(self, PROTOCOL, HOST)
+        super().__init__(PROTOCOL, HOST)

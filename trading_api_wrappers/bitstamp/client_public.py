@@ -8,7 +8,7 @@ class BitstampPublic(Client):
     error_key = 'error'
 
     def __init__(self, timeout=30):
-        Client.__init__(self, BitstampServer(), timeout)
+        super().__init__(BitstampServer(), timeout)
 
     def url_for(self, path, path_arg=None, version=2):
         if version == 1:
