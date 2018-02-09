@@ -133,6 +133,3 @@ class _Market(_Enum):
     @property
     def quote(self):
         return super(_Market, self).value['quote']
-
-    def __str__(self):
-        return self.name.replace('_', '').upper()

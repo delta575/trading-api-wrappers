@@ -12,4 +12,4 @@ class BudaServer(Server):
 
     def __init__(self, test):
         host = HOST if not test else TEST_HOST
-        super(BudaServer, self).__init__(PROTOCOL, host, VERSION)
+        super().__init__(PROTOCOL, host, VERSION)

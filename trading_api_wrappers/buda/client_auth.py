@@ -13,41 +13,42 @@ from .client_public import BudaPublic
 
 class BudaAuth(BudaPublic):
 
-    def __init__(self, key=False, secret=False, test=False, timeout=30):
-        super(BudaAuth, self).__init__(test, timeout)
+    def __init__(self, key: str=False, secret: str=False, test: bool=False, 
+                 timeout: int=30, return_json: bool=False):
+        super().__init__(test, timeout, return_json)
         check_keys(key, secret)
         self.KEY = str(key)
         self.SECRET = str(secret)
 
     def quotation(self,
-                  market_id: _c.Market,
-                  quotation_type: _c.QuotationType,
+                  market_id: str,
+                  quotation_type: str,
                   amount: float,
                   limit: float=None):
-        market_id = _c.Market.check(market_id).value
-        quotation_type = _c.QuotationType.check(quotation_type).value
         payload = {
             'quotation': {
-                'type': quotation_type,
+                'type': str(quotation_type),
                 'amount': str(amount),
                 'limit': str(limit) if limit else None,
             },
         }
         url, path = self.url_path_for('markets/%s/quotations', market_id)
         data = self._sign_and_post(url, path, payload=payload)
+        if self.return_json:
+            return data
         return _m.Quotation.create_from_json(data['quotation'])
 
     def quotation_market(self,
-                         market_id: _c.Market,
-                         quotation_type: _c.QuotationType,
+                         market_id: str,
+                         quotation_type: str,
                          amount: float):
         return self.quotation(
             market_id=market_id, quotation_type=quotation_type,
             amount=amount, limit=None)
 
     def quotation_limit(self,
-                        market_id: _c.Market,
-                        quotation_type: _c.QuotationType,
+                        market_id: str,
+                        quotation_type: str,
                         amount: float,
                         limit: float):
         return self.quotation(
@@ -56,18 +57,16 @@ class BudaAuth(BudaPublic):
 
     # REPORTS -----------------------------------------------------------------
     def _report(self,
-                market_id: _c.Market,
+                market_id: str,
                 report_type: _c.ReportType,
                 start_at: datetime=None,
                 end_at: datetime=None):
-        market_id = _c.Market.check(market_id).value
-        report_type = _c.ReportType.check(report_type).value
         if isinstance(start_at, datetime):
             start_at = int(start_at.timestamp())
         if isinstance(end_at, datetime):
             end_at = int(end_at.timestamp())
         params = {
-            'report_type': report_type,
+            'report_type': str(report_type),
             'from': start_at,
             'to': end_at,
         }
@@ -76,42 +75,45 @@ class BudaAuth(BudaPublic):
         return data
 
     def report_average_prices(self,
-                              market_id: _c.Market,
-                              start_at: datetime = None,
-                              end_at: datetime = None):
+                              market_id: str,
+                              start_at: datetime=None,
+                              end_at: datetime=None):
         data = self._report(
             market_id=market_id, report_type=_c.ReportType.AVERAGE_PRICES,
             start_at=start_at, end_at=end_at)
+        if self.return_json:
+            return data
         return [_m.AveragePrice.create_from_json(report)
                 for report in data['reports']]
 
     def report_candlestick(self,
-                           market_id: _c.Market,
+                           market_id: str,
                            start_at: datetime = None,
                            end_at: datetime = None):
         data = self._report(
             market_id=market_id, report_type=_c.ReportType.CANDLESTICK,
             start_at=start_at, end_at=end_at)
+        if self.return_json:
+            return data
         return [_m.Candlestick.create_from_json(report)
                 for report in data['reports']]
 
     # BALANCES-----------------------------------------------------------------
-    def balance(self, currency: _c.Currency):
-        currency = _c.Currency.check(currency).value
+    def balance(self, currency: str):
         url, path = self.url_path_for('balances/%s', currency)
         data = self._sign_and_get(url, path)
+        if self.return_json:
+            return data
         return _m.Balance.create_from_json(data['balance'])
 
     def balance_event_pages(self,
-                            currencies,
-                            event_names,
+                            currencies: list,
+                            event_names: list,
                             page: int=None,
                             per_page: int=None,
                             relevant: bool=None):
-        currencies = [_c.Currency.check(c).value
-                      for c in currencies]
-        event_names = [_c.BalanceEvent.check(e).value
-                       for e in event_names]
+        currencies = [str(c) for c in currencies]
+        event_names = [str(e) for e in event_names]
         params = {
             'currencies[]': currencies,
             'event_names[]': event_names,
@@ -121,58 +123,60 @@ class BudaAuth(BudaPublic):
         }
         url, path = self.url_path_for('balance_events')
         data = self._sign_and_get(url, path, params=params)
+        if self.return_json:
+            return data
         # TODO: Response only contains a 'total_count' field instead of meta
         return _m.BalanceEventPages.create_from_json(
             data['balance_events'], data['total_count'], page)
 
     # ORDERS ------------------------------------------------------------------
     def new_order(self,
-                  market_id: _c.Market,
-                  order_type: _c.OrderType,
-                  price_type: _c.OrderPriceType,
+                  market_id: str,
+                  order_type: str,
+                  price_type: str,
                   amount: float,
                   limit: float=None):
-        market_id = _c.Market.check(market_id)
-        order_type = _c.OrderType.check(order_type)
-        price_type = _c.OrderPriceType.check(price_type)
         payload = {
-            'type': order_type.value,
-            'price_type': price_type.value,
+            'type': str(order_type),
+            'price_type': str(price_type),
             'amount': str(amount),
             'limit': str(limit) if limit else None,
         }
         return self.new_order_payload(market_id, payload)
 
-    def new_order_payload(self, market_id: _c.Market, payload):
-        market_id = _c.Market.check(market_id).value
+    def new_order_payload(self, market_id: str, payload):
         url, path = self.url_path_for('markets/%s/orders', market_id)
         data = self._sign_and_post(url, path, payload=payload)
+        if self.return_json:
+            return data
         return _m.Order.create_from_json(data['order'])
 
     def order_pages(self,
-                    market_id: _c.Market,
+                    market_id: str,
                     page: int=None,
                     per_page: int=None,
-                    state: _c.OrderState=None,
+                    state: str=None,
                     minimum_exchanged: float=None):
-        market_id = _c.Market.check(market_id)
-        state = _c.OrderState.check(state)
         if per_page and per_page > _c.ORDERS_LIMIT:
             msg = f"Param 'per_page' must be <= {_c.ORDERS_LIMIT}"
             raise ValueError(msg)
         params = {
             'per': per_page,
             'page': page,
-            'state': state.value if state else state,
+            'state': str(state) if state else None,
             'minimum_exchanged': minimum_exchanged,
         }
-        url, path = self.url_path_for('markets/%s/orders', market_id.value)
+        url, path = self.url_path_for('markets/%s/orders', market_id)
         data = self._sign_and_get(url, path, params=params)
+        if self.return_json:
+            return data
         return _m.OrderPages.create_from_json(data['orders'], data.get('meta'))
 
     def order_details(self, order_id: int):
         url, path = self.url_path_for('orders/%s', order_id)
         data = self._sign_and_get(url, path)
+        if self.return_json:
+            return data
         return _m.Order.create_from_json(data['order'])
 
     def cancel_order(self, order_id: int):
@@ -181,49 +185,53 @@ class BudaAuth(BudaPublic):
         }
         url, path = self.url_path_for('orders/%s', order_id)
         data = self._sign_and_put(url, path, payload=payload)
+        if self.return_json:
+            return data
         return _m.Order.create_from_json(data['order'])
 
     # PAYMENTS ----------------------------------------------------------------
-    def _transfers(self, currency: _c.Currency, path, model, key):
-        currency = _c.Currency.check(currency).value
+    def _transfers(self, currency: str, path, model, key):
         url, path = self.url_path_for(path, currency)
         data = self._sign_and_get(url, path)
+        if self.return_json:
+            return data
         return [model.create_from_json(transfer)
                 for transfer in data[key]]
 
-    def withdrawals(self, currency: _c.Currency):
+    def withdrawals(self, currency: str):
         return self._transfers(currency=currency,
                                path='currencies/%s/withdrawals',
                                model=_m.Withdrawal, key='withdrawals')
 
-    def deposits(self, currency: _c.Currency):
+    def deposits(self, currency: str):
         return self._transfers(currency=currency,
                                path='currencies/%s/deposits',
                                model=_m.Deposit, key='deposits')
 
     # TODO: UNTESTED
     def withdrawal(self,
-                   currency: _c.Currency,
+                   currency: str,
                    amount: float,
                    target_address: str=None,
                    amount_includes_fee: bool=True,
                    simulate: bool=False):
-        currency = _c.Currency.check(currency).value
         payload = {
             'withdrawal_data': {
                 'target_address': target_address,
             },
             'amount': str(amount),
-            'currency': currency,
+            'currency': str(currency),
             'simulate': simulate,
             'amount_includes_fee': amount_includes_fee,
         }
         url, path = self.url_path_for('currencies/%s/withdrawals', currency)
         data = self._sign_and_post(url, path, payload=payload)
+        if self.return_json:
+            return data
         return _m.Withdrawal.create_from_json(data['withdrawal'])
 
     def simulate_withdrawal(self,
-                            currency: _c.Currency,
+                            currency: str,
                             amount: float,
                             amount_includes_fee: bool=True):
         return self.withdrawal(

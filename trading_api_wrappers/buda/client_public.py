@@ -9,44 +9,52 @@ class BudaPublic(Client):
 
     error_key = 'message'
 
-    def __init__(self, test=False, timeout=30):
-        super(BudaPublic, self).__init__(BudaServer(test), timeout)
+    def __init__(self, test: bool=False, timeout: int=30,
+                 return_json: bool=False):
+        super().__init__(BudaServer(test), timeout)
+        self.return_json = return_json
 
     def markets(self):
         url, path = self.url_path_for('markets')
         data = self.get(url)
+        if self.return_json:
+            return data
         return [_m.Market.create_from_json(market)
                 for market in data['markets']]
 
-    def market_details(self, market_id: _c.Market):
-        market_id = _c.Market.check(market_id)
-        url = self.url_for('markets/%s', path_arg=market_id.value)
+    def market_details(self, market_id: str):
+        url = self.url_for('markets/%s', market_id)
         data = self.get(url)
+        if self.return_json:
+            return data
         return _m.Market.create_from_json(data['market'])
 
-    def ticker(self, market_id: _c.Market):
-        market_id = _c.Market.check(market_id)
-        url = self.url_for('markets/%s/ticker', path_arg=market_id.value)
+    def ticker(self, market_id: str):
+        url = self.url_for('markets/%s/ticker', market_id)
         data = self.get(url)
+        if self.return_json:
+            return data
         return _m.Ticker.create_from_json(data['ticker'])
 
-    def order_book(self, market_id: _c.Market):
-        market_id = _c.Market.check(market_id)
-        url = self.url_for('markets/%s/order_book', path_arg=market_id.value)
+    def order_book(self, market_id: str):
+        url = self.url_for('markets/%s/order_book', market_id)
         data = self.get(url)
+        if self.return_json:
+            return data
         return _m.OrderBook.create_from_json(data['order_book'])
 
     def trade_transaction_pages(self,
-                                market_id: _c.Market,
+                                market_id: str,
                                 page: int=None,
                                 per_page: int=None):
-        market_id = _c.Market.check(market_id)
         params = {
             'page': page,
             'per': per_page,
         }
         url, path = self.url_path_for('markets/%s/trade_transactions',
-                                      path_arg=market_id.value)
+                                      market_id)
         data = self.get(url, params=params)
+        if self.return_json:
+            return data
         return _m.TradeTransactionPages.create_from_json(
             data['trade_transactions'], data.get('meta'))

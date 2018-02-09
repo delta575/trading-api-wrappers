@@ -1,4 +1,4 @@
-from ..base import _Enum, _Market, _Currency
+from ..base import _Enum, _Currency, _Market
 
 # Limits
 ORDERS_LIMIT = 300
