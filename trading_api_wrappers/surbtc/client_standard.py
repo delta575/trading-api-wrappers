@@ -14,6 +14,10 @@ class SURBTCStandard(StandardClient):
         self.client = SURBTCAuth(key=str(key), secret=str(secret), timeout=timeout)
 
     @staticmethod
+    def name():
+        return "Buda"
+
+    @staticmethod
     def get_pair_mapping(base, quote):
         return base + '-' + quote
 
@@ -128,4 +132,18 @@ class SURBTCStandard(StandardClient):
                 quote,
                 float(trade[2]),
                 trade[3]
+            )
+
+    def get_balance(self, currency):
+        return float(self.client.balance(currency).amount.amount)
+
+    def get_ticker(self, base, quote, bid_ask='bid'):
+        # TODO: refactor this
+        if bid_ask == 'bid':
+            return float(
+                self.client.ticker(self.get_pair_mapping(base, quote)).max_bid.amount
+            )
+        elif bid_ask == 'ask':
+            return float(
+                self.client.ticker(self.get_pair_mapping(base, quote)).max_ask.amount
             )

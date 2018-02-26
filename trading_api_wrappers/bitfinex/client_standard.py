@@ -7,6 +7,10 @@ class BitfinexStandard(StandardClient):
         StandardClient.__init__(self)
         self.client = BitfinexAuth(key=str(key), secret=str(secret), timeout=timeout)
 
+    @staticmethod
+    def name():
+        return "Bitfinex"
+
     @classmethod
     def get_pair_mapping(cls, base, quote):
         return cls.get_currency_mapping(base) + cls.get_currency_mapping(quote)

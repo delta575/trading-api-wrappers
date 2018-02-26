@@ -15,6 +15,10 @@ class KrakenStandard(StandardClient):
         self.client = KrakenAuth(key=str(key), secret=str(secret), timeout=timeout)
 
     @staticmethod
+    def name():
+        return "Kraken"
+
+    @staticmethod
     def get_pair_mapping(base, quote):
         if base == 'bch':
             pair = self.currency_mapping[base]+self.currency_mapping[quote][1:]
