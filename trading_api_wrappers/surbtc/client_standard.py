@@ -31,6 +31,17 @@ class SURBTCStandard(StandardClient):
             raw_orderbook, lambda entry: (entry.amount, entry.price)
         )
 
+    def markets(self):
+        to_return_markets = {}
+        for market in self.client.markets():
+            to_return_markets[market.name] = {
+                "name": market.name,
+                "minimum_order_amount": market.minimum_order_amount.amount,
+                "base": market.base_currency.lower(),
+                "quote": market.quote_currency.lower()
+            }
+        return to_return_markets
+
     def get_orderbook(self, base, quote):
         market = self.get_pair_mapping(base, quote)
         tmp_orderbook = self.client.order_book(market)
@@ -137,6 +148,9 @@ class SURBTCStandard(StandardClient):
     def get_balance(self, currency):
         return float(self.client.balance(currency).amount.amount)
 
+    def get_available_balance(self, currency):
+        return float(self.client.balance(currency).available_amount.amount)
+
     def get_ticker(self, base, quote, bid_ask='bid'):
         # TODO: refactor this
         if bid_ask == 'bid':
@@ -147,3 +161,31 @@ class SURBTCStandard(StandardClient):
             return float(
                 self.client.ticker(self.get_pair_mapping(base, quote)).max_ask.amount
             )
+
+    def my_open_orders(self, base, quote):
+        market = self.get_pair_mapping(base, quote)
+        orders = self.client.order_pages(
+            market, state='pending', per_page=300
+        ).orders
+        return [
+            {
+                'id': order.id,
+                'type': order.type.lower(),
+                'market': order.market_id,
+                'original_amount': order.original_amount.amount,
+                'remaining_amount': order.original_amount.amount - order.traded_amount.amount
+            } for order in orders
+        ]
+
+    def deploy_order(self, base, quote, order):
+        market = self.get_pair_mapping(base, quote)
+        prepared_order = {
+            "order": {
+                "limit": order["price"],
+                "amount": order["amount"],
+                "type": order["type"],
+                "price_type": order["price_type"]
+            }
+        }
+        result = self.client.new_order_payload(market, prepared_order)
+        return result.id
