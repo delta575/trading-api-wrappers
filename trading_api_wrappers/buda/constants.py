@@ -3,7 +3,6 @@ from ..base import _Enum, _Currency, _Market
 # Limits
 ORDERS_LIMIT = 300
 
-
 class Currency(_Currency):
     BCH = dict(value='BCH', decimals=8)
     BTC = dict(value='BTC', decimals=8)

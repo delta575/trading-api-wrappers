@@ -9,7 +9,6 @@ from ..common import check_keys, clean_parameters, gen_nonce
 
 
 class KrakenAuth(KrakenPublic):
-
     def __init__(self, key: str=False, secret: str=False, timeout: int=30):
         super().__init__(timeout)
         check_keys(key, secret)
@@ -272,13 +271,15 @@ class KrakenAuth(KrakenPublic):
     # Get status of recent withdrawals
     def withdraw_status(self,
                         asset: str,
-                        method: str,
-                        asset_class: str=None):
+                        method: str=None,
+                        asset_class: str='currency'):
         payload = {
             'asset': str(asset),
-            'method': str(method),
             'aclass': str(asset_class) if asset_class else None,
         }
+        if method is not None:
+            payload['method'] = str(method)
+        
         url, path = self.url_path_for('private/WithdrawStatus')
         return self._sign_and_post(url, path, payload)
 

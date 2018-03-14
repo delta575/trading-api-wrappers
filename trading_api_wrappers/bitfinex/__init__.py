@@ -3,6 +3,7 @@ from . import constants_v2 as _c2
 from .client_auth_v1 import BitfinexAuth
 from .client_public_v1 import BitfinexPublic
 from .client_public_v2 import BitfinexPublic as BitfinexPublicV2
+from .client_standard import BitfinexStandard
 
 __all__ = [
     'Bitfinex',
@@ -17,6 +18,7 @@ class Bitfinex(object):
     # Clients V1
     Auth = BitfinexAuth
     Public = BitfinexPublic
+    Standard = BitfinexStandard
 
 
 class BitfinexV2(object):

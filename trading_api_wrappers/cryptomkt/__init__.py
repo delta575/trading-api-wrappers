@@ -2,6 +2,7 @@ from . import constants as _c
 from . import models as _m
 from .client_auth import CryptoMKTAuth
 from .client_public import CryptoMKTPublic
+from .client_standard import CryptoMKTStandard
 
 __all__ = [
     'CryptoMKT',
@@ -18,3 +19,4 @@ class CryptoMKT(object):
     # Clients
     Auth = CryptoMKTAuth
     Public = CryptoMKTPublic
+    Standard = CryptoMKTStandard

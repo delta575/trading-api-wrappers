@@ -2,6 +2,7 @@ from . import constants as _c
 from . import models as _m
 from .client_auth import BudaAuth
 from .client_public import BudaPublic
+from .client_standard import BudaStandard
 
 __all__ = [
     'Buda',
@@ -23,3 +24,4 @@ class Buda(object):
     # Clients
     Auth = BudaAuth
     Public = BudaPublic
+    Standard = BudaStandard

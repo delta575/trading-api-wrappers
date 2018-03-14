@@ -4,7 +4,6 @@ from ..base import Server
 PROTOCOL = 'https'
 HOST = 'www.bitstamp.net/api'
 
-
 # Bitstamp API server
 class BitstampServer(Server):
 

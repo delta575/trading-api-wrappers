@@ -123,7 +123,7 @@ class BitstampAuth(BitstampPublic):
                      currency_pair: str,
                      amount: float,
                      price: float,
-                     limit_price: float,
+                     limit_price: float=None,
                      daily_order: bool=None):
         payload = {
             'amount': amount,
