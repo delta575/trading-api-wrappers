@@ -21,6 +21,7 @@ setup(
         'trading_api_wrappers.coindesk',
         'trading_api_wrappers.coinmarketcap',
         'trading_api_wrappers.cryptomkt',
+        'trading_api_wrappers.currencylayer',
         'trading_api_wrappers.kraken',
         'trading_api_wrappers.oxr',
         'trading_api_wrappers.surbtc',
