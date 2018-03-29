@@ -160,6 +160,16 @@ client = OXR(APP_ID)
 OpenExchangeRates API Doc:
 https://docs.openexchangerates.org
 
+### CurrencyLayer
+
+```python
+from trading_api_wrappers import CurrencyLayer
+client = CurrencyLayer(ACCESS_KEY)
+```
+      
+CurrencyLayer API Doc:
+https://currencylayer.com/documentation
+
 
 ## Licence
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
