@@ -6,7 +6,7 @@ if not (sys.version_info >= (3, 6)):
 
 setup(
     name='trading_api_wrappers',
-    version='0.6.1',
+    version='0.7.0',
     description='Trading API Wrappers for Python 3.6',
     url='https://github.com/delta575/trading-api-wrappers',
     author='Felipe Aránguiz, Sebastián Aránguiz',
@@ -21,6 +21,7 @@ setup(
         'trading_api_wrappers.coindesk',
         'trading_api_wrappers.coinmarketcap',
         'trading_api_wrappers.cryptomkt',
+        'trading_api_wrappers.currencylayer',
         'trading_api_wrappers.kraken',
         'trading_api_wrappers.oxr',
         'trading_api_wrappers.surbtc',
