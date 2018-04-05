@@ -46,8 +46,8 @@ class CurrencyLayerTest(unittest.TestCase):
         except InvalidResponse as e:
             raise self.skip_test_non_paid_plan(e)
         self.assertEqual('EUR', rates['source'])
-        self.assertIn('USDEUR', rates['quotes'])
-        self.assertIn('CLPEUR', rates['quotes'])
+        self.assertIn('EURUSD', rates['quotes'])
+        self.assertIn('EURCLP', rates['quotes'])
         self.assertIn('timestamp', rates)
 
     def test_get_live_rates_for_currencies(self):
@@ -109,13 +109,13 @@ class CurrencyLayerTest(unittest.TestCase):
         self.assertEqual('2012-01-01', time_frame['start_date'])
         self.assertEqual('2012-02-29', time_frame['end_date'])
         self.assertEqual(60, len(time_frame['quotes']))
-        self.assertEqual(1, time_frame['quotes']['2010-01-01']['USDUSD'])
-        self.assertEqual(0.697253, time_frame['quotes']['2010-01-01']['USDEUR'])
+        self.assertEqual(1, time_frame['quotes']['2012-01-01']['USDUSD'])
+        self.assertEqual(0.772484, time_frame['quotes']['2012-01-01']['USDEUR'])
 
     def test_time_frame_for_base(self):
         try:
             time_frame = self.client.time_frame(
-                '2012-01-01', '2012-03-01',
+                '2012-01-01', '2012-02-29',
                 currencies=['USD', 'EUR'],
                 base='EUR')
         except InvalidResponse as e:
@@ -124,7 +124,7 @@ class CurrencyLayerTest(unittest.TestCase):
         self.assertEqual('2012-01-01', time_frame['start_date'])
         self.assertEqual('2012-02-29', time_frame['end_date'])
         self.assertEqual(60, len(time_frame['quotes']))
-        self.assertEqual(1, time_frame['quotes']['2010-01-01']['EUREUR'])
+        self.assertEqual(1, time_frame['quotes']['2012-01-01']['EUREUR'])
         # self.assertEqual(?, time_frame['quotes']['2010-01-01']['EURUSD'])
 
     def test_change(self):
