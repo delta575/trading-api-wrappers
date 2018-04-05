@@ -184,8 +184,8 @@ class CurrencyLayer(Client):
                 }
         """
         params = {
-            'start': format_date_iso(start),
-            'end': format_date_iso(end),
+            'start_date': format_date_iso(start),
+            'end_date': format_date_iso(end),
         }
         url = self.url_for('timeframe')
         data = self.get(url, base, currencies, params)
