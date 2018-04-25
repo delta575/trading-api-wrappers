@@ -14,8 +14,8 @@ from .client_public import BudaPublic
 class BudaAuth(BudaPublic):
 
     def __init__(self, key: str=False, secret: str=False, test: bool=False, 
-                 timeout: int=30, return_json: bool=False):
-        super().__init__(test, timeout, return_json)
+                 timeout: int=30, return_json: bool=False, host: str=None):
+        super().__init__(test, timeout, return_json, host)
         check_keys(key, secret)
         self.KEY = str(key)
         self.SECRET = str(secret)

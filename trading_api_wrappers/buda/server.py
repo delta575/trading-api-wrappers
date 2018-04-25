@@ -10,6 +10,7 @@ VERSION = 'v2'
 # Buda API server
 class BudaServer(Server):
 
-    def __init__(self, test):
-        host = HOST if not test else TEST_HOST
+    def __init__(self, test, host=HOST):
+        if test:
+            host = TEST_HOST
         super().__init__(PROTOCOL, host, VERSION)
