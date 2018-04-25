@@ -8,16 +8,17 @@ from decouple import config
 from trading_api_wrappers import Buda, errors
 from trading_api_wrappers.buda import models
 
-TEST = config('BUDA_TEST', cast=bool, default=True)
 API_KEY = config('BUDA_API_KEY')
 API_SECRET = config('BUDA_API_SECRET')
+HOST = config('BUDA_HOST', default=None)
+TEST_ORDERS = config('BUDA_TEST_ORDERS', cast=bool, default=False)
 MARKET_ID = Buda.Market.BTC_CLP
 
 
 class BudaPublicTest(unittest.TestCase):
 
     def setUp(self):
-        self.client = Buda.Public(TEST)
+        self.client = Buda.Public(host=HOST)
 
     def test_instantiate_client(self):
         self.assertIsInstance(self.client, Buda.Public)
@@ -50,7 +51,7 @@ class BudaPublicTest(unittest.TestCase):
 class BudaAuthTest(unittest.TestCase):
 
     def setUp(self):
-        self.client = Buda.Auth(API_KEY, API_SECRET, TEST)
+        self.client = Buda.Auth(API_KEY, API_SECRET, host=HOST)
 
     def test_instantiate_client(self):
         self.assertIsInstance(self.client, Buda.Auth)
@@ -130,7 +131,7 @@ class BudaAuthTest(unittest.TestCase):
         single_order = self.client.order_details(first_order.id)
         self.assertIsInstance(single_order, models.Order)
 
-    @unittest.skipUnless(TEST, 'Only run on staging context')
+    @unittest.skipUnless(TEST_ORDERS, 'Only run on staging context')
     def test_new_order_cancel_order(self):
         # New order
         new_order = self.client.new_order(
@@ -146,7 +147,7 @@ class BudaAuthTest(unittest.TestCase):
 class BudaAuthTestBadApi(unittest.TestCase):
 
     def setUp(self):
-        self.client = Buda.Auth('BAD_KEY', 'BAD_SECRET')
+        self.client = Buda.Auth('BAD_KEY', 'BAD_SECRET', host=HOST)
 
     def test_instantiate_client(self):
         self.assertIsInstance(self.client, Buda.Auth)
