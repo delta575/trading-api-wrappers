@@ -1,39 +1,117 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Note: To use the 'upload' functionality of this file, you must:
+#   $ pip install twine
+
+import io
+import os
 import sys
-from setuptools import setup
+from shutil import rmtree
 
-if not (sys.version_info >= (3, 6)):
-    sys.exit('Only Python 3.6 or later is supported')
+from setuptools import find_packages, setup, Command
 
+# Package meta-data.
+NAME = 'trading-api-wrappers'
+DESCRIPTION = 'Trading API Wrappers for Python 3.6.'
+URL = 'https://github.com/delta575/trading-api-wrappers'
+EMAIL = 'faranguiz575@gmail.com, sarang575@gmail.com'
+AUTHOR = 'Felipe Aránguiz, Sebastián Aránguiz'
+REQUIRES_PYTHON = '>=3.6.0'
+VERSION = '0.8.0'
+
+# What packages are required for this module to be executed?
+REQUIRED = [
+    'requests',
+]
+
+# The rest you shouldn't have to touch too much :)
+# ------------------------------------------------
+# Except, perhaps the License and Trove Classifiers!
+# If you do change the License, remember to change the Trove Classifier for that!
+
+here = os.path.abspath(os.path.dirname(__file__))
+
+# Import the README and use it as the long-description.
+# Note: this will only work if 'README.rst' is present in your MANIFEST.in file!
+with io.open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
+    long_description = '\n' + f.read()
+
+# Load the package's __version__.py module as a dictionary.
+about = {}
+if not VERSION:
+    with open(os.path.join(here, NAME, '__version__.py')) as f:
+        exec(f.read(), about)
+else:
+    about['__version__'] = VERSION
+
+
+class UploadCommand(Command):
+    """Support setup.py upload."""
+
+    description = 'Build and publish the package.'
+    user_options = []
+
+    @staticmethod
+    def status(s):
+        """Prints things in bold."""
+        print('\033[1m{0}\033[0m'.format(s))
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        try:
+            self.status('Removing previous builds…')
+            rmtree(os.path.join(here, 'dist'))
+        except OSError:
+            pass
+
+        self.status('Building Source and Wheel (universal) distribution…')
+        os.system('{0} setup.py sdist bdist_wheel --universal'.format(sys.executable))
+
+        self.status('Uploading the package to PyPi via Twine…')
+        os.system('twine upload dist/*')
+
+        self.status('Pushing git tags…')
+        os.system('git tag v{0}'.format(about['__version__']))
+        os.system('git push --tags')
+
+        sys.exit()
+
+
+# Where the magic happens:
 setup(
-    name='trading_api_wrappers',
-    version='0.7.3',
-    description='Trading API Wrappers for Python 3.6',
-    url='https://github.com/delta575/trading-api-wrappers',
-    author='Felipe Aránguiz, Sebastián Aránguiz',
-    authoremail='faranguiz575@gmail.com, sarang575@gmail.com',
+    name=NAME,
+    version=about['__version__'],
+    description=DESCRIPTION,
+    long_description=long_description,
+    author=AUTHOR,
+    author_email=EMAIL,
+    python_requires=REQUIRES_PYTHON,
+    url=URL,
+    packages=find_packages(exclude=('test',)),
+    install_requires=REQUIRED,
+    include_package_data=True,
     license='MIT',
-    packages=[
-        'trading_api_wrappers',
-        'trading_api_wrappers.bitcoinity',
-        'trading_api_wrappers.bitfinex',
-        'trading_api_wrappers.bitstamp',
-        'trading_api_wrappers.buda',
-        'trading_api_wrappers.coindesk',
-        'trading_api_wrappers.coinmarketcap',
-        'trading_api_wrappers.cryptomkt',
-        'trading_api_wrappers.currencylayer',
-        'trading_api_wrappers.kraken',
-        'trading_api_wrappers.oxr',
-        'trading_api_wrappers.surbtc',
+    classifiers=[
+        # Trove classifiers
+        # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
+        # 'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'Natural Language :: English',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy'
     ],
-    package_dir={
-        'trading_api_wrappers': 'trading_api_wrappers',
+    # $ setup.py publish support.
+    cmdclass={
+        'upload': UploadCommand,
     },
-    install_requires=[
-        'requests',
-    ],
-    tests_require=[
-        'python-decouple',
-    ],
-    zip_safe=True
 )
