@@ -106,7 +106,7 @@ class KrakenAuth(KrakenPublic):
 
     # Query trades info.
     def open_positions(self,
-                       txid: list,
+                       txid: list=None,
                        include_pl: bool=None):
         payload = {
             'txid': txid,
