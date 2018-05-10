@@ -68,7 +68,7 @@ class BitstampAuth(BitstampPublic):
         if sort_desc is not None:
             payload['sort'] = 'desc' if sort_desc else 'asc'
         path = 'user_transactions'
-        path = path if currency_pair else f'{path}/{currency_pair}'
+        path = f'{path}/{currency_pair}' if currency_pair else path
         url = self.url_for(path)
         return self._sign_and_post(url, payload)
 
