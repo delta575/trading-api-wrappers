@@ -371,6 +371,6 @@ class BitstampAuth(BitstampPublic):
 
     # Packs and sign the payload and send the request with POST.
     def _sign_and_post(self, url, payload=None):
-        clean_payload = clean_parameters(payload)
+        clean_payload = clean_parameters(payload or {})
         signed_payload = self._sign_payload(clean_payload)
         return self.post(url, headers=None, data=signed_payload)
