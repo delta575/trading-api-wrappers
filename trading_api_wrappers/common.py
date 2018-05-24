@@ -37,8 +37,7 @@ def build_route(path, params=None):
 
 
 def clean_parameters(parameters: dict):
-    if parameters:
-        return {k: v for k, v in parameters.items() if v is not None}
+    return {k: v for k, v in parameters.items() if v is not None}
 
 
 def date_range(start_date, end_date):

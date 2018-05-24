@@ -32,7 +32,7 @@ Installation
 
 .. code:: bash
 
-    $ pip install git+https://github.com/delta575/trading-api-wrappers.git
+    $ pip install trading-api-wrappers
 
 Usage
 -----

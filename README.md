@@ -30,7 +30,7 @@ Rename `.env.example` to `.env`
 ## Installation
 
 ```bash
-$ pip install git+https://github.com/delta575/trading-api-wrappers.git
+$ pip install  trading-api-wrappers
 ```    
 
 ## Usage

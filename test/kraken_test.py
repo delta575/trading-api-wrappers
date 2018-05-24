@@ -31,6 +31,10 @@ class KrakenAuthTest(unittest.TestCase):
     def test_instantiate_client(self):
         self.assertIsInstance(self.client, Kraken.Auth)
 
+    def test_balance(self):
+        response = self.client.balance()
+        self.assertIn('result', response.keys())
+
     def test_trade_balance(self):
         response = self.client.trade_balance()
         self.assertIn('result', response.keys())
