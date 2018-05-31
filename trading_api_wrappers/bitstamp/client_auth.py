@@ -8,8 +8,8 @@ from ..common import check_keys, clean_parameters, gen_nonce
 
 class BitstampAuth(BitstampPublic):
 
-    def __init__(self, key, secret, customer_id, timeout=30):
-        super().__init__(timeout)
+    def __init__(self, key, secret, customer_id, timeout: int=30, retry=None):
+        super().__init__(timeout, retry)
         check_keys(key, secret)
         self.KEY = str(key)
         self.SECRET = str(secret)

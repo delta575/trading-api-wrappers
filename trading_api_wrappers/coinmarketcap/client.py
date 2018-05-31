@@ -10,8 +10,9 @@ VERSION = 'v1'
 
 class CoinMarketCap(Client):
 
-    def __init__(self, timeout: int=120):
-        super().__init__(Server(PROTOCOL, HOST, VERSION), timeout)
+    def __init__(self, timeout: int=120, retry=None):
+        server = Server(PROTOCOL, HOST, VERSION)
+        super().__init__(server, timeout, retry)
         self._currencies = None
 
     def ticker(self,

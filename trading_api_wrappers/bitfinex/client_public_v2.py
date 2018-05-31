@@ -8,8 +8,8 @@ from ..base import Client
 
 class BitfinexPublic(Client):
 
-    def __init__(self, timeout=30, return_json=False):
-        super().__init__(Server(version=2), timeout)
+    def __init__(self, timeout=30, return_json=False, retry=None):
+        super().__init__(Server(version=2), timeout, retry)
         self.return_json = return_json
 
     def ticker(self, symbol: str):

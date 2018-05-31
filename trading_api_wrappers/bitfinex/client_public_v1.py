@@ -5,8 +5,8 @@ from ..base import Client
 
 class BitfinexPublic(Client):
 
-    def __init__(self, timeout: int=30):
-        super().__init__(Server(version=1), timeout)
+    def __init__(self, timeout: int=30, retry=None):
+        super().__init__(Server(version=1), timeout, retry)
 
     def ticker(self, symbol: str):
         """Gets the innermost bid and asks and information on the most recent trade.

@@ -7,8 +7,8 @@ class KrakenPublic(Client):
 
     error_key = 'error'
 
-    def __init__(self, timeout: int=30):
-        super().__init__(KrakenServer(), timeout)
+    def __init__(self, timeout: int=30, retry=None):
+        super().__init__(KrakenServer(), timeout, retry)
 
     def server_time(self):
         url = self.url_for('public/Time')

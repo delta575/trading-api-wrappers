@@ -4,9 +4,18 @@ from urllib.parse import urlparse
 
 # pip
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 # local
 from . import errors
+
+TIMEOUT = 30
+RETRY = Retry(
+    total=3,
+    backoff_factor=2,
+    status_forcelist=(400, 401, 404, 408, 429, 500, 502, 503, 504),
+)
 
 
 class Server(object):
@@ -26,9 +35,18 @@ class Client(object):
 
     error_key = ''
 
-    def __init__(self, server: Server, timeout=30):
+    def __init__(self, server: Server, timeout: int=TIMEOUT,
+                 retry: (bool, int, Retry)=None):
         self.SERVER = server
         self.TIMEOUT = timeout
+        # Set session
+        session = requests.Session()
+        if retry is True:
+            retry = RETRY
+        adapter = HTTPAdapter(max_retries=retry)
+        session.mount('http://', adapter)
+        session.mount('https://', adapter)
+        self.session = session
 
     def get(self, url, headers=None, params=None):
         response = self._request('get', url, headers=headers, params=params)
@@ -44,7 +62,7 @@ class Client(object):
 
     def _request(self, method, url, headers, params=None, data=None):
         data = self._encode_data(data)
-        response = requests.request(
+        response = self.session.request(
             method,
             url,
             headers=headers,

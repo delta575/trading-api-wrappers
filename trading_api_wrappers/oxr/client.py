@@ -11,8 +11,8 @@ class OXR(Client):
 
     error_key = 'error'
 
-    def __init__(self, app_id: str, timeout: int=120):
-        super().__init__(Server(PROTOCOL, HOST), timeout)
+    def __init__(self, app_id: str, timeout: int=120, retry=None):
+        super().__init__(Server(PROTOCOL, HOST), timeout, retry)
         self.APP_ID = str(app_id)
 
     def currencies(self):

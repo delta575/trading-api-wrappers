@@ -12,8 +12,9 @@ VERSION = 'v1'
 
 class CoinDesk(Client):
 
-    def __init__(self, timeout: int=15):
-        super().__init__(Server(PROTOCOL, HOST, VERSION), timeout)
+    def __init__(self, timeout: int=15, retry=None):
+        server = Server(PROTOCOL, HOST, VERSION)
+        super().__init__(server, timeout, retry)
 
     def bpi(self, currency: str):
         return _BPI(self, currency)
