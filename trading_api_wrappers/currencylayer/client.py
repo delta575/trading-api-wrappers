@@ -15,8 +15,8 @@ class CurrencyLayer(Client):
     """
     error_key = 'error'
 
-    def __init__(self, access_key: str, timeout: int=120):
-        super().__init__(Server(PROTOCOL, HOST), timeout)
+    def __init__(self, access_key: str, timeout: int=120, retry=None):
+        super().__init__(Server(PROTOCOL, HOST), timeout, retry)
         self.ACCESS_KEY = str(access_key)
 
     def currencies(self):

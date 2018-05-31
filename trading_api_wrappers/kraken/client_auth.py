@@ -10,8 +10,9 @@ from ..common import check_keys, clean_parameters, gen_nonce
 
 class KrakenAuth(KrakenPublic):
 
-    def __init__(self, key: str=False, secret: str=False, timeout: int=30):
-        super().__init__(timeout)
+    def __init__(self, key: str=False, secret: str=False, timeout: int=30,
+                 retry=None):
+        super().__init__(timeout, retry)
         check_keys(key, secret)
         self.KEY = str(key)
         self.SECRET = str(secret)

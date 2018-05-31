@@ -11,8 +11,8 @@ class CryptoMKTPublic(Client):
 
     error_key = 'message'
 
-    def __init__(self, timeout: int=30, return_json=False):
-        super().__init__(CryptoMKTServer(), timeout)
+    def __init__(self, timeout: int=30, return_json=False, retry=None):
+        super().__init__(CryptoMKTServer(), timeout, retry)
         self.return_json = return_json
 
     def markets(self):

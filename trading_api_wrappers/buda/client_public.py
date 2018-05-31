@@ -10,8 +10,8 @@ class BudaPublic(Client):
     error_key = 'message'
 
     def __init__(self, timeout: int=30, host: str=None,
-                 return_json: bool=False):
-        super().__init__(BudaServer(host), timeout)
+                 return_json: bool=False, retry=None):
+        super().__init__(BudaServer(host), timeout, retry)
         self.return_json = return_json
 
     def markets(self):

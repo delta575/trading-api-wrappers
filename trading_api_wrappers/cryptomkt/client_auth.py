@@ -12,8 +12,8 @@ from ..common import check_keys, clean_parameters
 class CryptoMKTAuth(CryptoMKTPublic):
 
     def __init__(self, key: str=False, secret: str=False, timeout: int=30,
-                 return_json=False):
-        super().__init__(timeout, return_json)
+                 return_json=False, retry=None):
+        super().__init__(timeout, return_json, retry)
         check_keys(key, secret)
         self.KEY = str(key)
         self.SECRET = str(secret)
