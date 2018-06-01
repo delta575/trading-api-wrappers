@@ -14,7 +14,7 @@ TIMEOUT = 30
 RETRY = Retry(
     total=3,
     backoff_factor=2,
-    status_forcelist=(400, 401, 404, 408, 429, 500, 502, 503, 504),
+    status_forcelist=(400, 401, 403, 404, 408, 429, 500, 502, 503, 504),
 )
 
 
