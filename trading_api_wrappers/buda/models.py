@@ -429,11 +429,12 @@ class TransferData(
 
     @classmethod
     def create_from_json(cls, transfer, address_key):
-        return cls(
-            type=transfer['type'],
-            address=transfer.get(address_key),
-            tx_hash=transfer.get('tx_hash'),
-        )
+        if transfer:
+            return cls(
+                type=transfer['type'],
+                address=transfer.get(address_key),
+                tx_hash=transfer.get('tx_hash'),
+            )
 
 
 class Transfer(
