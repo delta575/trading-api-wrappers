@@ -45,9 +45,11 @@ class BudaPublic(Client):
 
     def trades(self,
                market_id: str,
-               timestamp: int=None):
+               timestamp: int=None,
+               limit: int=None):
         params = {
             'timestamp': timestamp,
+            'limit': limit,
         }
         url, path = self.url_path_for('markets/%s/trades', market_id)
         data = self.get(url, params=params)

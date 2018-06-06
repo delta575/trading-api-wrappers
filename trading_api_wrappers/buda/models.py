@@ -412,7 +412,7 @@ class Trades(
     @classmethod
     def create_from_json(cls, trades):
         return cls(
-            timestamp=int(trades['timestamp']),
+            timestamp=int_or_none(trades['timestamp']),
             last_timestamp=int_or_none(trades['last_timestamp']),
             entries=[TradeEntry.create_from_json(entry)
                      for entry in trades['entries']],
@@ -429,11 +429,12 @@ class TransferData(
 
     @classmethod
     def create_from_json(cls, transfer, address_key):
-        return cls(
-            type=transfer['type'],
-            address=transfer.get(address_key),
-            tx_hash=transfer.get('tx_hash'),
-        )
+        if transfer:
+            return cls(
+                type=transfer['type'],
+                address=transfer.get(address_key),
+                tx_hash=transfer.get('tx_hash'),
+            )
 
 
 class Transfer(
