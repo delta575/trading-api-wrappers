@@ -1,16 +1,8 @@
-import time
 from datetime import date, datetime, timedelta
 from urllib.parse import urlencode
 
 # local
 from . import logger
-
-
-def gen_nonce():
-    # Sleeps 200ms to avoid flooding the server with requests.
-    time.sleep(0.2)
-    # Get a str from the current time in microseconds.
-    return str(int(time.time() * 1E6))
 
 
 def check_keys(key, secret):

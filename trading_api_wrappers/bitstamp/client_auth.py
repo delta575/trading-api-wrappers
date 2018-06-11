@@ -3,7 +3,7 @@ import hmac
 
 # local
 from .client_public import BitstampPublic
-from ..common import check_keys, clean_parameters, gen_nonce
+from ..common import check_keys, clean_parameters
 
 
 class BitstampAuth(BitstampPublic):
@@ -357,7 +357,7 @@ class BitstampAuth(BitstampPublic):
     def _sign_payload(self, payload=None):
         payload = payload or {}
         payload['key'] = self.KEY
-        payload['nonce'] = gen_nonce()
+        payload['nonce'] = self.nonce()
         msg = str(payload['nonce']) + self.CUSTOMER_ID + self.KEY
         payload['signature'] = hmac.new(
             self.SECRET.encode('utf-8'),

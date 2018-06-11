@@ -1,4 +1,5 @@
 import json
+import time
 from enum import Enum
 from urllib.parse import urlparse
 
@@ -34,6 +35,8 @@ class Server(object):
 class Client(object):
 
     error_key = ''
+    enable_rate_limit = True
+    rate_limit = 1000  # in milliseconds (seconds * 1E3)
 
     def __init__(self, server: Server, timeout: int=TIMEOUT,
                  retry: (bool, int, Retry)=None):
@@ -47,6 +50,7 @@ class Client(object):
         session.mount('http://', adapter)
         session.mount('https://', adapter)
         self.session = session
+        self.last_request_timestamp = 0
 
     def get(self, url, headers=None, params=None):
         response = self._request('get', url, headers=headers, params=params)
@@ -61,6 +65,9 @@ class Client(object):
         return response
 
     def _request(self, method, url, headers, params=None, data=None):
+        if self.enable_rate_limit:
+            self.throttle()
+        self.last_request_timestamp = self.milliseconds()
         data = self._encode_data(data)
         response = self.session.request(
             method,
@@ -101,6 +108,32 @@ class Client(object):
         url = self.url_for(path, path_arg)
         path = urlparse(url).path
         return url, path
+
+    def throttle(self):
+        now = float(self.milliseconds())
+        elapsed = now - self.last_request_timestamp
+        if elapsed < self.rate_limit:
+            delay = self.rate_limit - elapsed
+            time.sleep(delay / 1E3)
+
+    def nonce(self):
+        return str(self.microseconds())
+
+    @staticmethod
+    def seconds():
+        return int(time.time())
+
+    @staticmethod
+    def milliseconds():
+        return int(time.time() * 1E3)
+
+    @staticmethod
+    def microseconds():
+        return int(time.time() * 1E6)
+
+    def __del__(self):
+        if self.session:
+            self.session.close()
 
 
 class _Enum(Enum):
