@@ -116,6 +116,9 @@ class Client(object):
             delay = self.rate_limit - elapsed
             time.sleep(delay / 1E3)
 
+    def nonce(self):
+        return str(self.microseconds())
+
     @staticmethod
     def seconds():
         return int(time.time())

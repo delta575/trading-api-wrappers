@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 
 # local
 from .client_public import KrakenPublic
-from ..common import check_keys, clean_parameters, gen_nonce
+from ..common import check_keys, clean_parameters
 
 
 class KrakenAuth(KrakenPublic):
@@ -298,7 +298,7 @@ class KrakenAuth(KrakenPublic):
 
     # PRIVATE METHODS ---------------------------------------------------------
     def _sign_payload(self, path: str, data: dict=None):
-        data['nonce'] = gen_nonce()
+        data['nonce'] = self.nonce()
         encoded_data = self._encode_data(data)
 
         # Unicode-objects must be encoded before hashing

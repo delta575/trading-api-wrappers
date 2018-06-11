@@ -5,7 +5,7 @@ import json
 
 # local
 from .client_public_v1 import BitfinexPublic
-from ..common import check_keys, clean_parameters, gen_nonce
+from ..common import check_keys, clean_parameters
 
 
 class BitfinexAuth(BitfinexPublic):
@@ -248,7 +248,7 @@ class BitfinexAuth(BitfinexPublic):
     def _sign_payload(self, path: str, payload: dict):
 
         payload['request'] = path
-        payload['nonce'] = gen_nonce()
+        payload['nonce'] = self.nonce()
         payload = clean_parameters(payload)
 
         j = json.dumps(payload).encode('utf-8')

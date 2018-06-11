@@ -7,7 +7,7 @@ from datetime import datetime
 # local
 from . import constants as _c
 from . import models as _m
-from ..common import build_route, check_keys, gen_nonce
+from ..common import build_route, check_keys
 from .client_public import BudaPublic
 
 
@@ -243,7 +243,7 @@ class BudaAuth(BudaPublic):
     def _sign_payload(self, method, path, params=None, payload=None):
 
         route = build_route(path, params)
-        nonce = gen_nonce()
+        nonce = self.nonce()
 
         if payload:
             j = json.dumps(payload).encode('utf-8')
