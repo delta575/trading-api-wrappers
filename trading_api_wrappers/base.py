@@ -128,6 +128,10 @@ class Client(object):
     def microseconds():
         return int(time.time() * 1E6)
 
+    def __del__(self):
+        if self.session:
+            self.session.close()
+
 
 class _Enum(Enum):
     @staticmethod
