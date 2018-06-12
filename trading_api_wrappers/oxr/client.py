@@ -8,7 +8,6 @@ HOST = 'openexchangerates.org/api/'
 
 
 class OXR(Client):
-
     error_key = 'error'
 
     def __init__(self, app_id: str, timeout: int=120, retry=None):
@@ -21,9 +20,7 @@ class OXR(Client):
         Exchange Rates API, along with their full names.
         ref. https://oxr.readme.io/docs/currencies-json
         """
-        url = self.url_for('currencies.json')
-        data = self.get(url)
-        return data
+        return self.get('currencies.json')
 
     def latest(self, 
                base: str=None, 
@@ -32,9 +29,7 @@ class OXR(Client):
         Get latest data.
         ref. https://oxr.readme.io/docs/latest-json
         """
-        url = self.url_for('latest.json')
-        data = self._get_exchange_rates(url, base, symbols)
-        return data
+        return self.get('latest.json', base, symbols)
 
     def historical(self,
                    date_for: str,
@@ -45,9 +40,7 @@ class OXR(Client):
         ref. https://oxr.readme.io/docs/historical-json
         """
         date_for = format_date_iso(date_for)
-        url = self.url_for('historical/%s.json', date_for)
-        data = self._get_exchange_rates(url, base, symbols)
-        return data
+        return self.get(f'historical/{date_for}.json', base, symbols)
 
     def time_series(self,
                     start: str,
@@ -58,13 +51,10 @@ class OXR(Client):
         Get time-series data.
         ref. https://oxr.readme.io/docs/time-series-json
         """
-        params = {
+        return self.get('time-series.json', base, symbols, params={
             'start': format_date_iso(start),
             'end': format_date_iso(end),
-        }
-        url = self.url_for('time-series.json')
-        data = self._get_exchange_rates(url, base, symbols, params)
-        return data
+        })
 
     def convert(self,
                 value: int,
@@ -75,9 +65,7 @@ class OXR(Client):
         API rates.
         ref. https://oxr.readme.io/docs/convert
         """
-        url = self.url_for('convert/%s/%s/%s', (value, from_symbol, to_symbol))
-        data = self._get_exchange_rates(url)
-        return data
+        return self.get(f'convert/{value}/{from_symbol}/{to_symbol}')
 
     def ohlc(self,
              start_time: str,
@@ -88,26 +76,29 @@ class OXR(Client):
         Get historical open, high, low, close (OHLC) and average data.
         ref. https://oxr.readme.io/docs/ohlc-json
         """
-        params = {
+        return self.get('ohlc.json', base, symbols, params={
             'start_time': format_datetime_iso(start_time),
             'period': period,
-        }
-        url = self.url_for('ohlc.json')
-        data = self._get_exchange_rates(url, base, symbols, params)
-        return data
+        })
 
-    def _get_exchange_rates(self,
-                            url: str,
-                            base: str=None,
-                            symbols: list=None,
-                            params: dict=None):
-        if params is None:
-            params = dict()
-        params['app_id'] = self.APP_ID
+    # OVERRIDES ---------------------------------------------------------------
+    def get(self,
+            endpoint: str,
+            base: str=None,
+            symbols: list=None,
+            params: dict=None):
+        params = params or {}
         if base is not None:
             params['base'] = base
         if isinstance(symbols, list) or isinstance(symbols, tuple):
             symbols = ','.join(symbols)
         if symbols is not None:
             params['symbols'] = symbols
-        return self.get(url, params=params)
+        return super().get(endpoint, params=params)
+
+    def sign(self, method, path, params=None, data=None):
+        params = params or {}
+        params['app_id'] = self.APP_ID
+        return {
+            'params': params
+        }

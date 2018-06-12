@@ -28,11 +28,9 @@ class CoinMarketCap(Client):
         if currency:
             if len(currency) == 3:
                 currency = self._get_symbol(currency)['value']
-            url = self.url_for('ticker/%s/', currency)
-            data = self.get(url, params=params)[0]
+            data = self.get(f'ticker/{currency}/', params=params)[0]
         else:
-            url = self.url_for('ticker/')
-            data = self.get(url, params=params)
+            data = self.get('ticker/', params=params)
         return data
 
     def price(self,
@@ -42,11 +40,7 @@ class CoinMarketCap(Client):
         return float(ticker[f"price_{convert or 'usd'}".lower()])
 
     def stats(self, convert: str=None):
-        params = {
-            'convert': convert,
-        }
-        url = self.url_for('global/')
-        data = self.get(url, params=params)
+        data = self.get('global/', params={'convert': convert})
         return data
 
     def _get_currencies(self):
@@ -59,6 +53,6 @@ class CoinMarketCap(Client):
             self._currencies = self._get_currencies()
         return self._currencies[currency.upper()]
 
-    def get(self, url: str, headers: dict=None, params: dict=None):
+    def get(self, endpoint: str, headers: dict=None, params: dict=None):
         clean_params = clean_parameters(params)
-        return super(CoinMarketCap, self).get(url, params=clean_params)
+        return super().get(endpoint, params=clean_params)

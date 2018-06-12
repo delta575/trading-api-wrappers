@@ -8,7 +8,6 @@ from .server import CryptoMKTServer
 
 
 class CryptoMKTPublic(Client):
-
     error_key = 'message'
 
     def __init__(self, timeout: int=30, return_json=False, retry=None):
@@ -16,16 +15,13 @@ class CryptoMKTPublic(Client):
         self.return_json = return_json
 
     def markets(self):
-        url = self.url_for('market')
-        data = self.get(url)
+        data = self.get('market')
         return data['data']
 
     def ticker(self, market_id: str):
-        url = self.url_for('ticker')
-        params = {
+        data = self.get('ticker', params={
             'market': str(market_id)
-        }
-        data = self.get(url, params=params)
+        })
         if self.return_json:
             return data
         return _m.Ticker.create_from_json(data['data'])
@@ -35,14 +31,12 @@ class CryptoMKTPublic(Client):
                    order_type: str,
                    page: int=None,
                    limit: int=_c.ORDERS_LIMIT):
-        params = {
+        data = self.get('book', params={
             'market': str(market_id),
             'type': str(order_type),
             'page': page,
             'limit': limit
-        }
-        url = self.url_for('book')
-        data = self.get(url, params=params)
+        })
         if self.return_json:
             return data
         return _m.OrderBook.create_from_json(
@@ -58,15 +52,13 @@ class CryptoMKTPublic(Client):
             start = start.strftime('%Y-%m-%d')
         if isinstance(end, datetime):
             end = end.strftime('%Y-%m-%d')
-        params = {
+        data = self.get('trades', params={
             'market': str(market_id),
             'start': start,
             'end': end,
             'page': page,
             'limit': limit,
-        }
-        url = self.url_for('trades')
-        data = self.get(url, params=params)
+        })
         if self.return_json:
             return data
         return _m.Trades.create_from_json(

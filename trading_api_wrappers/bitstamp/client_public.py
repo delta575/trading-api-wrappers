@@ -4,34 +4,32 @@ from ..base import Client
 
 
 class BitstampPublic(Client):
-
     error_key = 'error'
 
     def __init__(self, timeout: int=30, retry=None):
         super().__init__(BitstampServer(), timeout, retry)
 
-    def url_for(self, path, path_arg=None, version=2):
+    @staticmethod
+    def _endpoint_for(endpoint, version=2):
+        # NOTE: Bitstamp urls MUST end with /
         if version == 1:
-            url = f'{self.SERVER.URL}/{path}/'
+            return f'{endpoint}/'
         else:
-            url = f'{self.SERVER.URL}/v{version}/{path}/'
-        if path_arg:
-            url = url % path_arg
-        return url
+            return f'v{version}/{endpoint}/'
 
     def ticker(self, currency_pair: str):
         """
         Returns ticker dictionary.
         """
-        url = self.url_for('ticker/%s', currency_pair)
-        return self.get(url)
+        endpoint = self._endpoint_for(f'ticker/{currency_pair}')
+        return self.get(endpoint)
 
     def ticker_hour(self, currency_pair: str):
         """
         Returns dictionary of the average ticker of the past hour.
         """
-        url = self.url_for('ticker_hour/%s', currency_pair)
-        return self.get(url)
+        endpoint = self._endpoint_for(f'ticker_hour/{currency_pair}')
+        return self.get(endpoint)
 
     def order_book(self, currency_pair: str):
         """
@@ -40,8 +38,8 @@ class BitstampPublic(Client):
         Each is a list of open orders and each order is represented as a list
         of price and amount.
         """
-        url = self.url_for('order_book/%s', currency_pair)
-        return self.get(url)
+        endpoint = self._endpoint_for(f'order_book/{currency_pair}')
+        return self.get(endpoint)
 
     def transactions(self, currency_pair: str, time_interval: str=None):
         """
@@ -50,8 +48,8 @@ class BitstampPublic(Client):
         Parameter time is specified by one of two values of TransRange class.
         """
         params = {'time': str(time_interval)} if time_interval else None
-        url = self.url_for('transactions/%s', currency_pair)
-        return self.get(url, params=params)
+        endpoint = self._endpoint_for(f'transactions/{currency_pair}')
+        return self.get(endpoint, params=params)
 
     def trading_pairs_info(self):
         """
@@ -68,8 +66,7 @@ class BitstampPublic(Client):
                 'base_decimals':8
             },
         """
-        url = self.url_for('trading-pairs-info')
-        return self.get(url)
+        return self.get(self._endpoint_for('trading-pairs-info'))
 
     def conversion_rate_usd_eur(self):
         """
@@ -77,5 +74,5 @@ class BitstampPublic(Client):
 
             {'buy': 'buy conversion rate', 'sell': 'sell conversion rate'}
         """
-        url = self.url_for('eur_usd', version=1)
-        return self.get(url)
+        endpoint = self._endpoint_for('eur_usd', version=1)
+        return self.get(endpoint)

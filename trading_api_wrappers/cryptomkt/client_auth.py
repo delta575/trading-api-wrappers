@@ -1,6 +1,5 @@
 import hashlib
 import hmac
-import time
 
 # local
 from . import constants as _c
@@ -11,8 +10,12 @@ from ..common import check_keys, clean_parameters
 
 class CryptoMKTAuth(CryptoMKTPublic):
 
-    def __init__(self, key: str=False, secret: str=False, timeout: int=30,
-                 return_json=False, retry=None):
+    def __init__(self,
+                 key: str=None,
+                 secret: str=None,
+                 timeout: int=30,
+                 return_json=False,
+                 retry=None):
         super().__init__(timeout, return_json, retry)
         check_keys(key, secret)
         self.KEY = str(key)
@@ -20,9 +23,7 @@ class CryptoMKTAuth(CryptoMKTPublic):
 
     # BALANCE------------------------------------------------------------------
     def balance(self):
-        url, path = self.url_path_for('balance')
-        headers = self._sign_payload(path=path)
-        data = self.get(url, headers=headers)
+        data = self.get('balance')
         if self.return_json:
             return data
         return _m.Balance.create_from_json(data['data'])
@@ -36,14 +37,11 @@ class CryptoMKTAuth(CryptoMKTPublic):
                       market_id: str,
                       page: int=None,
                       limit: int=_c.ORDERS_LIMIT):
-        params = {
+        data = self.get('orders/active', params={
             'market': str(market_id),
             'page': page,
             'limit': limit,
-        }
-        url, path = self.url_path_for('orders/active')
-        headers = self._sign_payload(path=path)
-        data = self.get(url, headers=headers, params=params)
+        })
         if self.return_json:
             return data
         return _m.Orders.create_from_json(data['data'], data['pagination'])
@@ -52,14 +50,11 @@ class CryptoMKTAuth(CryptoMKTPublic):
                         market_id: str,
                         page: int=None,
                         limit: int=_c.ORDERS_LIMIT):
-        params = {
+        data = self.get('orders/executed', params={
             'market': str(market_id),
             'page': page,
             'limit': limit,
-        }
-        url, path = self.url_path_for('orders/executed')
-        headers = self._sign_payload(path=path)
-        data = self.get(url, headers=headers, params=params)
+        })
         if self.return_json:
             return data
         return _m.Orders.create_from_json(data['data'], data['pagination'])
@@ -69,37 +64,28 @@ class CryptoMKTAuth(CryptoMKTPublic):
                      order_type: str,
                      amount: float,
                      price: float):
-        payload = {
+        data = self.post('orders/create', data={
             'market': str(market_id),
             'type': str(order_type),
             'amount': amount,
             'price': price,
-        }
-        url, path = self.url_path_for('orders/create')
-        headers = self._sign_payload(path=path, payload=payload)
-        data = self.post(url, headers=headers, data=payload)
+        })
         if self.return_json:
             return data
         return _m.Order.create_from_json(data['data'])
 
     def order_status(self, order_id: str):
-        params = {
+        data = self.get('orders/status', params={
             'id': order_id,
-        }
-        url, path = self.url_path_for('orders/status')
-        headers = self._sign_payload(path=path)
-        data = self.get(url, headers=headers, params=params)
+        })
         if self.return_json:
             return data
         return _m.Order.create_from_json(data['data'])
 
     def cancel_order(self, order_id: str):
-        payload = {
+        data = self.get('orders/cancel', params={
             'id': order_id,
-        }
-        url, path = self.url_path_for('orders/cancel')
-        headers = self._sign_payload(path=path, payload=payload)
-        data = self.post(url, headers=headers, data=payload)
+        })
         if self.return_json:
             return data
         return _m.Order.create_from_json(data['data'])
@@ -115,7 +101,7 @@ class CryptoMKTAuth(CryptoMKTPublic):
                        error_url: str=None,
                        success_url: str=None,
                        refund_email: str=None):
-        payload = {
+        data = self.post('payment/new_order', data={
             'to_receive': amount,
             'to_receive_currency': str(currency),
             'payment_receiver': account_email,
@@ -124,48 +110,44 @@ class CryptoMKTAuth(CryptoMKTPublic):
             'error_url': error_url,
             'success_url': success_url,
             'refund_email': refund_email,
-        }
-        payload = clean_parameters(payload)
-        url, path = self.url_path_for('payment/new_order')
-        headers = self._sign_payload(path=path, payload=payload)
-        data = self.post(url, headers=headers, data=payload)
+        })
         if self.return_json:
             return data
         return data
 
     # TODO: Not tested
     def payment_status(self, payment_id: str):
-        params = {
+        data = self.get('payment/status', params={
             'id': payment_id,
-        }
-        url, path = self.url_path_for('payment/status')
-        headers = self._sign_payload(path=path)
-        data = self.get(url, headers=headers, params=params)
+        })
         return data
 
     # PRIVATE METHODS ---------------------------------------------------------
-    def _sign_payload(self, path: str, payload: dict=None):
-
-        timestamp = str(int(time.time()))
+    def sign(self, method, path, params=None, data=None):
+        timestamp = str(self.seconds())
         msg = timestamp + path
 
-        if payload:
-            for value in [str(payload[k]) for k in sorted(payload.keys())]:
+        if data:
+            for value in [str(data[k]) for k in sorted(data.keys())]:
                 msg += value
 
-        signature = hmac.new(key=self.SECRET.encode('utf-8'),
-                             msg=msg.encode('utf-8'),
-                             digestmod=hashlib.sha384).hexdigest()
+        h = hmac.new(key=self.SECRET.encode('utf-8'),
+                     msg=msg.encode('utf-8'),
+                     digestmod=hashlib.sha384)
+
+        signature = h.hexdigest()
 
         # Request fails with 'get_requests_not_allowed' when
         # 'Content-Type': 'application/json' is present
         return {
-            'X-MKT-APIKEY': self.KEY,
-            'X-MKT-SIGNATURE': signature,
-            'X-MKT-TIMESTAMP': timestamp,
+            'headers': {
+                'X-MKT-APIKEY': self.KEY,
+                'X-MKT-SIGNATURE': signature,
+                'X-MKT-TIMESTAMP': timestamp,
+            },
         }
 
     # Request fails with 'get_requests_not_allowed' when
     # json.dumps()' is used
     def _encode_data(self, data):
-        return data
+        return clean_parameters(data or {})

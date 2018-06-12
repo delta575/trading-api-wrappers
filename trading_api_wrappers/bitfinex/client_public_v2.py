@@ -13,19 +13,15 @@ class BitfinexPublic(Client):
         self.return_json = return_json
 
     def ticker(self, symbol: str):
-        url = self.url_for('ticker/%s', symbol)
-        data = self.get(url)
+        data = self.get(f'ticker/{symbol}')
         if self.return_json:
             return data
         return _m.TradingTicker.create_from_json(data)
 
     def tickers(self, symbols: list):
-        symbols = [str(symbol) for symbol in symbols]
-        params = {
-            'symbols': symbols,
-        }
-        url = self.url_for('tickers')
-        data = self.get(url, params=params)
+        data = self.get('tickers', params={
+            'symbols': [str(symbol) for symbol in symbols],
+        })
         if self.return_json:
             return data
         return {ticker[0]: _m.TradingTicker.create_from_json(ticker[1:])
@@ -43,14 +39,12 @@ class BitfinexPublic(Client):
             end = end.timestamp() * 1000
         if sort:
             sort = 1 if sort is True else -1
-        params = {
+        data = self.get(f'trades/{symbol}/hist', params={
             'limit': limit,
             'start': start,
             'end': end,
             'sort': sort,
-        }
-        url = self.url_for('trades/%s/hist', symbol)
-        data = self.get(url, params=params)
+        })
         if self.return_json:
             return data
         return [_m.TradingTrade.create_from_json(trade)
@@ -60,12 +54,7 @@ class BitfinexPublic(Client):
               symbol: str,
               precision: str,
               length: int=None):
-        params = {
-            'len': length,
-        }
-        path_arg = f'{symbol}/{precision}'
-        url = self.url_for('book/%s', path_arg)
-        data = self.get(url, params=params)
+        data = self.get(f'book/{symbol}/{precision}', params={'len': length})
         if self.return_json:
             return data
         return [_m.TradingBook.create_from_json(book)
@@ -80,12 +69,9 @@ class BitfinexPublic(Client):
               sort: bool=None):
         if sort:
             sort = 1 if sort else -1
-        params = {
-            'sort': sort,
-        }
-        path_arg = f'{key}:{size}:{symbol}:{side}/{section}'
-        url = self.url_for('stats1/%s', path_arg)
-        data = self.get(url, params=params)
+        data = self.get(
+            f'stats1/{key}:{size}:{symbol}:{side}/{section}',
+            params={'sort': sort})
         if self.return_json:
             return data
         if section == 'last':
@@ -124,15 +110,14 @@ class BitfinexPublic(Client):
             end = end.timestamp() * 1000
         if sort:
             sort = 1 if sort else -1
-        params = {
-            'limit': limit,
-            'start': start,
-            'end': end,
-            'sort': sort,
-        }
-        path_arg = f'{time_frame}:{symbol}/{section}'
-        url = self.url_for('candles/trade:%s', path_arg)
-        data = self.get(url, params=params)
+        data = self.get(
+            f'candles/trade:{time_frame}:{symbol}/{section}', params={
+                'limit': limit,
+                'start': start,
+                'end': end,
+                'sort': sort,
+            }
+        )
         if self.return_json:
             return data
         if section == 'last':

@@ -10,7 +10,10 @@ from ..common import check_keys, clean_parameters
 
 class BitfinexAuth(BitfinexPublic):
 
-    def __init__(self, key: str=False, secret: str=False, timeout: int=30,
+    def __init__(self,
+                 key: str=None,
+                 secret: str=None,
+                 timeout: int=30,
                  retry=None):
         super().__init__(timeout, retry)
         check_keys(key, secret)
@@ -20,23 +23,23 @@ class BitfinexAuth(BitfinexPublic):
     # INFO --------------------------------------------------------------------
     # Return information about your account (trading fees).
     def account_info(self):
-        return self._sign_and_get('account_infos')
+        return self.get('account_infos')
 
     # Return information about your account (trading fees).
     def summary(self):
-        return self._sign_and_get('summary')
+        return self.get('summary')
 
     # Check the permissions of the key being used to generate this request.
     def key_info(self):
-        return self._sign_and_get('key_info')
+        return self.get('key_info')
 
     # See your trading wallet information for margin trading.
     def margin_info(self):
-        return self._sign_and_get('margin_infos')
+        return self.get('margin_infos')
 
     # See your balances.
     def balances(self):
-        return self._sign_and_get('balances')
+        return self.get('balances')
 
     # MOVEMENTS ---------------------------------------------------------------
     # Return your deposit address to make a new deposit.
@@ -44,12 +47,11 @@ class BitfinexAuth(BitfinexPublic):
                     method: str,
                     wallet_name: str,
                     renew: bool=None):
-        payload = {
+        return self.post('deposit/new', data={
             'method': method,
             'wallet_name': wallet_name,
             'renew': renew if renew is not None else None,
-        }
-        return self._sign_and_post('deposit/new', payload)
+        })
 
     # Allow you to move available balances between your wallets.
     def transfer(self,
@@ -57,13 +59,12 @@ class BitfinexAuth(BitfinexPublic):
                  currency: str,
                  wallet_from: str,
                  wallet_to: str):
-        payload = {
+        return self.post('transfer', data={
             'amount': str(amount),
             'currency': str(currency),
             'walletfrom': wallet_from,
             'walletto': wallet_to,
-        }
-        return self._sign_and_post('transfer', payload)
+        })
 
     # Allow you to request a withdrawal from one of your wallet.
     def withdraw(self,
@@ -71,13 +72,12 @@ class BitfinexAuth(BitfinexPublic):
                  wallet: str,
                  amount: float,
                  address: str):
-        payload = {
+        return self.post('withdraw', data={
             'withdraw_type': str(w_type),
             'walletselected': wallet,
             'amount': str(amount),
             'address': address,
-        }
-        return self._sign_and_post('withdraw', payload)
+        })
 
     # ORDERS ------------------------------------------------------------------
     # Submit a new order.
@@ -97,7 +97,7 @@ class BitfinexAuth(BitfinexPublic):
             'ocoorder': False,
         }
         payload.update(params or {})
-        return self._sign_and_post('order/new', payload)
+        return self.post('order/new', payload)
 
     # Submit a new order.
     def place_oco_order(self,
@@ -108,55 +108,42 @@ class BitfinexAuth(BitfinexPublic):
                         symbol: str,
                         buy_price_oco: float,
                         sell_price_oco: float):
-        oco = {
+        return self.place_order(amount, price, side, ord_type, symbol, params={
             'ocoorder': True,
             'buy_price_oco': str(buy_price_oco),
             'sell_price_oco': str(sell_price_oco),
-        }
-        return self.place_order(amount, price, side, ord_type, symbol, oco)
+        })
 
     # Cancel an order.
     def delete_order(self, order_id: int):
-        payload = {
-            'order_id': order_id,
-        }
-        return self._sign_and_post('order/cancel', payload)
+        return self.post('order/cancel', data={'order_id': order_id})
 
     # Cancel all orders.
     def delete_all_order(self):
-        return self._sign_and_post('order/cancel/all')
+        return self.post('order/cancel/all')
 
     # Get the status of an order. Is it active? Was it cancelled?
     # To what extent has it been executed? etc.
     def status_order(self, order_id: int):
-        payload = {
-            'order_id': order_id,
-        }
-        return self._sign_and_post('order/status', payload)
+        return self.post('order/status', data={'order_id': order_id})
 
     # View your active orders.
     def active_orders(self):
-        return self._sign_and_post('orders')
+        return self.post('orders')
 
     # View your latest inactive orders.
     # Limited to last 3 days and 1 request per minute.
     def orders_history(self, limit: int):
-        payload = {
-            'limit': limit,
-        }
-        return self._sign_and_post('order/hist', payload)
+        return self.post('order/hist', data={'limit': limit})
 
     # POSITIONS ---------------------------------------------------------------
     # View your active positions.
     def active_positions(self):
-        return self._sign_and_post('positions')
+        return self.post('positions')
 
     # Claim a position.
     def claim_position(self, position_id: int):
-        payload = {
-            'position_id': position_id,
-        }
-        return self._sign_and_post('position/claim', payload)
+        return self.post('position/claim', data={'position_id': position_id})
 
     # HISTORICAL DATA ---------------------------------------------------------
     # View all of your balance ledger entries.
@@ -166,14 +153,13 @@ class BitfinexAuth(BitfinexPublic):
                         until: float=None,
                         limit: int=None,
                         wallet: str=None):
-        payload = {
+        return self.post('history', data={
             'currency': str(currency),
             'since': since,
             'until': until,
             'limit': limit,
             'wallet': wallet,
-        }
-        return self._sign_and_post('history', payload)
+        })
 
     # View your past deposits/withdrawals.
     def movements(self,
@@ -182,14 +168,13 @@ class BitfinexAuth(BitfinexPublic):
                   since: float=None,
                   until: float=None,
                   limit: int=None):
-        payload = {
+        return self.post('history/movements', data={
             'currency': str(currency),
             'method': method,
             'since': since,
             'until': until,
             'limit': limit,
-        }
-        return self._sign_and_post('history/movements', payload)
+        })
 
     # View your past trades.
     def past_trades(self,
@@ -198,14 +183,13 @@ class BitfinexAuth(BitfinexPublic):
                     until: float=None,
                     limit_trades: int=None,
                     reverse: bool=None):
-        payload = {
+        return self.post('mytrades', data={
             'symbol': str(symbol),
             'timestamp': timestamp,
             'until': until,
             'limit_trades': limit_trades,
             'reverse': reverse if reverse is not None else None,
-        }
-        return self._sign_and_post('mytrades', payload)
+        })
 
     # MARGIN FUNDING ----------------------------------------------------------
     # Submit a new Offer.
@@ -215,62 +199,51 @@ class BitfinexAuth(BitfinexPublic):
                     rate: float,
                     period: int,
                     direction: str):
-        payload = {
+        return self.post('offer/new', data={
             'currency': str(currency),
             'amount': str(amount),
             'rate': str(rate),
             'period': period,
             'direction': str(direction),
-        }
-        return self._sign_and_post('offer/new', payload)
+        })
 
     # Cancel an offer.
     def cancel_offer(self, offer_id: int):
-        payload = {
-            'offer_id': offer_id,
-        }
-        return self._sign_and_post('offer/cancel', payload)
+        return self.post('offer/cancel', data={'offer_id': offer_id})
 
     # Get the status of an offer. Is it active? Was it cancelled?
     # To what extent has it been executed? etc.
     def status_offer(self, offer_id: int):
-        payload = {
-            'offer_id': offer_id,
-        }
-        return self._sign_and_post('offer/status', payload)
+        return self.post('offer/status', data={'offer_id': offer_id})
 
     # View your active offers.
     def active_offers(self):
-        return self._sign_and_post('offers')
+        return self.post('offers')
 
     # PRIVATE METHODS ---------------------------------------------------------
     # Pack and sign the payload of the request.
-    def _sign_payload(self, path: str, payload: dict):
-
+    def sign(self, method, path, params=None, data=None):
+        payload = data or {}
         payload['request'] = path
         payload['nonce'] = self.nonce()
         payload = clean_parameters(payload)
 
-        j = json.dumps(payload).encode('utf-8')
-        encoded_body = base64.standard_b64encode(j)
+        body = json.dumps(payload).encode('utf-8')
+        encoded_body = base64.standard_b64encode(body)
 
-        h = hmac.new(self.SECRET.encode('utf-8'), encoded_body, hashlib.sha384)
+        h = hmac.new(key=self.SECRET.encode('utf-8'), 
+                     msg=encoded_body,
+                     digestmod=hashlib.sha384)
+        
         signature = h.hexdigest()
 
         return {
-            'X-BFX-APIKEY': self.KEY,
-            'X-BFX-SIGNATURE': signature,
-            'X-BFX-PAYLOAD': encoded_body,
+            'headers': {
+                'X-BFX-APIKEY': self.KEY,
+                'X-BFX-SIGNATURE': signature,
+                'X-BFX-PAYLOAD': encoded_body,
+            },
         }
 
-    # Packs and sign the payload and send the request with GET.
-    def _sign_and_get(self, path: str, payload: dict=None):
-        url, path = self.url_path_for(path)
-        signed_payload = self._sign_payload(path, payload or {})
-        return self.get(url, headers=signed_payload)
-
-    # Packs and sign the payload and send the request with POST.
-    def _sign_and_post(self, path: str, payload: dict=None):
-        url, path = self.url_path_for(path)
-        signed_payload = self._sign_payload(path, payload or {})
-        return self.post(url, headers=signed_payload, data=payload)
+    def _encode_data(self, data):
+        return clean_parameters(data or {})

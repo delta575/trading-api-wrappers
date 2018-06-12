@@ -40,8 +40,7 @@ class BitfinexPublic(Client):
                                             information was valid
 
         """
-        url = self.url_for('pubticker/%s', symbol)
-        return self.get(url)
+        return self.get(f'pubticker/{symbol}')
 
     def stats(self, symbol: str):
         """Various statistics about the requested pair.
@@ -62,8 +61,7 @@ class BitfinexPublic(Client):
             volume  [float as str]      Volume in the period
 
         """
-        url = self.url_for('stats/%s', symbol)
-        return self.get(url)
+        return self.get(f'stats/{symbol}')
 
     def today(self, symbol: str):
         """Today's low, high and volume.
@@ -85,8 +83,7 @@ class BitfinexPublic(Client):
             low     [float as str]      Today's low price
 
         """
-        url = self.url_for('today/%s', symbol)
-        return self.get(url)
+        return self.get(f'today/{symbol}')
 
     def lend_book(self,
                   currency: str,
@@ -128,12 +125,10 @@ class BitfinexPublic(Client):
                                         rate
 
         """
-        params = {
+        return self.get(f'lendbook/{currency}', params={
             'limit_bids': limit_bids,
             'limit_asks': limit_asks,
-        }
-        url = self.url_for('lendbook/%s', currency)
-        return self.get(url, params=params)
+        })
 
     def order_book(self,
                    symbol: str,
@@ -177,13 +172,11 @@ class BitfinexPublic(Client):
             timestamp   [float as str]
 
         """
-        params = {
+        return self.get(f'book/{symbol}', params={
             'limit_bids': limit_bids,
             'limit_asks': limit_asks,
             'group': group,
-        }
-        url = self.url_for('book/%s', symbol)
-        return self.get(url, params=params)
+        })
 
     def trades(self,
                symbol: str,
@@ -218,12 +211,10 @@ class BitfinexPublic(Client):
                                         (can be '' if undetermined)
 
         """
-        params = {
+        return self.get(f'trades/{symbol}', params={
             'timestamp': timestamp,
             'limit_trades': limit_trades,
-        }
-        url = self.url_for('trades/%s', symbol)
-        return self.get(url, params=params)
+        })
 
     def lends(self,
               currency: str,
@@ -260,12 +251,10 @@ class BitfinexPublic(Client):
             timestamp   [int]
 
         """
-        params = {
+        return self.get(f'lends/{currency}', params={
             'timestamp': timestamp,
             'limit_lends': limit_lends,
-        }
-        url = self.url_for('lends/%s', currency)
-        return self.get(url, params=params)
+        })
 
     def symbols(self):
         """Get a list of valid symbol IDs.
@@ -276,8 +265,7 @@ class BitfinexPublic(Client):
             list: A list of symbol names as str.
 
         """
-        url = self.url_for('symbols')
-        return self.get(url)
+        return self.get('symbols')
 
     def symbols_details(self):
         """Get a list of valid symbol IDs and the pair details.
@@ -299,5 +287,4 @@ class BitfinexPublic(Client):
                                                 contracts/pairs
 
         """
-        url = self.url_for('symbols_details')
-        return self.get(url)
+        return self.get('symbols_details')

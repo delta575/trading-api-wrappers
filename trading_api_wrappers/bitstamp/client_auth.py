@@ -8,7 +8,12 @@ from ..common import check_keys, clean_parameters
 
 class BitstampAuth(BitstampPublic):
 
-    def __init__(self, key, secret, customer_id, timeout: int=30, retry=None):
+    def __init__(self,
+                 key: str,
+                 secret: str,
+                 customer_id: (str, int),
+                 timeout: int=30,
+                 retry=None):
         super().__init__(timeout, retry)
         check_keys(key, secret)
         self.KEY = str(key)
@@ -39,9 +44,9 @@ class BitstampAuth(BitstampPublic):
              ...
              }
         """
-        path = f'balance/{currency_pair}' if currency_pair else 'balance'
-        url = self.url_for(path)
-        return self._sign_and_post(url)
+        endpoint = self._endpoint_for(
+            f'balance/{currency_pair}' if currency_pair else 'balance')
+        return self.post(endpoint)
 
     def user_transactions(self,
                           currency_pair: str=None,
@@ -67,10 +72,10 @@ class BitstampAuth(BitstampPublic):
         }
         if sort_desc is not None:
             payload['sort'] = 'desc' if sort_desc else 'asc'
-        path = 'user_transactions'
-        path = f'{path}/{currency_pair}' if currency_pair else path
-        url = self.url_for(path)
-        return self._sign_and_post(url, payload)
+        endpoint = self._endpoint_for('user_transactions')
+        if currency_pair:
+            endpoint = f'{endpoint}/{currency_pair}/'
+        return self.post(endpoint, data=payload)
 
     # Orders ------------------------------------------------------------------
     def open_orders(self, currency_pair: str=None):
@@ -78,9 +83,8 @@ class BitstampAuth(BitstampPublic):
         Returns JSON list of open orders. Each order is represented as a
         dictionary.
         """
-        path = f"open_orders/{currency_pair or 'all'}"
-        url = self.url_for(path)
-        return self._sign_and_post(url)
+        endpoint = self._endpoint_for(f"open_orders/{currency_pair or 'all'}")
+        return self.post(endpoint)
 
     def orders_status(self, order_id: int):
         """
@@ -94,9 +98,8 @@ class BitstampAuth(BitstampPublic):
           or  btc, eur, ....
           or  eur, usd, ....
         """
-        payload = {'id': order_id}
-        url = self.url_for('order_status', version=1)
-        return self._sign_and_post(url, payload)
+        endpoint = self._endpoint_for('order_status', version=1)
+        return self.post(endpoint, data={'id': order_id})
 
     def cancel_order(self, order_id: int):
         """
@@ -105,9 +108,8 @@ class BitstampAuth(BitstampPublic):
         Returns dictionary of the canceled order, containing the keys:
         id, type, price, amount
         """
-        payload = {'id': order_id}
-        url = self.url_for('cancel_order')
-        return self._sign_and_post(url, payload)
+        endpoint = self._endpoint_for('cancel_order')
+        return self.post(endpoint, data={'id': order_id})
 
     def cancel_all_orders(self):
         """
@@ -115,32 +117,30 @@ class BitstampAuth(BitstampPublic):
 
         Returns True if it was successful
         """
-        url = self.url_for('cancel_all_orders', version=1)
-        return self._sign_and_post(url)
+        endpoint = self._endpoint_for('cancel_all_orders', version=1)
+        return self.post(endpoint)
 
     def _limit_order(self,
-                     path,
+                     endpoint,
                      currency_pair: str,
                      amount: float,
                      price: float,
                      limit_price: float,
                      daily_order: bool=None):
-        payload = {
+        endpoint = self._endpoint_for(endpoint % currency_pair)
+        return self.post(endpoint, data={
             'amount': amount,
             'price': price,
             'limit_price': limit_price,
             'daily_order': daily_order,
-        }
-        url = self.url_for(path, currency_pair)
-        return self._sign_and_post(url, payload)
+        })
 
     def _market_order(self,
-                      path: str,
+                      endpoint: str,
                       currency_pair: str,
                       amount: float):
-        payload = {'amount': amount}
-        url = self.url_for(path, currency_pair)
-        return self._sign_and_post(url, payload)
+        endpoint = self._endpoint_for(endpoint % currency_pair)
+        return self.post(endpoint, data={'amount': amount})
 
     def buy_limit_order(self,
                         currency_pair: str,
@@ -191,9 +191,8 @@ class BitstampAuth(BitstampPublic):
 
         By default, the last 24 hours (86400 seconds) are returned.
         """
-        payload = {'timedelta': time_delta}
-        url = self.url_for('withdrawal-requests')
-        return self._sign_and_post(url, payload)
+        endpoint = self._endpoint_for('withdrawal-requests')
+        return self.post(endpoint, data={'timedelta': time_delta})
 
     def withdrawal(self,
                    method: str,
@@ -201,24 +200,22 @@ class BitstampAuth(BitstampPublic):
                    amount: float,
                    version: int=2,
                    **kwargs):
-        payload = {
+        endpoint = self._endpoint_for(f'{method}_withdrawal', version)
+        return self.post(endpoint, data={
             'amount': amount,
             'address': address,
             **kwargs
-        }
-        url = self.url_for(f'{method}_withdrawal', version=version)
-        return self._sign_and_post(url, payload)
+        })
 
     def bitcoin_withdrawal(self, address: str, amount: float,
                            instant: bool=None):
         """
         Send bitcoin to another bitcoin wallet specified by address.
         """
-        kwargs = {
+        return self.withdrawal('bitcoin', address, amount, **{
             'version': 1,
             'instant': (1 if instant else 0) if instant else None,
-        }
-        return self.withdrawal('bitcoin', address, amount, **kwargs)
+        })
 
     def ripple_withdrawal(self, address: str, amount: float, currency: str):
         """
@@ -258,8 +255,8 @@ class BitstampAuth(BitstampPublic):
     def deposit_address(self,
                         method: str,
                         version: int=2):
-        url = self.url_for('%s_address' % method, version=version)
-        return self._sign_and_post(url)
+        endpoint = self._endpoint_for(f'{method}_address', version)
+        return self.post(endpoint)
 
     def bitcoin_deposit_address(self):
         """
@@ -312,22 +309,21 @@ class BitstampAuth(BitstampPublic):
         confirmations
           number of confirmations
         """
-        url = self.url_for('unconfirmed_btc', version=1)
-        return self._sign_and_post(url)
+        endpoint = self._endpoint_for('unconfirmed_btc', version=1)
+        return self.post(endpoint)
 
     # Transfers ---------------------------------------------------------------
     def _transfer(self,
-                  path: str,
+                  endpoint: str,
                   amount: float,
                   currency: str,
                   sub_account: int=None):
-        payload = {
+        endpoint = self._endpoint_for(endpoint)
+        return self.post(endpoint, data={
             'amount': amount,
             'currency': currency,
             'subAccount': sub_account,
-        }
-        url = self.url_for(path)
-        return self._sign_and_post(url, payload)
+        })
 
     def transfer_to_main(self,
                          amount: float,
@@ -337,8 +333,8 @@ class BitstampAuth(BitstampPublic):
         Returns dictionary with status.
         sub account has to be the numerical id of the sub account, not the name
         """
-        return self._transfer(
-            'transfer-to-main', amount, currency, sub_account)
+        return self._transfer('transfer-to-main',
+                              amount, currency, sub_account)
 
     def transfer_from_main(self,
                            amount: float,
@@ -348,29 +344,29 @@ class BitstampAuth(BitstampPublic):
         Returns dictionary with status.
         sub account has to be the numerical id of the sub account, not the name
         """
-        return self._transfer(
-            'transfer-from-main', amount, currency, sub_account)
+        return self._transfer('transfer-from-main',
+                              amount, currency, sub_account)
 
     # TODO: Bank methods
 
     # PRIVATE METHODS ---------------------------------------------------------
-    def _sign_payload(self, payload=None):
-        payload = payload or {}
+    def sign(self, method, path, params=None, data=None):
+        nonce = self.nonce()
+        payload = data or {}
         payload['key'] = self.KEY
-        payload['nonce'] = self.nonce()
-        msg = str(payload['nonce']) + self.CUSTOMER_ID + self.KEY
-        payload['signature'] = hmac.new(
-            self.SECRET.encode('utf-8'),
-            msg=msg.encode('utf-8'),
-            digestmod=hashlib.sha256
-        ).hexdigest().upper()
-        return payload
+        payload['nonce'] = nonce
+
+        msg = nonce + self.CUSTOMER_ID + self.KEY
+
+        h = hmac.new(key=self.SECRET.encode('utf-8'),
+                     msg=msg.encode('utf-8'),
+                     digestmod=hashlib.sha256)
+
+        payload['signature'] = h.hexdigest().upper()
+
+        return {
+            'data': payload
+        }
 
     def _encode_data(self, data):
-        return data
-
-    # Packs and sign the payload and send the request with POST.
-    def _sign_and_post(self, url, payload=None):
-        clean_payload = clean_parameters(payload or {})
-        signed_payload = self._sign_payload(clean_payload)
-        return self.post(url, headers=None, data=signed_payload)
+        return clean_parameters(data or {})

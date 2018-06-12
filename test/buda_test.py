@@ -94,6 +94,7 @@ class BudaAuthTest(unittest.TestCase):
         balance = self.client.balance(Buda.Currency.BTC)
         self.assertIsInstance(balance, models.Balance)
 
+    @unittest.skip('Takes longer than timeout')
     def test_balances_event_pages(self):
         currencies = [item for item in Buda.Currency]
         event_names = [item for item in Buda.BalanceEvent]
