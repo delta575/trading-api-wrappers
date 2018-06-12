@@ -38,9 +38,7 @@ class CurrencyLayer(Client):
                     }
                 }
         """
-        url = self.url_for('list')
-        data = self.get(url)
-        return data
+        return self.get('list')
 
     def live_rates(self,
                    base: str=None,
@@ -82,9 +80,7 @@ class CurrencyLayer(Client):
                     }
                 }
         """
-        url = self.url_for('live')
-        data = self.get(url, base, currencies)
-        return data
+        return self.get('live', base, currencies)
 
     def historical(self,
                    date_for,
@@ -126,12 +122,9 @@ class CurrencyLayer(Client):
                     }
                 }
         """
-        params = {
+        return self.get('historical', base, currencies, params={
             'date': format_date_iso(date_for),
-        }
-        url = self.url_for('historical')
-        data = self.get(url, base, currencies, params)
-        return data
+        })
 
     def time_frame(self,
                    start: str,
@@ -183,13 +176,10 @@ class CurrencyLayer(Client):
                     },
                 }
         """
-        params = {
+        return self.get('timeframe', base, currencies, params={
             'start_date': format_date_iso(start),
             'end_date': format_date_iso(end),
-        }
-        url = self.url_for('timeframe')
-        data = self.get(url, base, currencies, params)
-        return data
+        })
 
     def convert(self,
                 amount: float,
@@ -215,15 +205,12 @@ class CurrencyLayer(Client):
                 End date for the requested time-frame. Accepts `datetime`
                 and `str` in ISO format (2000-01-01).
         """
-        params = {
+        return self.get('convert', params={
             'amount': amount,
             'from': from_currency,
             'to': to_currency,
             'date': format_date_iso(date_for),
-        }
-        url = self.url_for('convert')
-        data = self.get(url, params=params)
-        return data
+        })
 
     def change(self,
                base: str=None,
@@ -273,9 +260,7 @@ class CurrencyLayer(Client):
                     },
                 }
         """
-        url = self.url_for('change')
-        data = self.get(url, base, currencies)
-        return data
+        return self.get('change', base, currencies)
 
     def change_time_frame(self,
                           start: str,
@@ -332,26 +317,29 @@ class CurrencyLayer(Client):
                     },
                 }
         """
-        params = {
+        return self.get('change', base, currencies, params={
             'start': format_date_iso(start),
             'end': format_date_iso(end),
-        }
-        url = self.url_for('change')
-        data = self.get(url, base, currencies, params)
-        return data
+        })
 
     # OVERRIDES ---------------------------------------------------------------
     def get(self,
-            url: str,
+            endpoint: str,
             base: str=None,
             currencies: list=None,
             params: dict=None):
         params = params or {}
-        params['access_key'] = self.ACCESS_KEY
         if base is not None:
             params['source'] = base
         if isinstance(currencies, list) or isinstance(currencies, tuple):
             currencies = ','.join(currencies)
         if currencies is not None:
             params['currencies'] = currencies
-        return super().get(url, params=params)
+        return super().get(endpoint, params=params)
+
+    def sign(self, method, path, params=None, data=None):
+        params = params or {}
+        params['access_key'] = self.ACCESS_KEY
+        return {
+            'params': params
+        }

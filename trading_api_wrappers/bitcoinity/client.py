@@ -14,11 +14,8 @@ class Bitcoinity(Client):
                currency: str,
                exchange: str,
                span: str):
-        params = {
+        return self.get('markets/get_ticker', params={
             'currency': currency,
             'exchange': exchange,
             'span': span,
-        }
-        url = self.url_for('markets/get_ticker')
-        data = self.get(url, params=params)
-        return data
+        })

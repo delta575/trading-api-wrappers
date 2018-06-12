@@ -30,8 +30,7 @@ class _BPI(CoinDesk):
         self.currency = currency.upper()
 
     def current(self):
-        url = self.url_for('bpi/currentprice/%s.json', self.currency)
-        return self.get(url)
+        return self.get(f'bpi/currentprice/{self.currency}.json')
 
     def historical(self,
                    start: datetime,
@@ -54,13 +53,11 @@ class _BPI(CoinDesk):
                 str(today): current['bpi'][self.currency]['rate_float']}
             return current
         # Normal call for historical BPI
-        params = {
+        response = self.get('bpi/historical/close.json', params={
             'currency': self.currency,
             'start': start,
             'end': end,
-        }
-        url = self.url_for('bpi/historical/close.json')
-        response = self.get(url, params=params)
+        })
         # If end date is today, add current BPI
         if end == today and include_today:
             response['bpi'][str(today)] = (

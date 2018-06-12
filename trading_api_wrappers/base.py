@@ -10,6 +10,7 @@ from urllib3.util.retry import Retry
 
 # local
 from . import errors
+from .common import clean_parameters
 
 TIMEOUT = 30
 RETRY = Retry(
@@ -25,7 +26,6 @@ class Server(object):
         url = f'{protocol}://{host}'
         if version:
             url = f'{url}/{version}'
-
         self.PROTOCOL = protocol
         self.HOST = host
         self.VERSION = version
@@ -33,7 +33,6 @@ class Server(object):
 
 
 class Client(object):
-
     error_key = ''
     enable_rate_limit = True
     rate_limit = 1000  # in milliseconds (seconds * 1E3)
@@ -52,43 +51,54 @@ class Client(object):
         self.session = session
         self.last_request_timestamp = 0
 
-    def get(self, url, headers=None, params=None):
-        response = self._request('get', url, headers=headers, params=params)
-        return response
+    def get(self, endpoint, params=None):
+        return self._request('get', endpoint, params=params)
 
-    def put(self, url, headers, data):
-        response = self._request('put', url, headers=headers, data=data)
-        return response
+    def post(self, endpoint, data=None):
+        return self._request('post', endpoint, data=data)
 
-    def post(self, url, headers, data):
-        response = self._request('post', url, headers=headers, data=data)
-        return response
+    def put(self, endpoint, data=None):
+        return self._request('put', endpoint, data=data)
 
-    def _request(self, method, url, headers, params=None, data=None):
+    def patch(self, endpoint, data=None):
+        return self._request('patch', endpoint, data=data)
+
+    def delete(self, endpoint, data=None):
+        return self._request('delete', endpoint, data=data)
+
+    def _request(self, method, endpoint, params=None, data=None):
+        # Rate limit requests
         if self.enable_rate_limit:
             self.throttle()
         self.last_request_timestamp = self.milliseconds()
+        # Prepare the request
+        url, path = self.url_path_for(endpoint)
         data = self._encode_data(data)
+        request = self.sign(method, path, params, data)
+        # Send the request
         response = self.session.request(
             method,
-            url,
-            headers=headers,
-            params=params,
-            data=data,
+            url=url,
+            headers=request.get('headers'),
+            params=request.get('params', params),
+            data=request.get('data', data),
             verify=True,
             timeout=self.TIMEOUT)
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             raise errors.InvalidResponse(response) from e
-        json_resp = self._resp_to_json(response)
-        return json_resp
+        # Decode response
+        return self._decode_data(response)
+
+    def sign(self, method, path, params=None, data=None):
+        return {}
 
     def _encode_data(self, data):
-        data = json.dumps(data) if data else data
-        return data
+        data = clean_parameters(data or {})
+        return json.dumps(data) if data else data
 
-    def _resp_to_json(self, response):
+    def _decode_data(self, response):
         try:
             json_resp = response.json()
         except json.decoder.JSONDecodeError as e:
@@ -98,14 +108,11 @@ class Client(object):
                 raise errors.InvalidResponse(response)
         return json_resp
 
-    def url_for(self, path, path_arg=None):
-        url = f'{self.SERVER.URL}/{path}'
-        if path_arg:
-            url = url % path_arg
-        return url
+    def url_for(self, endpoint):
+        return f'{self.SERVER.URL}/{endpoint}'
 
-    def url_path_for(self, path, path_arg=None):
-        url = self.url_for(path, path_arg)
+    def url_path_for(self, endpoint):
+        url = self.url_for(endpoint)
         path = urlparse(url).path
         return url, path
 
