@@ -1,35 +1,55 @@
 import base64
-import hashlib
-import hmac
 from datetime import datetime
 
-# local
+from requests import PreparedRequest as P
+
 from . import constants as _c
 from . import models as _m
 from .client_public import BudaPublic
-from ..common import build_route, check_keys
+from ..auth import HMACAuth
+from ..base import AuthMixin
 
 
-class BudaAuth(BudaPublic):
+class BudaHMACAuth(HMACAuth):
+
+    api_key_header = 'X-SBTC-APIKEY'
+    nonce_header = 'X-SBTC-NONCE'
+    signature_header = 'X-SBTC-SIGNATURE'
+    signature_delimiter = ' '
+    algorithm = 'sha384'
+
+    def build_message(self, r: P, nonce: str):
+        components = [r.method, r.path_url]
+        if r.body:
+            encoded_body = base64.b64encode(r.body).decode('utf-8')
+            components.append(encoded_body)
+        components.append(nonce)
+        message = self.signature_delimiter.join(components)
+        return message
+
+
+class BudaAuth(BudaPublic, AuthMixin):
+    auth_cls = BudaHMACAuth
 
     def __init__(self,
-                 key: str=None,
-                 secret: str=None,
-                 timeout: int=30,
+                 key: str,
+                 secret: str,
+                 timeout: int=None,
                  host: str=None,
                  return_json: bool=False,
-                 retry=None):
-        super().__init__(timeout, host, return_json, retry)
-        check_keys(key, secret)
-        self.KEY = str(key)
-        self.SECRET = str(secret)
+                 max_retries: int=None,
+                 backoff_factor: float=None,
+                 enable_rate_limit: bool=None):
+        super().__init__(timeout, host, return_json, max_retries,
+                         backoff_factor, enable_rate_limit)
+        self.add_auth(key, secret)
 
     def quotation(self,
                   market_id: str,
                   quotation_type: str,
                   amount: float,
                   limit: float=None):
-        data = self.post(f'markets/{market_id}/quotations', data={
+        data = self.post(f'markets/{market_id}/quotations', json={
             'quotation': {
                 'type': str(quotation_type),
                 'amount': str(amount),
@@ -164,7 +184,7 @@ class BudaAuth(BudaPublic):
         return _m.Order.create_from_json(data['order'])
 
     def cancel_order(self, order_id: int):
-        data = self.put(f'orders/{order_id}', data={
+        data = self.put(f'orders/{order_id}', json={
             'state': _c.OrderState.CANCELING.value,
         })
         if self.return_json:
@@ -194,7 +214,7 @@ class BudaAuth(BudaPublic):
                    target_address: str=None,
                    amount_includes_fee: bool=True,
                    simulate: bool=False):
-        data = self.post(f'currencies/{currency}/withdrawals', data={
+        data = self.post(f'currencies/{currency}/withdrawals', json={
             'withdrawal_data': {
                 'target_address': target_address,
             },
@@ -214,31 +234,3 @@ class BudaAuth(BudaPublic):
         return self.withdrawal(
             currency, amount, target_address=None,
             amount_includes_fee=amount_includes_fee, simulate=True)
-
-    # PRIVATE METHODS ---------------------------------------------------------
-    def sign(self, method, path, params=None, data=None):
-        method = method.upper()
-        route = build_route(path, params)
-        nonce = self.nonce()
-
-        if data:
-            body = data.encode('utf-8')
-            encoded_body = base64.standard_b64encode(body).decode('utf-8')
-            msg = ' '.join([method, route, encoded_body, nonce])
-        else:
-            msg = ' '.join([method, route, nonce])
-
-        h = hmac.new(key=self.SECRET.encode('utf-8'),
-                     msg=msg.encode('utf-8'),
-                     digestmod=hashlib.sha384)
-
-        signature = h.hexdigest()
-
-        return {
-            'headers': {
-                'X-SBTC-APIKEY': self.KEY,
-                'X-SBTC-NONCE': nonce,
-                'X-SBTC-SIGNATURE': signature,
-                'content-type': 'application/json',
-            },
-        }

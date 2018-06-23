@@ -18,7 +18,7 @@ URL = 'https://github.com/delta575/trading-api-wrappers'
 EMAIL = 'faranguiz575@gmail.com, sarang575@gmail.com'
 AUTHOR = 'Felipe Aránguiz, Sebastián Aránguiz'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.11.0'
+VERSION = '0.12.0'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -33,8 +33,8 @@ REQUIRED = [
 here = os.path.abspath(os.path.dirname(__file__))
 
 # Import the README and use it as the long-description.
-# Note: this will only work if 'README.rst' is present in your MANIFEST.in file!
-with io.open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
+# Note: this will only work if 'README.md' is present in your MANIFEST.in file!
+with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = '\n' + f.read()
 
 # Load the package's __version__.py module as a dictionary.
@@ -89,18 +89,19 @@ setup(
     version=about['__version__'],
     description=DESCRIPTION,
     long_description=long_description,
+    long_description_content_type='text/markdown',
     author=AUTHOR,
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=find_packages(exclude=('test',)),
+    packages=find_packages(exclude=('tests',)),
     install_requires=REQUIRED,
     include_package_data=True,
     license='MIT',
     classifiers=[
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
-        # 'Development Status :: 5 - Production/Stable',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'License :: OSI Approved :: MIT License',

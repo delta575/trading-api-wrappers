@@ -1,18 +1,13 @@
 from datetime import datetime
 
-# local
 from . import constants as _c
 from . import models as _m
-from ..base import Client
-from .server import CryptoMKTServer
+from ..base import Client, ModelMixin
 
 
-class CryptoMKTPublic(Client):
+class CryptoMKTPublic(Client, ModelMixin):
     error_key = 'message'
-
-    def __init__(self, timeout: int=30, return_json=False, retry=None):
-        super().__init__(CryptoMKTServer(), timeout, retry)
-        self.return_json = return_json
+    base_url = 'https://api.cryptomkt.com/v1/'
 
     def markets(self):
         data = self.get('market')

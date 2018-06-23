@@ -1,11 +1,10 @@
 import unittest
 from datetime import datetime, timedelta
 
-# pip
 from decouple import config
 
-# local
-from trading_api_wrappers import Buda, errors
+from trading_api_wrappers import Buda
+from trading_api_wrappers import InvalidResponse
 from trading_api_wrappers.buda import models
 
 API_KEY = config('BUDA_API_KEY')
@@ -154,9 +153,9 @@ class BudaAuthTestBadApi(unittest.TestCase):
         self.assertIsInstance(self.client, Buda.Auth)
 
     def test_key_secret(self):
-        self.assertRaises(ValueError,
-                          lambda: Buda.Auth())
+        with self.assertRaises(TypeError):
+            Buda.Auth()
 
     def test_balance_returns_error(self):
-        self.assertRaises(errors.InvalidResponse,
-                          lambda: self.client.balance(Buda.Currency.CLP))
+        with self.assertRaises(InvalidResponse):
+            self.client.balance(Buda.Currency.CLP)

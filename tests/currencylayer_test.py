@@ -1,12 +1,9 @@
-# local
 import unittest
 
-# pip
 from decouple import config
 
-# local
 from trading_api_wrappers import CurrencyLayer
-from trading_api_wrappers.errors import InvalidResponse
+from trading_api_wrappers import InvalidResponse
 
 ACCESS_KEY = config('CURRENCYLAYER_ACCESS_KEY')
 

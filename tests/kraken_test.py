@@ -1,9 +1,7 @@
 import unittest
 
-# pip
 from decouple import config
 
-# local
 from trading_api_wrappers import errors, Kraken
 
 API_KEY = config('KRAKEN_API_KEY')

@@ -1,24 +1,55 @@
 import base64
 import hashlib
 import hmac
-from urllib.parse import urlencode
 
-# local
+from requests import PreparedRequest as P
+
 from .client_public import KrakenPublic
-from ..common import check_keys, clean_parameters
+from ..auth import HMACAuth
+from ..base import AuthMixin
 
 
-class KrakenAuth(KrakenPublic):
+class KrakenHMACAuth(HMACAuth):
+
+    api_key_header = 'API-Key'
+    signature_header = 'API-Sign'
+    algorithm = 'sha512'
+
+    def add_nonce(self, r: P, nonce: str):
+        body = self.parse_data(r.body)
+        body['nonce'] = nonce
+        r.prepare_body(data=body, files=None)
+
+    def build_message(self, r: P, nonce: str):
+        auth = (nonce + r.body).encode()
+        digest = hashlib.sha256(auth).digest()
+        message = r.path_url.encode() + digest
+        return message
+
+    def sign(self, msg: str):
+
+        h = hmac.new(key=base64.b64decode(self.secret),
+                     msg=msg,
+                     digestmod=self.algorithm)
+
+        signature = base64.b64encode(h.digest()).decode()
+
+        return signature
+
+
+class KrakenAuth(KrakenPublic, AuthMixin):
+    auth_cls = KrakenHMACAuth
 
     def __init__(self, 
-                 key: str=None, 
-                 secret: str=None, 
-                 timeout: int=30,
-                 retry=None):
-        super().__init__(timeout, retry)
-        check_keys(key, secret)
-        self.KEY = str(key)
-        self.SECRET = str(secret)
+                 key: str,
+                 secret: str,
+                 timeout: int=None,
+                 max_retries: int=None,
+                 backoff_factor: float=None,
+                 enable_rate_limit: bool=None):
+        super().__init__(timeout, max_retries, backoff_factor,
+                         enable_rate_limit)
+        self.add_auth(key, secret)
 
     # Private user data -------------------------------------------------------
     # Get account balance.
@@ -259,29 +290,3 @@ class KrakenAuth(KrakenPublic):
             'aclass': str(asset_class) if asset_class else None,
             'refid': refid,
         })
-
-    # PRIVATE METHODS ---------------------------------------------------------
-    def sign(self, method, path, params=None, data=None):
-        nonce = self.nonce()
-        payload = data or {}
-        payload['nonce'] = nonce
-
-        # Unicode-objects must be encoded before hashing
-        encoded = (nonce + urlencode(payload)).encode()
-        message = path.encode() + hashlib.sha256(encoded).digest()
-
-        signature = hmac.new(key=base64.b64decode(self.SECRET),
-                             msg=message,
-                             digestmod=hashlib.sha512)
-        sig_digest = base64.b64encode(signature.digest())
-
-        return {
-            'headers': {
-                'API-Key': self.KEY,
-                'API-Sign': sig_digest.decode(),
-            },
-            'data': payload
-        }
-
-    def _encode_data(self, data):
-        return clean_parameters(data or {})

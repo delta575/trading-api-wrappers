@@ -1,11 +1,10 @@
 import unittest
 from datetime import datetime
 
-# pip
 from decouple import config
 
-# local
-from trading_api_wrappers import errors, Bitfinex
+from trading_api_wrappers import Bitfinex
+from trading_api_wrappers import InvalidResponse
 
 API_KEY = config('BFX_API_KEY')
 API_SECRET = config('BFX_API_SECRET')
@@ -103,8 +102,9 @@ class BitfinexAuthTestBadApi(unittest.TestCase):
         self.assertIsInstance(self.client, Bitfinex.Auth)
 
     def test_key_secret(self):
-        self.assertRaises(ValueError, lambda: Bitfinex.Auth())
+        with self.assertRaises(TypeError):
+            Bitfinex.Auth()
 
     def test_account_info_returns_error(self):
-        self.assertRaises(errors.InvalidResponse,
-                          lambda: self.client.account_info())
+        with self.assertRaises(InvalidResponse):
+            self.client.account_info()

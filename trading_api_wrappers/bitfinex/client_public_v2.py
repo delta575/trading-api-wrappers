@@ -1,16 +1,12 @@
 from datetime import datetime
 
-# local
 from . import models_v2 as _m
-from .server import BitfinexServer as Server
-from ..base import Client
+from ..base import Client, ModelMixin
 
 
-class BitfinexPublic(Client):
-
-    def __init__(self, timeout=30, return_json=False, retry=None):
-        super().__init__(Server(version=2), timeout, retry)
-        self.return_json = return_json
+class BitfinexPublic(Client, ModelMixin):
+    base_url = 'https://api.bitfinex.com/v2/'
+    error_key = 'message'
 
     def ticker(self, symbol: str):
         data = self.get(f'ticker/{symbol}')

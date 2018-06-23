@@ -1,18 +1,15 @@
-# local
-from ..base import Client, Server
+from ..auth import ApiKeyAuth
+from ..base import AuthMixin, Client
 from ..common import format_date_iso, format_datetime_iso
 
-# API Server
-PROTOCOL = 'https'
-HOST = 'openexchangerates.org/api/'
 
-
-class OXR(Client):
+class OXR(Client, AuthMixin):
     error_key = 'error'
+    base_url = 'https://openexchangerates.org/api/'
 
-    def __init__(self, app_id: str, timeout: int=120, retry=None):
-        super().__init__(Server(PROTOCOL, HOST), timeout, retry)
-        self.APP_ID = str(app_id)
+    def __init__(self, app_id: str, timeout: int=120, max_retries: int=None):
+        super().__init__(timeout, max_retries)
+        self.auth = ApiKeyAuth(app_id, api_key_param='app_id')
 
     def currencies(self):
         """
@@ -95,10 +92,3 @@ class OXR(Client):
         if symbols is not None:
             params['symbols'] = symbols
         return super().get(endpoint, params=params)
-
-    def sign(self, method, path, params=None, data=None):
-        params = params or {}
-        params['app_id'] = self.APP_ID
-        return {
-            'params': params
-        }

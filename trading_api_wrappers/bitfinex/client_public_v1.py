@@ -1,12 +1,9 @@
-# local
-from .server import BitfinexServer as Server
 from ..base import Client
 
 
 class BitfinexPublic(Client):
-
-    def __init__(self, timeout: int=30, retry=None):
-        super().__init__(Server(version=1), timeout, retry)
+    base_url = 'https://api.bitfinex.com/v1/'
+    error_key = 'message'
 
     def ticker(self, symbol: str):
         """Gets the innermost bid and asks and information on the most recent trade.

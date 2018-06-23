@@ -1,13 +1,9 @@
-# local
-from .server import KrakenServer
 from ..base import Client
 
 
 class KrakenPublic(Client):
     error_key = 'error'
-
-    def __init__(self, timeout: int=30, retry=None):
-        super().__init__(KrakenServer(), timeout, retry)
+    base_url = 'https://api.kraken.com/0/'
 
     def server_time(self):
         return self.get('public/Time')

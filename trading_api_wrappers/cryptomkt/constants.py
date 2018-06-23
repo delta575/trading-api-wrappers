@@ -1,10 +1,10 @@
-from ..base import _Enum, _Market, _Currency
+from ..base import _Enum, Market, Currency
 
 # Limits
 ORDERS_LIMIT = 100
 
 
-class Currency(_Currency):
+class Currency(Currency):
     ARS = dict(value='ARS')
     BRL = dict(value='BRL')
     BTC = dict(value='BTC')
@@ -19,7 +19,7 @@ class OrderType(_Enum):
     SELL = 'sell'
 
 
-class Market(_Market):
+class Market(Market):
     BTC_ARS = dict(value='BTCARS', base=Currency.BTC, quote=Currency.ARS)
     BTC_BRL = dict(value='BTCBRL', base=Currency.BTC, quote=Currency.BRL)
     BTC_CLP = dict(value='BTCCLP', base=Currency.BTC, quote=Currency.CLP)

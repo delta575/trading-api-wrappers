@@ -1,24 +1,49 @@
 import base64
-import hashlib
-import hmac
-import json
 
-# local
+from requests import PreparedRequest as P
+
 from .client_public_v1 import BitfinexPublic
-from ..common import check_keys, clean_parameters
+from ..auth import HMACAuth
+from ..base import AuthMixin
 
 
-class BitfinexAuth(BitfinexPublic):
+class BitfinexHMACAuth(HMACAuth):
+
+    api_key_header = 'x-bfx-apikey'
+    signature_header = 'x-bfx-signature'
+    payload_header = 'x-bfx-payload'
+    algorithm = 'sha384'
+
+    def add_nonce(self, r: P, nonce: str):
+        pass
+
+    def add_signature(self, r: P, nonce: str):
+        message = self.build_message(r, nonce)
+        r.headers[self.payload_header] = message
+        signature = self.sign(message)
+        r.headers[self.signature_header] = signature
+
+    def build_message(self, r: P, nonce: str):
+        body = self.load_json(r.body)
+        body['request'] = r.path_url
+        body['nonce'] = nonce
+        encoded_msg = base64.b64encode(self.encode_json(body))
+        return encoded_msg
+
+
+class BitfinexAuth(BitfinexPublic, AuthMixin):
+    auth_cls = BitfinexHMACAuth
 
     def __init__(self,
-                 key: str=None,
-                 secret: str=None,
-                 timeout: int=30,
-                 retry=None):
-        super().__init__(timeout, retry)
-        check_keys(key, secret)
-        self.KEY = str(key)
-        self.SECRET = str(secret)
+                 key: str,
+                 secret: str,
+                 timeout: int=None,
+                 max_retries: int=None,
+                 backoff_factor: float=None,
+                 enable_rate_limit: bool=None):
+        super().__init__(timeout, max_retries, backoff_factor,
+                         enable_rate_limit)
+        self.add_auth(key, secret)
 
     # INFO --------------------------------------------------------------------
     # Return information about your account (trading fees).
@@ -47,7 +72,7 @@ class BitfinexAuth(BitfinexPublic):
                     method: str,
                     wallet_name: str,
                     renew: bool=None):
-        return self.post('deposit/new', data={
+        return self.post('deposit/new', json={
             'method': method,
             'wallet_name': wallet_name,
             'renew': renew if renew is not None else None,
@@ -59,7 +84,7 @@ class BitfinexAuth(BitfinexPublic):
                  currency: str,
                  wallet_from: str,
                  wallet_to: str):
-        return self.post('transfer', data={
+        return self.post('transfer', json={
             'amount': str(amount),
             'currency': str(currency),
             'walletfrom': wallet_from,
@@ -72,7 +97,7 @@ class BitfinexAuth(BitfinexPublic):
                  wallet: str,
                  amount: float,
                  address: str):
-        return self.post('withdraw', data={
+        return self.post('withdraw', json={
             'withdraw_type': str(w_type),
             'walletselected': wallet,
             'amount': str(amount),
@@ -116,7 +141,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # Cancel an order.
     def delete_order(self, order_id: int):
-        return self.post('order/cancel', data={'order_id': order_id})
+        return self.post('order/cancel', json={'order_id': order_id})
 
     # Cancel all orders.
     def delete_all_order(self):
@@ -125,7 +150,7 @@ class BitfinexAuth(BitfinexPublic):
     # Get the status of an order. Is it active? Was it cancelled?
     # To what extent has it been executed? etc.
     def status_order(self, order_id: int):
-        return self.post('order/status', data={'order_id': order_id})
+        return self.post('order/status', json={'order_id': order_id})
 
     # View your active orders.
     def active_orders(self):
@@ -134,7 +159,7 @@ class BitfinexAuth(BitfinexPublic):
     # View your latest inactive orders.
     # Limited to last 3 days and 1 request per minute.
     def orders_history(self, limit: int):
-        return self.post('order/hist', data={'limit': limit})
+        return self.post('order/hist', json={'limit': limit})
 
     # POSITIONS ---------------------------------------------------------------
     # View your active positions.
@@ -143,7 +168,7 @@ class BitfinexAuth(BitfinexPublic):
 
     # Claim a position.
     def claim_position(self, position_id: int):
-        return self.post('position/claim', data={'position_id': position_id})
+        return self.post('position/claim', json={'position_id': position_id})
 
     # HISTORICAL DATA ---------------------------------------------------------
     # View all of your balance ledger entries.
@@ -153,7 +178,7 @@ class BitfinexAuth(BitfinexPublic):
                         until: float=None,
                         limit: int=None,
                         wallet: str=None):
-        return self.post('history', data={
+        return self.post('history', json={
             'currency': str(currency),
             'since': since,
             'until': until,
@@ -168,7 +193,7 @@ class BitfinexAuth(BitfinexPublic):
                   since: float=None,
                   until: float=None,
                   limit: int=None):
-        return self.post('history/movements', data={
+        return self.post('history/movements', json={
             'currency': str(currency),
             'method': method,
             'since': since,
@@ -183,7 +208,7 @@ class BitfinexAuth(BitfinexPublic):
                     until: float=None,
                     limit_trades: int=None,
                     reverse: bool=None):
-        return self.post('mytrades', data={
+        return self.post('mytrades', json={
             'symbol': str(symbol),
             'timestamp': timestamp,
             'until': until,
@@ -199,7 +224,7 @@ class BitfinexAuth(BitfinexPublic):
                     rate: float,
                     period: int,
                     direction: str):
-        return self.post('offer/new', data={
+        return self.post('offer/new', json={
             'currency': str(currency),
             'amount': str(amount),
             'rate': str(rate),
@@ -209,41 +234,13 @@ class BitfinexAuth(BitfinexPublic):
 
     # Cancel an offer.
     def cancel_offer(self, offer_id: int):
-        return self.post('offer/cancel', data={'offer_id': offer_id})
+        return self.post('offer/cancel', json={'offer_id': offer_id})
 
     # Get the status of an offer. Is it active? Was it cancelled?
     # To what extent has it been executed? etc.
     def status_offer(self, offer_id: int):
-        return self.post('offer/status', data={'offer_id': offer_id})
+        return self.post('offer/status', json={'offer_id': offer_id})
 
     # View your active offers.
     def active_offers(self):
         return self.post('offers')
-
-    # PRIVATE METHODS ---------------------------------------------------------
-    # Pack and sign the payload of the request.
-    def sign(self, method, path, params=None, data=None):
-        payload = data or {}
-        payload['request'] = path
-        payload['nonce'] = self.nonce()
-        payload = clean_parameters(payload)
-
-        body = json.dumps(payload).encode('utf-8')
-        encoded_body = base64.standard_b64encode(body)
-
-        h = hmac.new(key=self.SECRET.encode('utf-8'), 
-                     msg=encoded_body,
-                     digestmod=hashlib.sha384)
-        
-        signature = h.hexdigest()
-
-        return {
-            'headers': {
-                'X-BFX-APIKEY': self.KEY,
-                'X-BFX-SIGNATURE': signature,
-                'X-BFX-PAYLOAD': encoded_body,
-            },
-        }
-
-    def _encode_data(self, data):
-        return clean_parameters(data or {})

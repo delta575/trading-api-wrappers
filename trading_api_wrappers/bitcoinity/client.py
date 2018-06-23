@@ -1,14 +1,9 @@
-# local
-from ..base import Client, Server
-
-# API Server
-PROTOCOL = 'https'
-HOST = 'bitcoinity.org'
+from ..base import Client
 
 
 class Bitcoinity(Client):
-    def __init__(self, timeout: int=15, retry=None):
-        super().__init__(Server(PROTOCOL, HOST), timeout, retry)
+    base_url = 'https://bitcoinity.org/'
+    timeout = 15
 
     def ticker(self,
                currency: str,
