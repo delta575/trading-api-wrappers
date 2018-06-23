@@ -1,29 +1,33 @@
-from . import logger
+from requests import Response
+
+from requests.exceptions import RequestException
 
 
-class Error(Exception):
+class APIException(RequestException):
     pass
 
 
-class Unavailable(Error):
-    pass
+class InvalidResponse(APIException):
+    def __init__(self, msg_key: str, msg: str, r: Response):
+        # Add status code
+        message = str(r.status_code)
+        # Check for client or server errors
+        if 400 <= r.status_code < 500:
+            message = f'{message} Client Error:'
+        elif 500 <= r.status_code < 600:
+            message = f'{message} Server Error:'
+        # Add reason
+        message = f'{message} {r.reason}'
+        # Add message from source
+        if msg:
+            message = f'{message} ({msg_key}: {msg})'
+        # Add url
+        message = f'{message} for url: {r.url}'
 
-
-class TradingAPIError(Error):
-    def __init__(self, message):
+        super().__init__(message, response=r)
         self.message = message
-        logger.log_error(self.message)
 
 
-class InvalidResponse(TradingAPIError):
-    def __init__(self, response):
-        msg = ('InvalidResponse (Code: {r.status_code}): '
-               'Message: {r.text} ({r.url})'.
-               format(r=response))
-        super(InvalidResponse, self).__init__(msg)
-
-
-class DecodeError(TradingAPIError):
-    def __init__(self):
-        msg = 'DecodeError: Unable to decode JSON from response (no content).'
-        super(DecodeError, self).__init__(msg)
+class DecodeError(APIException):
+    def __init__(self, msg, r: Response):
+        super().__init__(msg, response=r)

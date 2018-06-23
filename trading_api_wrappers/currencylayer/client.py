@@ -1,23 +1,25 @@
-# local
-from ..base import Client, Server
+from ..auth import ApiKeyAuth
+from ..base import AuthMixin, Client
 from ..common import format_date_iso
 
-# API Server
-PROTOCOL = 'http'  # https is only enabled for paid subscriptions
-HOST = 'apilayer.net/api/'
 
-
-class CurrencyLayer(Client):
+class CurrencyLayer(Client, AuthMixin):
     """CurrencyLayer API Client
 
     Documentation:
     https://currencylayer.com/documentation
     """
+    # https is only enabled for paid subscriptions
+    base_url = 'http://apilayer.net/api/'
     error_key = 'error'
+    timeout = 120
 
-    def __init__(self, access_key: str, timeout: int=120, retry=None):
-        super().__init__(Server(PROTOCOL, HOST), timeout, retry)
-        self.ACCESS_KEY = str(access_key)
+    def __init__(self,
+                 access_key: str,
+                 timeout: int=None,
+                 retry=None):
+        super().__init__(timeout, retry)
+        self.auth = ApiKeyAuth(access_key, api_key_param='access_key')
 
     def currencies(self):
         """Returns all currently supported currencies.
@@ -336,10 +338,3 @@ class CurrencyLayer(Client):
         if currencies is not None:
             params['currencies'] = currencies
         return super().get(endpoint, params=params)
-
-    def sign(self, method, path, params=None, data=None):
-        params = params or {}
-        params['access_key'] = self.ACCESS_KEY
-        return {
-            'params': params
-        }

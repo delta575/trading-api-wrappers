@@ -1,35 +1,12 @@
 from datetime import date, datetime, timedelta
-from urllib.parse import urlencode
-
-# local
-from . import logger
 
 
-def check_keys(key, secret):
-    if not key or not secret:
-        msg = 'API Key and Secret are needed!'
-        logger.log_error(msg)
-        raise ValueError(msg)
-
-
-def build_parameters(parameters):
-    if parameters:
-        p = clean_parameters(parameters)
-        return urlencode(p, True)
-    else:
-        return None
-
-
-def build_route(path, params=None):
-    built_params = build_parameters(params)
-    if built_params:
-        return f'{path}?{built_params}'
-    else:
-        return path
-
-
-def clean_parameters(parameters: dict):
-    return {k: v for k, v in parameters.items() if v is not None}
+def clean_empty(d: (dict, list)):
+    if not isinstance(d, (dict, list)):
+        return d
+    if isinstance(d, list):
+        return [v for v in (clean_empty(v) for v in d) if v]
+    return {k: v for k, v in ((k, clean_empty(v)) for k, v in d.items()) if v}
 
 
 def date_range(start_date, end_date):

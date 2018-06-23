@@ -1,25 +1,52 @@
-import hashlib
-import hmac
+import json
+from urllib.parse import urlsplit
 
-# local
+from requests import PreparedRequest as P
+
 from . import constants as _c
 from . import models as _m
 from .client_public import CryptoMKTPublic
-from ..common import check_keys, clean_parameters
+from ..auth import HMACAuth
+from ..base import AuthMixin, RetryTypes
 
 
-class CryptoMKTAuth(CryptoMKTPublic):
+class CryptoMKTHMACAuth(HMACAuth):
+
+    api_key_header = 'X-MKT-APIKEY'
+    nonce_header = 'X-MKT-TIMESTAMP'
+    signature_header = 'X-MKT-SIGNATURE'
+    signature_delimiter = ''
+    algorithm = 'sha384'
+
+    def _nonce(self):
+        return self.timestamp.seconds()
+
+    def build_message(self, r: P, nonce: str):
+        path = urlsplit(r.path_url).path
+        body = json.loads(r.body) if r.body else {}
+        components = [nonce, path]
+        for key in sorted(body.keys()):
+            value = str(body[key])
+            components.append(value)
+        message = self.signature_delimiter.join(components)
+        return message
+
+
+class CryptoMKTAuth(CryptoMKTPublic, AuthMixin):
+    auth_cls = CryptoMKTHMACAuth
 
     def __init__(self,
-                 key: str=None,
-                 secret: str=None,
-                 timeout: int=30,
-                 return_json=False,
-                 retry=None):
-        super().__init__(timeout, return_json, retry)
-        check_keys(key, secret)
-        self.KEY = str(key)
-        self.SECRET = str(secret)
+                 key: str,
+                 secret: str,
+                 timeout: int=None,
+                 return_json: bool=None,
+                 retry: RetryTypes=None,
+                 enable_rate_limit: bool=None):
+        super().__init__(
+            timeout, retry, enable_rate_limit,
+            return_json=return_json,
+        )
+        self.add_auth(key, secret)
 
     # BALANCE------------------------------------------------------------------
     def balance(self):
@@ -64,7 +91,7 @@ class CryptoMKTAuth(CryptoMKTPublic):
                      order_type: str,
                      amount: float,
                      price: float):
-        data = self.post('orders/create', data={
+        data = self.post('orders/create', json={
             'market': str(market_id),
             'type': str(order_type),
             'amount': amount,
@@ -101,7 +128,7 @@ class CryptoMKTAuth(CryptoMKTPublic):
                        error_url: str=None,
                        success_url: str=None,
                        refund_email: str=None):
-        data = self.post('payment/new_order', data={
+        data = self.post('payment/new_order', json={
             'to_receive': amount,
             'to_receive_currency': str(currency),
             'payment_receiver': account_email,
@@ -121,33 +148,3 @@ class CryptoMKTAuth(CryptoMKTPublic):
             'id': payment_id,
         })
         return data
-
-    # PRIVATE METHODS ---------------------------------------------------------
-    def sign(self, method, path, params=None, data=None):
-        timestamp = str(self.seconds())
-        msg = timestamp + path
-
-        if data:
-            for value in [str(data[k]) for k in sorted(data.keys())]:
-                msg += value
-
-        h = hmac.new(key=self.SECRET.encode('utf-8'),
-                     msg=msg.encode('utf-8'),
-                     digestmod=hashlib.sha384)
-
-        signature = h.hexdigest()
-
-        # Request fails with 'get_requests_not_allowed' when
-        # 'Content-Type': 'application/json' is present
-        return {
-            'headers': {
-                'X-MKT-APIKEY': self.KEY,
-                'X-MKT-SIGNATURE': signature,
-                'X-MKT-TIMESTAMP': timestamp,
-            },
-        }
-
-    # Request fails with 'get_requests_not_allowed' when
-    # json.dumps()' is used
-    def _encode_data(self, data):
-        return clean_parameters(data or {})

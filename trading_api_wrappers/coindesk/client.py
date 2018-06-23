@@ -1,20 +1,12 @@
 from datetime import datetime, timedelta
 
-# local
-from ..base import Client, Server
+from ..base import Client
 from ..common import current_utc_date, date_range
-
-# API Server
-PROTOCOL = 'http'
-HOST = 'api.coindesk.com'
-VERSION = 'v1'
 
 
 class CoinDesk(Client):
-
-    def __init__(self, timeout: int=15, retry=None):
-        server = Server(PROTOCOL, HOST, VERSION)
-        super().__init__(server, timeout, retry)
+    base_url = 'http://api.coindesk.com/v1/'
+    timeout = 15
 
     def bpi(self, currency: str):
         return _BPI(self, currency)
@@ -26,7 +18,7 @@ class CoinDesk(Client):
 class _BPI(CoinDesk):
 
     def __init__(self, parent, currency: str):
-        super().__init__(timeout=parent.TIMEOUT)
+        super().__init__(timeout=parent.timeout)
         self.currency = currency.upper()
 
     def current(self):
@@ -83,7 +75,7 @@ class _BPI(CoinDesk):
 class _Rate(CoinDesk):
 
     def __init__(self, parent, currency: str):
-        super().__init__(timeout=parent.TIMEOUT)
+        super().__init__(timeout=parent.timeout)
         self.currency = currency.upper()
         self._bpi = self.bpi(self.currency)
 

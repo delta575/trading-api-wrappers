@@ -1,19 +1,25 @@
-# local
 from . import models as _m
-from .server import BudaServer
-from ..base import Client
+from ..base import Client, ModelMixin
+from ..base import RetryTypes
 
 
-class BudaPublic(Client):
+class BudaPublic(Client, ModelMixin):
     error_key = 'message'
+    base_url = 'https://www.buda.com/api/v2/'
 
     def __init__(self,
-                 timeout: int=30,
+                 timeout: int=None,
                  host: str=None,
                  return_json: bool=False,
-                 retry=None):
-        super().__init__(BudaServer(host), timeout, retry)
-        self.return_json = return_json
+                 retry: RetryTypes=None,
+                 enable_rate_limit: bool=None):
+        # Override base_url
+        if host is not None:
+            self.base_url = host
+        super().__init__(
+            timeout, retry, enable_rate_limit,
+            return_json=return_json,
+        )
 
     def markets(self):
         data = self.get('markets')

@@ -1,19 +1,10 @@
-# local
-from ..base import Client, Server
-from ..common import clean_parameters
-
-# API Server
-PROTOCOL = 'https'
-HOST = 'api.coinmarketcap.com'
-VERSION = 'v1'
+from ..base import Client
 
 
 class CoinMarketCap(Client):
-
-    def __init__(self, timeout: int=120, retry=None):
-        server = Server(PROTOCOL, HOST, VERSION)
-        super().__init__(server, timeout, retry)
-        self._currencies = None
+    base_url = 'https://api.coinmarketcap.com/v1/'
+    currencies = None
+    timeout = 120
 
     def ticker(self,
                currency: str=None,
@@ -49,10 +40,6 @@ class CoinMarketCap(Client):
                 for currency in ticker}
 
     def _get_symbol(self, currency: str):
-        if self._currencies is None:
-            self._currencies = self._get_currencies()
-        return self._currencies[currency.upper()]
-
-    def get(self, endpoint: str, headers: dict=None, params: dict=None):
-        clean_params = clean_parameters(params)
-        return super().get(endpoint, params=clean_params)
+        if self.currencies is None:
+            self.currencies = self._get_currencies()
+        return self.currencies[currency.upper()]

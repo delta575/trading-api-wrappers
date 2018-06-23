@@ -1,7 +1,6 @@
 import unittest
 from datetime import datetime, timedelta
 
-# local
 from trading_api_wrappers import CoinDesk
 
 CURRENCY = 'clp'

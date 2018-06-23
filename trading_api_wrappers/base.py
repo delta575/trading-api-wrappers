@@ -1,130 +1,33 @@
-import json
+import json as j
 import time
 from enum import Enum
-from urllib.parse import urlparse
+from json.decoder import JSONDecodeError
+from urllib.parse import urljoin
 
-# pip
 import requests
+from requests import Response
+from requests import Session
 from requests.adapters import HTTPAdapter
+from requests.auth import AuthBase
 from urllib3.util.retry import Retry
 
-# local
 from . import errors
-from .common import clean_parameters
+from .common import clean_empty
 
 TIMEOUT = 30
 RETRY = Retry(
     total=3,
     backoff_factor=2,
-    status_forcelist=(400, 401, 403, 404, 408, 429, 500, 502, 503, 504),
+    status_forcelist=[
+        400, 401, 403, 404, 408, 429,
+        500, 502, 503, 504,
+    ],
 )
 
-
-class Server(object):
-
-    def __init__(self, protocol, host, version=None):
-        url = f'{protocol}://{host}'
-        if version:
-            url = f'{url}/{version}'
-        self.PROTOCOL = protocol
-        self.HOST = host
-        self.VERSION = version
-        self.URL = url
+RetryTypes = (bool, int, Retry)
 
 
-class Client(object):
-    error_key = ''
-    enable_rate_limit = True
-    rate_limit = 1000  # in milliseconds (seconds * 1E3)
-
-    def __init__(self, server: Server, timeout: int=TIMEOUT,
-                 retry: (bool, int, Retry)=None):
-        self.SERVER = server
-        self.TIMEOUT = timeout
-        # Set session
-        session = requests.Session()
-        if retry is True:
-            retry = RETRY
-        adapter = HTTPAdapter(max_retries=retry)
-        session.mount('http://', adapter)
-        session.mount('https://', adapter)
-        self.session = session
-        self.last_request_timestamp = 0
-
-    def get(self, endpoint, params=None):
-        return self._request('get', endpoint, params=params)
-
-    def post(self, endpoint, data=None):
-        return self._request('post', endpoint, data=data)
-
-    def put(self, endpoint, data=None):
-        return self._request('put', endpoint, data=data)
-
-    def patch(self, endpoint, data=None):
-        return self._request('patch', endpoint, data=data)
-
-    def delete(self, endpoint, data=None):
-        return self._request('delete', endpoint, data=data)
-
-    def _request(self, method, endpoint, params=None, data=None):
-        # Rate limit requests
-        if self.enable_rate_limit:
-            self.throttle()
-        self.last_request_timestamp = self.milliseconds()
-        # Prepare the request
-        url, path = self.url_path_for(endpoint)
-        data = self._encode_data(data)
-        request = self.sign(method, path, params, data)
-        # Send the request
-        response = self.session.request(
-            method,
-            url=url,
-            headers=request.get('headers'),
-            params=request.get('params', params),
-            data=request.get('data', data),
-            verify=True,
-            timeout=self.TIMEOUT)
-        try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            raise errors.InvalidResponse(response) from e
-        # Decode response
-        return self._decode_data(response)
-
-    def sign(self, method, path, params=None, data=None):
-        return {}
-
-    def _encode_data(self, data):
-        data = clean_parameters(data or {})
-        return json.dumps(data) if data else data
-
-    def _decode_data(self, response):
-        try:
-            json_resp = response.json()
-        except json.decoder.JSONDecodeError as e:
-            raise errors.DecodeError() from e
-        if isinstance(json_resp, dict):
-            if bool(json_resp.get(self.error_key, False)):
-                raise errors.InvalidResponse(response)
-        return json_resp
-
-    def url_for(self, endpoint):
-        return f'{self.SERVER.URL}/{endpoint}'
-
-    def url_path_for(self, endpoint):
-        url = self.url_for(endpoint)
-        path = urlparse(url).path
-        return url, path
-
-    def throttle(self):
-        now = float(self.milliseconds())
-        elapsed = now - self.last_request_timestamp
-        if elapsed < self.rate_limit:
-            delay = self.rate_limit - elapsed
-            time.sleep(delay / 1E3)
-
-    def nonce(self):
-        return str(self.microseconds())
+class Timestamp(object):
 
     @staticmethod
     def seconds():
@@ -138,9 +41,171 @@ class Client(object):
     def microseconds():
         return int(time.time() * 1E6)
 
+
+timestamp = Timestamp()
+
+
+class ClientSession(Session):
+
+    def __init__(self,
+                 base_url: str,
+                 timeout: int=TIMEOUT,
+                 retry: RetryTypes=RETRY):
+        # Init session
+        super().__init__()
+        # Instance attributes
+        self.auth: AuthBase = None
+        self.base_url: str = base_url
+        self.timeout: int = timeout
+        self.last_nonce: int = 0
+        self.last_request_timestamp: int = 0
+        # Set retry configuration
+        if retry is True:
+            retry = RETRY
+        adapter = HTTPAdapter(max_retries=retry)
+        self.mount('http://', adapter)
+        self.mount('https://', adapter)
+
+    def request(self, method, endpoint, *args, **kwargs):
+        """Send the request after generating the complete URL."""
+        kwargs.setdefault('allow_redirects', True)
+        url = self.url_for(endpoint)
+        return super().request(
+            method, url,
+            auth=self.auth,
+            timeout=self.timeout,
+            *args, **kwargs,
+        )
+
+    def url_for(self, endpoint: str):
+        """Create the URL based off this partial endpoint."""
+        return urljoin(self.base_url, endpoint)
+
+
+class Client(object):
+    base_url: str = ''
+    error_key: str = ''
+    rate_limit: int = 1000  # in milliseconds
+    session_cls = ClientSession
+    timestamp: Timestamp = timestamp
+    # Client defaults
+    timeout: int = TIMEOUT
+    retry: RetryTypes = False  # RETRY
+    enable_rate_limit: bool = True
+
+    def __init__(self,
+                 timeout: int=None,
+                 retry: RetryTypes=None,
+                 enable_rate_limit: bool=True,
+                 **kwargs):
+        super().__init__(**kwargs)
+        # Override defaults
+        if timeout is not None:
+            self.timeout = timeout
+        if retry is not None:
+            self.retry = retry
+        if enable_rate_limit is not None:
+            self.enable_rate_limit = enable_rate_limit
+        # Create session
+        self.session: ClientSession = self.session_cls(
+            self.base_url, self.timeout, self.retry)
+        # Attributes
+        self.last_request_timestamp: int = 0
+
+    def get(self, endpoint, **kwargs):
+        return self._fetch('GET', endpoint, **kwargs)
+
+    def post(self, endpoint, data=None, json=None, **kwargs):
+        return self._fetch('POST', endpoint, data=data, json=json, **kwargs)
+
+    def put(self, endpoint, data=None, **kwargs):
+        return self._fetch('PUT', endpoint, data=data, **kwargs)
+
+    def patch(self, endpoint, data=None, **kwargs):
+        return self._fetch('PATCH', endpoint, data=data, **kwargs)
+
+    def delete(self, endpoint, **kwargs):
+        return self._fetch('DELETE', endpoint, **kwargs)
+
+    def _fetch(self, method, endpoint, *args, **kwargs):
+        # Clean empty values
+        for key in ['data', 'json', 'params']:
+            value = kwargs.get(key)
+            if value:
+                cleaned = clean_empty(value)
+                kwargs[key] = cleaned
+        # Rate limit requests
+        if self.enable_rate_limit:
+            self.throttle()
+        self.last_request_timestamp = self.timestamp.milliseconds()
+        # Send the request
+        response = self.session.request(method, endpoint, *args, **kwargs)
+        # Check response for errors
+        try:
+            response.raise_for_status()
+        except requests.HTTPError:
+            error_msg = self._get_error_message(response)
+            raise errors.InvalidResponse(self.error_key, error_msg, response)
+        # Decode the response
+        json = self._decode_response(response)
+        return json
+
+    def _get_error_message(self, data):
+        if not self.error_key:
+            return
+        try:
+            json = data.json() if isinstance(data, Response) else data
+            message = json[self.error_key]
+            if message:
+                return j.dumps(message).replace('"', '').rstrip('.')
+        except (JSONDecodeError, KeyError, TypeError):
+            return
+
+    def _decode_response(self, response):
+        try:
+            json = response.json()
+        except JSONDecodeError as e:
+            error_msg = 'Unable to decode JSON from response (no content)'
+            raise errors.DecodeError(error_msg, response) from e
+        error_msg = self._get_error_message(json)
+        if error_msg:
+            raise errors.InvalidResponse(self.error_key, error_msg, response)
+        return json
+
+    def throttle(self):
+        now = float(self.timestamp.milliseconds())
+        elapsed = now - self.last_request_timestamp
+        if elapsed < self.rate_limit:
+            delay = self.rate_limit - elapsed
+            time.sleep(delay / 1E3)
+
     def __del__(self):
         if self.session:
             self.session.close()
+
+
+class AuthMixin(object):
+    auth_cls = None
+
+    @property
+    def auth(self):
+        return self.session.auth
+
+    @auth.setter
+    def auth(self, auth: AuthBase):
+        self.session.auth = auth
+
+    def add_auth(self, *credentials):
+        self.auth = self.auth_cls(*credentials)
+
+
+class ModelMixin(object):
+    return_json: bool = False
+
+    def __init__(self, return_json: bool=None):
+        super().__init__()
+        if return_json:
+            self.return_json = return_json
 
 
 class _Enum(Enum):
@@ -163,17 +228,17 @@ class _Enum(Enum):
         return self.value
 
 
-class _Currency(_Enum):
+class Currency(_Enum):
     @property
     def value(self):
-        return super(_Currency, self).value['value']
+        return super().value['value']
 
     @property
     def decimals(self):
-        return super(_Currency, self).value.get('decimals', 2)
+        return super().value.get('decimals', 2)
 
 
-class _Market(_Enum):
+class Market(_Enum):
     @staticmethod
     def _format_value(value):
         value = str(value).replace('-', '')
@@ -182,12 +247,12 @@ class _Market(_Enum):
 
     @property
     def value(self):
-        return super(_Market, self).value['value']
+        return super().value['value']
 
     @property
     def base(self):
-        return super(_Market, self).value['base']
+        return super().value['base']
 
     @property
     def quote(self):
-        return super(_Market, self).value['quote']
+        return super().value['quote']

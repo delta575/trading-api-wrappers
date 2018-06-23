@@ -1,24 +1,56 @@
-import hashlib
-import hmac
+from requests import PreparedRequest as P
 
-# local
 from .client_public import BitstampPublic
-from ..common import check_keys, clean_parameters
+from ..auth import HMACAuth
+from ..base import AuthMixin, RetryTypes
 
 
-class BitstampAuth(BitstampPublic):
+class BitstampHMACAuth(HMACAuth):
+
+    signature_delimiter = ''
+
+    def __init__(self,
+                 api_key: str,
+                 secret: str,
+                 customer_id: (str, int),
+                 **kwargs):
+        super().__init__(api_key, secret, **kwargs)
+        self.customer_id = str(customer_id)
+
+    def add_api_key(self, r: P):
+        r.body['key'] = self.api_key
+
+    def add_nonce(self, r: P, nonce: str):
+        r.body['nonce'] = nonce
+
+    def add_signature(self, r: P, nonce: str):
+        message = self.build_message(r, nonce)
+        signature = self.sign(message)
+        r.body['signature'] = signature.upper()
+
+    def auth_request(self, r: P, nonce: str):
+        r.body = self.parse_data(r.body)
+        super().auth_request(r, nonce)
+        r.prepare_body(data=r.body, files=None)
+
+    def build_message(self, r: P, nonce: str):
+        components = [nonce, self.customer_id, self.api_key]
+        message = self.signature_delimiter.join(components)
+        return message
+
+
+class BitstampAuth(BitstampPublic, AuthMixin):
+    auth_cls = BitstampHMACAuth
 
     def __init__(self,
                  key: str,
                  secret: str,
                  customer_id: (str, int),
-                 timeout: int=30,
-                 retry=None):
-        super().__init__(timeout, retry)
-        check_keys(key, secret)
-        self.KEY = str(key)
-        self.SECRET = str(secret)
-        self.CUSTOMER_ID = str(customer_id)
+                 timeout: int=None,
+                 retry: RetryTypes=None,
+                 enable_rate_limit: bool=None):
+        super().__init__(timeout, retry, enable_rate_limit)
+        self.add_auth(key, secret, customer_id)
 
     # Private user data -------------------------------------------------------
     def account_balance(self, currency_pair: str=None):
@@ -348,25 +380,3 @@ class BitstampAuth(BitstampPublic):
                               amount, currency, sub_account)
 
     # TODO: Bank methods
-
-    # PRIVATE METHODS ---------------------------------------------------------
-    def sign(self, method, path, params=None, data=None):
-        nonce = self.nonce()
-        payload = data or {}
-        payload['key'] = self.KEY
-        payload['nonce'] = nonce
-
-        msg = nonce + self.CUSTOMER_ID + self.KEY
-
-        h = hmac.new(key=self.SECRET.encode('utf-8'),
-                     msg=msg.encode('utf-8'),
-                     digestmod=hashlib.sha256)
-
-        payload['signature'] = h.hexdigest().upper()
-
-        return {
-            'data': payload
-        }
-
-    def _encode_data(self, data):
-        return clean_parameters(data or {})

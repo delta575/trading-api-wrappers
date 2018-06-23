@@ -1,6 +1,5 @@
 import unittest
 
-# local
 from trading_api_wrappers import Bitcoinity
 
 CURRENCY = 'USD'

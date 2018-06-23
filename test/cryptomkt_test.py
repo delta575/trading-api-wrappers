@@ -1,11 +1,10 @@
 import unittest
 from datetime import datetime, timedelta
 
-# pip
 from decouple import config
 
-# local
-from trading_api_wrappers import CryptoMKT, errors
+from trading_api_wrappers import CryptoMKT
+from trading_api_wrappers import InvalidResponse
 from trading_api_wrappers.cryptomkt import models
 
 POST_ORDERS = False  # Only post orders if explicitly set
@@ -105,7 +104,7 @@ class CryptoMKTAuthTest(unittest.TestCase):
         self.assertIsInstance(canceled_order, models.Order)
 
 
-class CRYPTOMKTAuthTestBadApi(unittest.TestCase):
+class CryptoMKTAuthTestBadApi(unittest.TestCase):
 
     def setUp(self):
         self.client = CryptoMKT.Auth('BAD_KEY', 'BAD_SECRET')
@@ -114,8 +113,9 @@ class CRYPTOMKTAuthTestBadApi(unittest.TestCase):
         self.assertIsInstance(self.client, CryptoMKT.Auth)
 
     def test_key_secret(self):
-        self.assertRaises(ValueError, lambda: CryptoMKT.Auth())
+        with self.assertRaises(TypeError):
+            CryptoMKT.Auth()
 
     def test_balance_returns_error(self):
-        self.assertRaises(errors.InvalidResponse,
-                          lambda: self.client.balance())
+        with self.assertRaises(InvalidResponse):
+            self.client.balance()

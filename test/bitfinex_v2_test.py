@@ -1,14 +1,11 @@
 import unittest
 from datetime import datetime
 
-# pip
 from decouple import config
 
-# local
 from trading_api_wrappers import BitfinexV2 as Bitfinex
 from trading_api_wrappers.bitfinex import models_v2 as models
 
-# Bitfinex API Server
 TEST = config('TEST', cast=bool, default=False)
 API_KEY = config('BFX_API_KEY')
 API_SECRET = config('BFX_API_SECRET')

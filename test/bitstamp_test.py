@@ -1,10 +1,8 @@
 import unittest
 from datetime import datetime
 
-# pip
 from decouple import config
 
-# local
 from trading_api_wrappers import errors, Bitstamp
 
 API_KEY = config('BITSTAMP_API_KEY')
@@ -64,7 +62,7 @@ class BitstampAuthTest(unittest.TestCase):
         self.assertIn('btc_available', response.keys())
 
     def test_user_transactions_returns_list(self):
-        response = self.client.user_transactions(PAIR)
+        response = self.client.user_transactions(PAIR, limit=10)
         self.assertIsInstance(response, list)
 
     def test_open_orders_returns_list(self):
@@ -96,5 +94,5 @@ class BitstampAuthTestBadApi(unittest.TestCase):
         self.assertIsInstance(self.client, Bitstamp.Auth)
 
     def test_account_balance_returns_error(self):
-        self.assertRaises(errors.InvalidResponse,
-                          lambda: self.client.account_balance())
+        with self.assertRaises(errors.InvalidResponse):
+            self.client.account_balance()

@@ -1,13 +1,9 @@
-# local
-from .server import BitstampServer
 from ..base import Client
 
 
 class BitstampPublic(Client):
     error_key = 'error'
-
-    def __init__(self, timeout: int=30, retry=None):
-        super().__init__(BitstampServer(), timeout, retry)
+    base_url = 'https://www.bitstamp.net/api/'
 
     @staticmethod
     def _endpoint_for(endpoint, version=2):
