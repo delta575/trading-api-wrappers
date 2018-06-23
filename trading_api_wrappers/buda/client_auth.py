@@ -21,7 +21,7 @@ class BudaHMACAuth(HMACAuth):
     def build_message(self, r: P, nonce: str):
         components = [r.method, r.path_url]
         if r.body:
-            encoded_body = base64.b64encode(r.body).decode('utf-8')
+            encoded_body = base64.b64encode(r.body).decode()
             components.append(encoded_body)
         components.append(nonce)
         message = self.signature_delimiter.join(components)
