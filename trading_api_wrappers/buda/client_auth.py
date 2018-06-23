@@ -7,7 +7,7 @@ from . import constants as _c
 from . import models as _m
 from .client_public import BudaPublic
 from ..auth import HMACAuth
-from ..base import AuthMixin, RetryTypes
+from ..base import AuthMixin
 
 
 class BudaHMACAuth(HMACAuth):
@@ -37,9 +37,11 @@ class BudaAuth(BudaPublic, AuthMixin):
                  timeout: int=None,
                  host: str=None,
                  return_json: bool=False,
-                 retry: RetryTypes=None,
+                 max_retries: int=None,
+                 backoff_factor: float=None,
                  enable_rate_limit: bool=None):
-        super().__init__(timeout, host, return_json, retry, enable_rate_limit)
+        super().__init__(timeout, host, return_json, max_retries,
+                         backoff_factor, enable_rate_limit)
         self.add_auth(key, secret)
 
     def quotation(self,

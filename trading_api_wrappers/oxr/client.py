@@ -7,8 +7,8 @@ class OXR(Client, AuthMixin):
     error_key = 'error'
     base_url = 'https://openexchangerates.org/api/'
 
-    def __init__(self, app_id: str, timeout: int=120, retry=None):
-        super().__init__(timeout, retry)
+    def __init__(self, app_id: str, timeout: int=120, max_retries: int=None):
+        super().__init__(timeout, max_retries)
         self.auth = ApiKeyAuth(app_id, api_key_param='app_id')
 
     def currencies(self):

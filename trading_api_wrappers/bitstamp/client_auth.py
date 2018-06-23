@@ -2,7 +2,7 @@ from requests import PreparedRequest as P
 
 from .client_public import BitstampPublic
 from ..auth import HMACAuth
-from ..base import AuthMixin, RetryTypes
+from ..base import AuthMixin
 
 
 class BitstampHMACAuth(HMACAuth):
@@ -47,9 +47,11 @@ class BitstampAuth(BitstampPublic, AuthMixin):
                  secret: str,
                  customer_id: (str, int),
                  timeout: int=None,
-                 retry: RetryTypes=None,
+                 max_retries: int=None,
+                 backoff_factor: float=None,
                  enable_rate_limit: bool=None):
-        super().__init__(timeout, retry, enable_rate_limit)
+        super().__init__(timeout, max_retries, backoff_factor,
+                         enable_rate_limit)
         self.add_auth(key, secret, customer_id)
 
     # Private user data -------------------------------------------------------

@@ -7,7 +7,7 @@ from . import constants as _c
 from . import models as _m
 from .client_public import CryptoMKTPublic
 from ..auth import HMACAuth
-from ..base import AuthMixin, RetryTypes
+from ..base import AuthMixin
 
 
 class CryptoMKTHMACAuth(HMACAuth):
@@ -40,10 +40,11 @@ class CryptoMKTAuth(CryptoMKTPublic, AuthMixin):
                  secret: str,
                  timeout: int=None,
                  return_json: bool=None,
-                 retry: RetryTypes=None,
+                 max_retries: int=None,
+                 backoff_factor: float=None,
                  enable_rate_limit: bool=None):
         super().__init__(
-            timeout, retry, enable_rate_limit,
+            timeout, max_retries, backoff_factor, enable_rate_limit,
             return_json=return_json,
         )
         self.add_auth(key, secret)

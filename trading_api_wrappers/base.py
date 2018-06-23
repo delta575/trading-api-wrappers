@@ -4,27 +4,24 @@ from enum import Enum
 from json.decoder import JSONDecodeError
 from urllib.parse import urljoin
 
+from typing import Iterable
+
+import backoff
 import requests
 from requests import Response
 from requests import Session
-from requests.adapters import HTTPAdapter
 from requests.auth import AuthBase
-from urllib3.util.retry import Retry
 
-from . import errors
 from .common import clean_empty
+from .errors import DecodeError
+from .errors import InvalidResponse
+from .errors import RequestException
 
 TIMEOUT = 30
-RETRY = Retry(
-    total=3,
-    backoff_factor=2,
-    status_forcelist=[
-        400, 401, 403, 404, 408, 429,
-        500, 502, 503, 504,
-    ],
-)
-
-RetryTypes = (bool, int, Retry)
+RETRY_CODES = [
+    400, 401, 403, 404, 408, 429,
+    500, 502, 503, 504,
+]
 
 
 class Timestamp(object):
@@ -49,8 +46,7 @@ class ClientSession(Session):
 
     def __init__(self,
                  base_url: str,
-                 timeout: int=TIMEOUT,
-                 retry: RetryTypes=RETRY):
+                 timeout: int=TIMEOUT):
         # Init session
         super().__init__()
         # Instance attributes
@@ -59,17 +55,17 @@ class ClientSession(Session):
         self.timeout: int = timeout
         self.last_nonce: int = 0
         self.last_request_timestamp: int = 0
-        # Set retry configuration
-        if retry is True:
-            retry = RETRY
-        adapter = HTTPAdapter(max_retries=retry)
-        self.mount('http://', adapter)
-        self.mount('https://', adapter)
 
     def request(self, method, endpoint, *args, **kwargs):
         """Send the request after generating the complete URL."""
         kwargs.setdefault('allow_redirects', True)
         url = self.url_for(endpoint)
+        # Clean empty values
+        for key in ['data', 'json', 'params']:
+            value = kwargs.get(key)
+            if value:
+                cleaned = clean_empty(value)
+                kwargs[key] = cleaned
         return super().request(
             method, url,
             auth=self.auth,
@@ -88,27 +84,32 @@ class Client(object):
     rate_limit: int = 1000  # in milliseconds
     session_cls = ClientSession
     timestamp: Timestamp = timestamp
+    retry_codes: Iterable[int] = RETRY_CODES
     # Client defaults
-    timeout: int = TIMEOUT
-    retry: RetryTypes = False  # RETRY
     enable_rate_limit: bool = True
+    backoff_factor: float = 1.5  # in seconds
+    max_retries: int = 3
+    timeout: int = TIMEOUT
 
     def __init__(self,
                  timeout: int=None,
-                 retry: RetryTypes=None,
-                 enable_rate_limit: bool=True,
+                 max_retries: int=None,
+                 backoff_factor: float=None,
+                 enable_rate_limit: bool=None,
                  **kwargs):
         super().__init__(**kwargs)
         # Override defaults
         if timeout is not None:
             self.timeout = timeout
-        if retry is not None:
-            self.retry = retry
+        if max_retries is not None:
+            self.max_retries = max_retries
         if enable_rate_limit is not None:
             self.enable_rate_limit = enable_rate_limit
+        if backoff_factor is not None:
+            self.backoff_factor = backoff_factor
         # Create session
         self.session: ClientSession = self.session_cls(
-            self.base_url, self.timeout, self.retry)
+            self.base_url, self.timeout)
         # Attributes
         self.last_request_timestamp: int = 0
 
@@ -127,13 +128,26 @@ class Client(object):
     def delete(self, endpoint, **kwargs):
         return self._fetch('DELETE', endpoint, **kwargs)
 
+    def _retry(self, target):
+        def give_up_retry(e: RequestException):
+            code = e.response.status_code
+            return code not in self.retry_codes
+        return backoff.on_exception(
+            backoff.expo,
+            RequestException,
+            factor=self.backoff_factor,
+            max_time=self.timeout,
+            max_tries=self.max_retries,
+            giveup=give_up_retry,
+        )(target)
+
     def _fetch(self, method, endpoint, *args, **kwargs):
-        # Clean empty values
-        for key in ['data', 'json', 'params']:
-            value = kwargs.get(key)
-            if value:
-                cleaned = clean_empty(value)
-                kwargs[key] = cleaned
+        @self._retry
+        def fetch():
+            return self._fetch_base(method, endpoint, *args, ** kwargs)
+        return fetch()
+
+    def _fetch_base(self, method, endpoint, *args, **kwargs):
         # Rate limit requests
         if self.enable_rate_limit:
             self.throttle()
@@ -145,7 +159,7 @@ class Client(object):
             response.raise_for_status()
         except requests.HTTPError:
             error_msg = self._get_error_message(response)
-            raise errors.InvalidResponse(self.error_key, error_msg, response)
+            raise InvalidResponse(self.error_key, error_msg, response)
         # Decode the response
         json = self._decode_response(response)
         return json
@@ -166,10 +180,10 @@ class Client(object):
             json = response.json()
         except JSONDecodeError as e:
             error_msg = 'Unable to decode JSON from response (no content)'
-            raise errors.DecodeError(error_msg, response) from e
+            raise DecodeError(error_msg, response) from e
         error_msg = self._get_error_message(json)
         if error_msg:
-            raise errors.InvalidResponse(self.error_key, error_msg, response)
+            raise InvalidResponse(self.error_key, error_msg, response)
         return json
 
     def throttle(self):

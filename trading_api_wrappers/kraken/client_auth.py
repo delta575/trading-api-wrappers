@@ -6,7 +6,7 @@ from requests import PreparedRequest as P
 
 from .client_public import KrakenPublic
 from ..auth import HMACAuth
-from ..base import AuthMixin, RetryTypes
+from ..base import AuthMixin
 
 
 class KrakenHMACAuth(HMACAuth):
@@ -44,9 +44,11 @@ class KrakenAuth(KrakenPublic, AuthMixin):
                  key: str,
                  secret: str,
                  timeout: int=None,
-                 retry: RetryTypes=None,
+                 max_retries: int=None,
+                 backoff_factor: float=None,
                  enable_rate_limit: bool=None):
-        super().__init__(timeout, retry, enable_rate_limit)
+        super().__init__(timeout, max_retries, backoff_factor,
+                         enable_rate_limit)
         self.add_auth(key, secret)
 
     # Private user data -------------------------------------------------------

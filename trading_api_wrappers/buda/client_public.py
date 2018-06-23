@@ -1,6 +1,5 @@
 from . import models as _m
 from ..base import Client, ModelMixin
-from ..base import RetryTypes
 
 
 class BudaPublic(Client, ModelMixin):
@@ -11,13 +10,14 @@ class BudaPublic(Client, ModelMixin):
                  timeout: int=None,
                  host: str=None,
                  return_json: bool=False,
-                 retry: RetryTypes=None,
+                 max_retries: int=None,
+                 backoff_factor: float=None,
                  enable_rate_limit: bool=None):
         # Override base_url
         if host is not None:
             self.base_url = host
         super().__init__(
-            timeout, retry, enable_rate_limit,
+            timeout, max_retries, backoff_factor, enable_rate_limit,
             return_json=return_json,
         )
 
