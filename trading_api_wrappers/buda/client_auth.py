@@ -140,7 +140,7 @@ class BudaAuth(BudaPublic, AuthMixin):
 
     # ORDERS ------------------------------------------------------------------
     def new_order_payload(self, market_id: str, payload):
-        data = self.post(f'markets/{market_id}/orders', payload)
+        data = self.post(f'markets/{market_id}/orders', json=payload)
         if self.return_json:
             return data
         return _m.Order.create_from_json(data['order'])
