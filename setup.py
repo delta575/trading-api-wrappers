@@ -23,6 +23,7 @@ VERSION = '0.12.0'
 # What packages are required for this module to be executed?
 REQUIRED = [
     'requests',
+    'backoff',
 ]
 
 # The rest you shouldn't have to touch too much :)
