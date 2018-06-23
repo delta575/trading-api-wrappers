@@ -130,8 +130,11 @@ class Client(object):
 
     def _retry(self, target):
         def give_up_retry(e: RequestException):
-            code = e.response.status_code
-            return code not in self.retry_codes
+            give_up = False
+            if e.response:
+                code = e.response.status_code
+                give_up = code not in self.retry_codes
+            return give_up
         return backoff.on_exception(
             backoff.expo,
             RequestException,
