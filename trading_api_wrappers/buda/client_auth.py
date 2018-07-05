@@ -207,7 +207,6 @@ class BudaAuth(BudaPublic, AuthMixin):
         return self._transfers(path=f'currencies/{currency}/deposits',
                                model=_m.Deposit, key='deposits')
 
-    # TODO: UNTESTED
     def withdrawal(self,
                    currency: str,
                    amount: float,
