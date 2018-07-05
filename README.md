@@ -4,7 +4,7 @@
 [![Python 3](https://pyup.io/repos/github/delta575/trading-api-wrappers/python-3-shield.svg)](https://pyup.io/repos/github/delta575/trading-api-wrappers/)
 
 Trading API Wrappers.
-Tested on Python 3.6
+Tested on Python 3.6, 3.7
 
 Supported APIs:
 
