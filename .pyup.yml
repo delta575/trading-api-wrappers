@@ -3,3 +3,8 @@
 
 schedule: every week
 branch: develop
+
+requirements:
+  - Pipfile
+  - Pipfile.lock
+  
