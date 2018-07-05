@@ -1,39 +1,66 @@
 # Trading API Wrappers
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Updates](https://pyup.io/repos/github/delta575/trading-api-wrappers/shield.svg)](https://pyup.io/repos/github/delta575/trading-api-wrappers/)
-[![Python 3](https://pyup.io/repos/github/delta575/trading-api-wrappers/python-3-shield.svg)](https://pyup.io/repos/github/delta575/trading-api-wrappers/)
 
-Trading API Wrappers.
-Tested on Python 3.6, 3.7
+> Python 3.6+ clients for popular **Crypto Exchanges** and other useful services.
+
+> **Disclaimer:** Still at an early stage of development. Rapidly evolving APIs.
+
+[![PyPI - License](https://img.shields.io/pypi/l/trading-api-wrappers.svg)](https://opensource.org/licenses/MIT)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/trading-api-wrappers.svg)
+[![PyPI](https://img.shields.io/pypi/v/trading-api-wrappers.svg)](https://pypi.org/project/trading-api-wrappers/)
+![PyPI - Status](https://img.shields.io/pypi/status/trading-api-wrappers.svg)
+[![Updates](https://pyup.io/repos/github/delta575/trading-api-wrappers/shield.svg)](https://pyup.io/repos/github/delta575/trading-api-wrappers/)
 
 Supported APIs:
 
+- [Buda](https://www.buda.com)
 - [Bitfinex](https://www.bitfinex.com)
 - [Bitstamp](https://www.bitstamp.net)
-- [Buda](https://www.buda.com)
 - [CoinDesk](https://www.coindesk.com)
 - [CoinMarketCap](https://coinmarketcap.com)
 - [CryptoMKT](https://www.cryptomkt.com)
 - [Kraken](https://www.kraken.com)
 - [OpenExchangeRates](https://openexchangerates.org)
 
-## Dev setup
-
-Install the libs
-
-```bash
-$ pip install -r requirements.txt
-```
-
-Rename `.env.example` to `.env`
 
 ## Installation
 
+### Requirements
+* Python 3.6 or 3.7
+
+To install, simply use `pipenv` (or `pip`, of course):
+
 ```bash
-$ pip install  trading-api-wrappers
-```    
+$ pipenv trading-api-wrappers
+```
+
+### Dev setup
+
+```bash
+$ pipenv install -d
+```
+
+Rename `.env.example` to `.env` and configure your credentials (for tests)
 
 ## Usage
+
+### Buda
+
+Public API:
+
+```python
+from trading_api_wrappers import Buda
+client = Buda.Public()
+```    
+
+Authenticated API:
+
+```python
+from trading_api_wrappers import Buda
+client = Buda.Auth(API_KEY, API_SECRET)
+```
+
+Buda API Doc:
+https://api.buda.com
 
 ### Bitfinex
 
@@ -72,25 +99,6 @@ client = Bitstamp.Auth(API_KEY, API_SECRET, CUSTOMER_ID)
 
 Bitstamp API Doc:
 https://www.bitstamp.net/api
-
-### Buda
-
-Public API:
-
-```python
-from trading_api_wrappers import Buda
-client = Buda.Public()
-```    
-
-Authenticated API:
-
-```python
-from trading_api_wrappers import Buda
-client = Buda.Auth(API_KEY, API_SECRET)
-```
-
-Buda API Doc:
-https://api.buda.com
 
 ### Kraken
 
@@ -172,7 +180,7 @@ https://currencylayer.com/documentation
 
 
 ## Licence
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![PyPI - License](https://img.shields.io/pypi/l/trading-api-wrappers.svg)](https://opensource.org/licenses/MIT)
 
 The MIT License
 
@@ -180,6 +188,7 @@ Copyright © 2017
 [Felipe Aránguiz](mailto://faranguiz575@gmail.com) | [Sebastián Aránguiz](mailto://sarang575@gmail.com)
 
 See [LICENSE](LICENSE)
+
 
 ## Donations
 
