@@ -2,6 +2,7 @@ from ..base import _Enum, Currency, Market
 
 # Limits
 ORDERS_LIMIT = 300
+TRANSFERS_LIMIT = 300
 
 
 class Currency(Currency):
