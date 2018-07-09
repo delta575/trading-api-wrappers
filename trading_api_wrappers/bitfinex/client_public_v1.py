@@ -3,7 +3,7 @@ from ..base import Client
 
 class BitfinexPublic(Client):
     base_url = 'https://api.bitfinex.com/v1/'
-    error_key = 'message'
+    error_keys = ['message']
 
     def ticker(self, symbol: str):
         """Gets the innermost bid and asks and information on the most recent trade.

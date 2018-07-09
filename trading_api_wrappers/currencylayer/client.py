@@ -11,7 +11,7 @@ class CurrencyLayer(Client, AuthMixin):
     """
     # https is only enabled for paid subscriptions
     base_url = 'http://apilayer.net/api/'
-    error_key = 'error'
+    error_keys = ['error']
     timeout = 120
 
     def __init__(self,
