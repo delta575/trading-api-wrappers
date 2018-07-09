@@ -2,8 +2,8 @@ from ..base import Client
 
 
 class BitstampPublic(Client):
-    error_key = 'error'
     base_url = 'https://www.bitstamp.net/api/'
+    error_keys = ['error', 'reason']
 
     @staticmethod
     def _endpoint_for(endpoint, version=2):

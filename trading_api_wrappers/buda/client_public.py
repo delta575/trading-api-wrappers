@@ -3,8 +3,8 @@ from ..base import Client, ModelMixin
 
 
 class BudaPublic(Client, ModelMixin):
-    error_key = 'message'
     base_url = 'https://www.buda.com/api/v2/'
+    error_keys = ['message']
 
     def __init__(self,
                  timeout: int=None,

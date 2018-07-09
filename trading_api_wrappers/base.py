@@ -80,7 +80,7 @@ class ClientSession(Session):
 
 class Client(object):
     base_url: str = ''
-    error_key: str = ''
+    error_keys: Iterable[str] = []
     rate_limit: int = 1000  # in milliseconds
     session_cls = ClientSession
     timestamp: Timestamp = timestamp
@@ -162,21 +162,22 @@ class Client(object):
             response.raise_for_status()
         except requests.HTTPError:
             error_msg = self._get_error_message(response)
-            raise InvalidResponse(self.error_key, error_msg, response)
+            raise InvalidResponse(error_msg, response)
         # Decode the response
         json = self._decode_response(response)
         return json
 
     def _get_error_message(self, data):
-        if not self.error_key:
-            return
-        try:
-            json = data.json() if isinstance(data, Response) else data
-            message = json[self.error_key]
-            if message:
-                return j.dumps(message).replace('"', '').rstrip('.')
-        except (JSONDecodeError, KeyError, TypeError):
-            return
+        for error_key in self.error_keys:
+            try:
+                json = data.json() if isinstance(data, Response) else data
+                message = json[error_key]
+                if message:
+                    msg = j.dumps(message).replace('"', '').rstrip('.')
+                    msg = f'{error_key}: {msg}'
+                    return msg
+            except (JSONDecodeError, KeyError, TypeError):
+                return
 
     def _decode_response(self, response):
         try:
@@ -186,7 +187,7 @@ class Client(object):
             raise DecodeError(error_msg, response) from e
         error_msg = self._get_error_message(json)
         if error_msg:
-            raise InvalidResponse(self.error_key, error_msg, response)
+            raise InvalidResponse(error_msg, response)
         return json
 
     def throttle(self):

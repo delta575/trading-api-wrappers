@@ -2,6 +2,7 @@ from ..base import _Enum, Currency, Market
 
 # Limits
 ORDERS_LIMIT = 300
+TRANSFERS_LIMIT = 300
 
 
 class Currency(Currency):
@@ -11,7 +12,7 @@ class Currency(Currency):
     CLP = dict(value='CLP')
     COP = dict(value='COP')
     ETH = dict(value='ETH', decimals=9)
-    LTC = dict(value='PEN', decimals=8)
+    LTC = dict(value='LTC', decimals=8)
     PEN = dict(value='PEN')
 
 

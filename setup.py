@@ -18,7 +18,7 @@ URL = 'https://github.com/delta575/trading-api-wrappers'
 EMAIL = 'faranguiz575@gmail.com, sarang575@gmail.com'
 AUTHOR = 'Felipe Aránguiz, Sebastián Aránguiz'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.12.3'
+VERSION = '0.13.0'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -109,6 +109,7 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy'
     ],

@@ -2,8 +2,8 @@ from ..base import Client
 
 
 class KrakenPublic(Client):
-    error_key = 'error'
     base_url = 'https://api.kraken.com/0/'
+    error_keys = ['error']
 
     def server_time(self):
         return self.get('public/Time')

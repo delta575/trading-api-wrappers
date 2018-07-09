@@ -477,6 +477,38 @@ class Deposit(Transfer):
     data_key = 'deposit_data'
 
 
+class WithdrawalPages(
+    namedtuple('withdrawal_pages', [
+        'withdrawals',
+        'meta',
+    ])
+):
+
+    @classmethod
+    def create_from_json(cls, withdrawals, pages_meta):
+        return cls(
+            withdrawals=[Withdrawal.create_from_json(withdrawal)
+                         for withdrawal in withdrawals],
+            meta=PagesMeta.create_from_json(pages_meta),
+        )
+
+
+class DepositPages(
+    namedtuple('deposit_pages', [
+        'deposits',
+        'meta',
+    ])
+):
+
+    @classmethod
+    def create_from_json(cls, deposits, pages_meta):
+        return cls(
+            deposits=[Deposit.create_from_json(deposit)
+                      for deposit in deposits],
+            meta=PagesMeta.create_from_json(pages_meta),
+        )
+
+
 class AveragePrice(
     namedtuple('reports', [
         'datetime',

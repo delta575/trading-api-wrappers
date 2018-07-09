@@ -6,7 +6,7 @@ from ..base import Client, ModelMixin
 
 class BitfinexPublic(Client, ModelMixin):
     base_url = 'https://api.bitfinex.com/v2/'
-    error_key = 'message'
+    error_keys = ['message']
 
     def ticker(self, symbol: str):
         data = self.get(f'ticker/{symbol}')

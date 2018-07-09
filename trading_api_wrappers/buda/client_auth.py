@@ -192,22 +192,56 @@ class BudaAuth(BudaPublic, AuthMixin):
         return _m.Order.create_from_json(data['order'])
 
     # PAYMENTS ----------------------------------------------------------------
-    def _transfers(self, path, model, key):
-        data = self.get(path)
+    def _transfers(self, path, model, key,
+                   page: int=None,
+                   per_page: int=None,
+                   state: str=None):
+        if per_page and per_page > _c.TRANSFERS_LIMIT:
+            msg = f"Param 'per_page' must be <= {_c.TRANSFERS_LIMIT}"
+            raise ValueError(msg)
+        data = self.get(path, params={
+            'per': per_page,
+            'page': page,
+            'state': str(state) if state else None,
+        })
         if self.return_json:
             return data
-        return [model.create_from_json(transfer)
-                for transfer in data[key]]
+        return model.create_from_json(data[key], data.get('meta'))
 
-    def withdrawals(self, currency: str):
+    def withdrawal_pages(self,
+                         currency: str,
+                         page: int=None,
+                         per_page: int=None):
         return self._transfers(path=f'currencies/{currency}/withdrawals',
-                               model=_m.Withdrawal, key='withdrawals')
+                               model=_m.WithdrawalPages, key='withdrawals',
+                               page=page, per_page=per_page)
 
-    def deposits(self, currency: str):
+    def withdrawals(self,
+                    currency: str,
+                    page: int=None,
+                    per_page: int=None):
+        data = self.withdrawal_pages(currency, page, per_page)
+        if isinstance(data, dict):
+            return data['withdrawals']
+        return data.withdrawals
+
+    def deposit_pages(self,
+                      currency: str,
+                      page: int=None,
+                      per_page: int=None):
         return self._transfers(path=f'currencies/{currency}/deposits',
-                               model=_m.Deposit, key='deposits')
+                               model=_m.DepositPages, key='deposits',
+                               page=page, per_page=per_page)
 
-    # TODO: UNTESTED
+    def deposits(self,
+                 currency: str,
+                 page: int=None,
+                 per_page: int=None):
+        data = self.deposit_pages(currency, page, per_page)
+        if isinstance(data, dict):
+            return data['deposits']
+        return data.deposits
+
     def withdrawal(self,
                    currency: str,
                    amount: float,

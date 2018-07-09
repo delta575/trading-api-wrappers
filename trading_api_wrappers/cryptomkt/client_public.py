@@ -6,8 +6,8 @@ from ..base import Client, ModelMixin
 
 
 class CryptoMKTPublic(Client, ModelMixin):
-    error_key = 'message'
     base_url = 'https://api.cryptomkt.com/v1/'
+    error_keys = ['message']
 
     def markets(self):
         data = self.get('market')

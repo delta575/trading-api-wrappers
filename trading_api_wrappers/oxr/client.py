@@ -4,8 +4,8 @@ from ..common import format_date_iso, format_datetime_iso
 
 
 class OXR(Client, AuthMixin):
-    error_key = 'error'
     base_url = 'https://openexchangerates.org/api/'
+    error_keys = ['error']
 
     def __init__(self, app_id: str, timeout: int=120, max_retries: int=None):
         super().__init__(timeout, max_retries)

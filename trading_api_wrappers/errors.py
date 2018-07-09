@@ -8,7 +8,7 @@ class APIException(RequestException):
 
 
 class InvalidResponse(APIException):
-    def __init__(self, msg_key: str, msg: str, r: Response):
+    def __init__(self, error_msg: str, r: Response):
         # Add status code
         message = str(r.status_code)
         # Check for client or server errors
@@ -19,8 +19,8 @@ class InvalidResponse(APIException):
         # Add reason
         message = f'{message} {r.reason}'
         # Add message from source
-        if msg:
-            message = f'{message} ({msg_key}: {msg})'
+        if error_msg:
+            message = f'{message} ({error_msg})'
         # Add url
         message = f'{message} for url: {r.url}'
 
