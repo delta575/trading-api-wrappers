@@ -61,6 +61,7 @@ class Market(
         'base_currency',
         'quote_currency',
         'minimum_order_amount',
+        'json',
     ]),
 ):
 
@@ -74,6 +75,7 @@ class Market(
             minimum_order_amount=Amount.create_from_json(
                 market['minimum_order_amount']
             ),
+            json=market,
         )
 
 
@@ -84,7 +86,8 @@ class Ticker(
         'max_bid',
         'volume',
         'price_variation_24h',
-        'price_variation_7d'
+        'price_variation_7d',
+        'json',
     ])
 ):
 
@@ -97,6 +100,7 @@ class Ticker(
             volume=Amount.create_from_json(ticker['volume']),
             price_variation_24h=float_or_none(ticker['price_variation_24h']),
             price_variation_7d=float_or_none(ticker['price_variation_7d']),
+            json=ticker,
         )
 
 
@@ -112,6 +116,7 @@ class Quotation(
         'quote_balance_change',
         'quote_exchanged',
         'type',
+        'json',
     ])
 ):
 
@@ -136,6 +141,7 @@ class Quotation(
             quote_exchanged=Amount.create_from_json(
                 quotation['quote_exchanged']),
             type=quotation['type'],
+            json=quotation,
         )
 
 
@@ -158,6 +164,7 @@ class OrderBook(
     namedtuple('order_book', [
         'asks',
         'bids',
+        'json',
     ])
 ):
 
@@ -168,6 +175,7 @@ class OrderBook(
                   for entry in order_book['asks']],
             bids=[OrderBookEntry.create_from_json(entry)
                   for entry in order_book['bids']],
+            json=order_book,
         )
 
 
@@ -192,6 +200,7 @@ class Balance(
         'available_amount',
         'frozen_amount',
         'pending_withdraw_amount',
+        'json',
     ])
 ):
 
@@ -208,6 +217,7 @@ class Balance(
                 balance['frozen_amount']),
             pending_withdraw_amount=Amount.create_from_json(
                 balance['pending_withdraw_amount']),
+            json=balance,
         )
 
 
@@ -227,6 +237,7 @@ class Order(
         'total_exchanged',
         'traded_amount',
         'type',
+        'json',
     ])
 ):
 
@@ -247,6 +258,7 @@ class Order(
             total_exchanged=Amount.create_from_json(order['total_exchanged']),
             traded_amount=Amount.create_from_json(order['traded_amount']),
             type=order['type'],
+            json=order,
         )
 
 
@@ -286,6 +298,7 @@ class BalanceEvent(
         'old_pending_withdraw_amount',
         'transaction_type',
         'transfer_description',
+        'json',
     ])
 ):
 
@@ -310,6 +323,7 @@ class BalanceEvent(
             old_pending_withdraw_amount=event['old_pending_withdraw_amount'],
             transaction_type=event['transaction_type'],
             transfer_description=event['transfer_description'],
+            json=event,
         )
 
 
@@ -343,6 +357,7 @@ class TradeTransaction(
         'ask_order',
         'bid_order',
         'triggering_order',
+        'json',
     ])
 ):
 
@@ -363,6 +378,7 @@ class TradeTransaction(
             bid_order=Order.create_from_json(transaction['bid']),
             triggering_order=Order.create_from_json(
                 transaction['triggering_order']),
+            json=transaction,
         )
 
 
@@ -405,7 +421,8 @@ class Trades(
     namedtuple('trade_transaction_pages', [
         'timestamp',
         'last_timestamp',
-        'entries'
+        'entries',
+        'json',
     ])
 ):
 
@@ -416,6 +433,7 @@ class Trades(
             last_timestamp=int_or_none(trades['last_timestamp']),
             entries=[TradeEntry.create_from_json(entry)
                      for entry in trades['entries']],
+            json=trades,
         )
 
 
@@ -447,6 +465,7 @@ class Transfer(
         'currency',
         'state',
         'data',
+        'json',
     ])
 ):
     address_key = None
@@ -464,6 +483,7 @@ class Transfer(
             state=transfer['state'],
             data=TransferData.create_from_json(
                 transfer[cls.data_key], cls.address_key),
+            json=transfer,
         )
 
 
@@ -512,7 +532,8 @@ class DepositPages(
 class AveragePrice(
     namedtuple('reports', [
         'datetime',
-        'amount'
+        'amount',
+        'json',
     ])
 ):
 
@@ -521,7 +542,8 @@ class AveragePrice(
 
         return cls(
             datetime=report[0],
-            amount=report[1]
+            amount=report[1],
+            json=report,
         )
 
 
@@ -532,7 +554,8 @@ class Candlestick(
         'high',
         'low',
         'close',
-        'volume'
+        'volume',
+        'json',
     ])
 ):
 
@@ -546,4 +569,5 @@ class Candlestick(
             low=report[3],
             close=report[4],
             volume=report[5],
+            json=report,
         )

@@ -30,7 +30,7 @@ Supported APIs:
 To install, simply use `pipenv` (or `pip`, of course):
 
 ```bash
-$ pipenv trading-api-wrappers
+$ pipenv install trading-api-wrappers
 ```
 
 ### Dev setup

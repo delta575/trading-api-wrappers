@@ -56,6 +56,7 @@ class Ticker(
         'volume',
         'market',
         'timestamp',
+        'json',
     ])
 ):
     @classmethod
@@ -70,6 +71,7 @@ class Ticker(
             volume=float(ticker['volume']),
             market=ticker['market'],
             timestamp=parse_iso_datetime(ticker['timestamp']),
+            json=ticker,
         )
 
 
@@ -78,6 +80,7 @@ class OrderBookEntry(
         'price',
         'amount',
         'timestamp',
+        'json',
     ])
 ):
     @classmethod
@@ -85,7 +88,8 @@ class OrderBookEntry(
         return cls(
             price=float(book_entry['price']),
             amount=float(book_entry['amount']),
-            timestamp=parse_iso_datetime(book_entry['timestamp'])
+            timestamp=parse_iso_datetime(book_entry['timestamp']),
+            json=book_entry,
         )
 
 
@@ -111,6 +115,7 @@ class TradesEntry(
         'price',
         'amount',
         'market',
+        'json',
     ])
 ):
     @classmethod
@@ -121,6 +126,7 @@ class TradesEntry(
             price=float(trades_entry['price']),
             amount=float(trades_entry['amount']),
             market=trades_entry['market'],
+            json=trades_entry,
         )
 
 
@@ -144,6 +150,7 @@ class WalletBalance(
         'available',
         'balance',
         'wallet',
+        'json',
     ])
 ):
     @classmethod
@@ -152,6 +159,7 @@ class WalletBalance(
             available=float(balance['available']),
             balance=float(balance['balance']),
             wallet=balance['wallet'],
+            json=balance,
         )
 
 
@@ -205,6 +213,7 @@ class Order(
         'created_at',
         'updated_at',
         'executed_at',
+        'json',
     ])
 ):
     @classmethod
@@ -234,6 +243,8 @@ class Order(
             updated_at=parse_iso_datetime(order.get('created_at')),
             # Order execution timestamp. Only on executed orders
             executed_at=parse_iso_datetime(order.get('executed_at')),
+            # Order JSON data
+            json=order,
         )
 
 
