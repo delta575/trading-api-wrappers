@@ -152,11 +152,10 @@
         },
         "pluggy": {
             "hashes": [
-                "sha256:7f8ae7f5bdf75671a718d2daf0a64b7885f74510bcd98b1a0bb420eb9a9d0cff",
-                "sha256:d345c8fe681115900d6da8d048ba67c25df42973bda370783cd58826442dcd7c",
-                "sha256:e160a7fcf25762bb60efc7e171d4497ff1d8d2d75a3d0df7a21b76821ecbf5c5"
+                "sha256:6e3836e39f4d36ae72840833db137f7b7d35105079aee6ec4a62d9f80d594dd1",
+                "sha256:95eb8364a4708392bae89035f45341871286a333f749c3141c20573d2b3876e1"
             ],
-            "version": "==0.6.0"
+            "version": "==0.7.1"
         },
         "py": {
             "hashes": [
@@ -167,11 +166,10 @@
         },
         "pytest": {
             "hashes": [
-                "sha256:0453c8676c2bee6feb0434748b068d5510273a916295fd61d306c4f22fbfd752",
-                "sha256:4b208614ae6d98195430ad6bde03641c78553acee7c83cec2e85d613c0cd383d"
+                "sha256:952c0389db115437f966c4c2079ae9d54714b9455190e56acebe14e8c38a7efa",
+                "sha256:341ec10361b64a24accaec3c7ba5f7d5ee1ca4cebea30f76fad3dd12db9f0541"
             ],
-            "index": "pypi",
-            "version": "==3.6.3"
+            "version": "==3.6.4"
         },
         "python-decouple": {
             "hashes": [
@@ -204,10 +202,10 @@
         },
         "tqdm": {
             "hashes": [
-                "sha256:224291ee0d8c52d91b037fd90806f48c79bcd9994d3b0abc9e44b946a908fccd",
-                "sha256:77b8424d41b31e68f437c6dd9cd567aebc9a860507cb42fbd880a5f822d966fe"
+                "sha256:536e5a0205b6401d8aaf04b21469949c178dbe3642e3c76d3bb494a83cb22a10",
+                "sha256:60bbaa6700e87a250f6abcbbd7ddb33243ad592240ba46afce5305b15b406fad"
             ],
-            "version": "==4.23.4"
+            "version": "==4.24.0"
         },
         "twine": {
             "hashes": [
