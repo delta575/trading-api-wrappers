@@ -10,4 +10,5 @@ from .currencylayer import *
 from .errors import *
 from .kraken import *
 from .oxr import *
+from .ripio import *
 from .surbtc import *
