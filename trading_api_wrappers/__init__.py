@@ -11,4 +11,5 @@ from .errors import *
 from .kraken import *
 from .oxr import *
 from .ripio import *
+from .sfox import *
 from .surbtc import *
