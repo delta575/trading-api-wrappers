@@ -1,4 +1,5 @@
 from .bitcoinity import *
+from .bitex import *
 from .bitfinex import *
 from .bitstamp import *
 from .buda import *
