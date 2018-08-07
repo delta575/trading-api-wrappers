@@ -1,4 +1,5 @@
 from .bitcoinity import *
+from .bitex import *
 from .bitfinex import *
 from .bitstamp import *
 from .buda import *
@@ -9,4 +10,6 @@ from .currencylayer import *
 from .errors import *
 from .kraken import *
 from .oxr import *
+from .ripio import *
+from .sfox import *
 from .surbtc import *
