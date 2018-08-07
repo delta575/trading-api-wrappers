@@ -9,9 +9,10 @@ class BitstampPublic(Client):
     def _endpoint_for(endpoint, version=2):
         # NOTE: Bitstamp urls MUST end with /
         if version == 1:
-            return f'{endpoint}/'
+            endpoint = f'{endpoint}/'
         else:
-            return f'v{version}/{endpoint}/'
+            endpoint = f'v{version}/{endpoint}/'
+        return endpoint.lower()
 
     def ticker(self, currency_pair: str):
         """
