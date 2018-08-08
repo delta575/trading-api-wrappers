@@ -177,7 +177,7 @@ class Client(object):
                     msg = f'{error_key}: {msg}'
                     return msg
             except (JSONDecodeError, KeyError, TypeError):
-                return
+                continue
 
     def _decode_response(self, response):
         try:
