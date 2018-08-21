@@ -2,9 +2,8 @@ import json as j
 import time
 from enum import Enum
 from json.decoder import JSONDecodeError
-from urllib.parse import urljoin
-
 from typing import Iterable
+from urllib.parse import urljoin
 
 import backoff
 import requests
