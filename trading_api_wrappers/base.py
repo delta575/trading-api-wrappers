@@ -10,7 +10,9 @@ import requests
 from requests import Response
 from requests import Session
 from requests.auth import AuthBase
+from requests_toolbelt import user_agent
 
+from .__version__ import __version__
 from .common import clean_empty
 from .errors import DecodeError
 from .errors import InvalidResponse
@@ -42,6 +44,7 @@ timestamp = Timestamp()
 
 
 class ClientSession(Session):
+    user_agent = user_agent('trading-api-wrappers', __version__)
 
     def __init__(self,
                  base_url: str,
@@ -65,6 +68,10 @@ class ClientSession(Session):
             if value:
                 cleaned = clean_empty(value)
                 kwargs[key] = cleaned
+        # Set default user-agent
+        headers = kwargs.get('headers', {})
+        headers['User-Agent'] = self.user_agent
+        # Send the request
         return super().request(
             method, url,
             auth=self.auth,
