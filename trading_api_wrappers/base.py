@@ -69,11 +69,12 @@ class ClientSession(Session):
                 cleaned = clean_empty(value)
                 kwargs[key] = cleaned
         # Set default user-agent
-        headers = kwargs.get('headers', {})
+        headers = kwargs.pop('headers', {})
         headers['User-Agent'] = self.user_agent
         # Send the request
         return super().request(
             method, url,
+            headers=headers,
             auth=self.auth,
             timeout=self.timeout,
             *args, **kwargs,
