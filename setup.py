@@ -12,19 +12,22 @@ from shutil import rmtree
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
-NAME = 'trading-api-wrappers'
-DESCRIPTION = 'Trading API Wrappers for Python 3.6.'
+NAME = 'trading_api_wrappers'
+DESCRIPTION = 'Trading API Wrappers for Python 3.6+'
 URL = 'https://github.com/delta575/trading-api-wrappers'
 EMAIL = 'faranguiz575@gmail.com, sarang575@gmail.com'
 AUTHOR = 'Felipe Aránguiz, Sebastián Aránguiz'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.14.1'
+VERSION = None
 
 # What packages are required for this module to be executed?
 REQUIRED = [
     'requests',
     'backoff',
 ]
+
+# What packages are optional?
+EXTRAS = {}
 
 # The rest you shouldn't have to touch too much :)
 # ------------------------------------------------
@@ -35,8 +38,11 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 # Import the README and use it as the long-description.
 # Note: this will only work if 'README.md' is present in your MANIFEST.in file!
-with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = '\n' + f.read()
+try:
+    with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
+        long_description = '\n' + f.read()
+except FileNotFoundError:
+    long_description = DESCRIPTION
 
 # Load the package's __version__.py module as a dictionary.
 about = {}
@@ -74,7 +80,7 @@ class UploadCommand(Command):
         self.status('Building Source and Wheel (universal) distribution…')
         os.system('{0} setup.py sdist bdist_wheel --universal'.format(sys.executable))
 
-        self.status('Uploading the package to PyPi via Twine…')
+        self.status('Uploading the package to PyPI via Twine…')
         os.system('twine upload dist/*')
 
         self.status('Pushing git tags…')
@@ -97,6 +103,7 @@ setup(
     url=URL,
     packages=find_packages(exclude=('tests',)),
     install_requires=REQUIRED,
+    extras_require=EXTRAS,
     include_package_data=True,
     license='MIT',
     classifiers=[
