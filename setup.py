@@ -13,7 +13,7 @@ from setuptools import find_packages, setup, Command
 
 # Package meta-data.
 NAME = 'trading_api_wrappers'
-DESCRIPTION = 'Trading API Wrappers for Python 3.6.'
+DESCRIPTION = 'Trading API Wrappers for Python 3.6+'
 URL = 'https://github.com/delta575/trading-api-wrappers'
 EMAIL = 'faranguiz575@gmail.com, sarang575@gmail.com'
 AUTHOR = 'Felipe Aránguiz, Sebastián Aránguiz'
