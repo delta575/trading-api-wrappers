@@ -1,3 +1,4 @@
+from . import __version__
 from .bitcoinity import *
 from .bitex import *
 from .bitfinex import *
