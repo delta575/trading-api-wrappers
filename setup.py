@@ -22,8 +22,9 @@ VERSION = None
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'requests',
     'backoff',
+    'requests',
+    'requests-toolbelt',
 ]
 
 # What packages are optional?
