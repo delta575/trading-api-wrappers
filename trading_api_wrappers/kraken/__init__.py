@@ -7,7 +7,7 @@ __all__ = [
 ]
 
 
-class Kraken(object):
+class Kraken:
     # Enum Types
     Currency = _c.Currency
     Symbol = _c.Symbol

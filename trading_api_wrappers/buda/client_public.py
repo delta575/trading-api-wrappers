@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from . import constants as _c
 from . import models as _m
 from ..base import Client, ModelMixin
 
@@ -5,21 +8,6 @@ from ..base import Client, ModelMixin
 class BudaPublic(Client, ModelMixin):
     base_url = 'https://www.buda.com/api/v2/'
     error_keys = ['message']
-
-    def __init__(self,
-                 timeout: int=None,
-                 host: str=None,
-                 return_json: bool=False,
-                 max_retries: int=None,
-                 backoff_factor: float=None,
-                 enable_rate_limit: bool=None):
-        # Override base_url
-        if host is not None:
-            self.base_url = host
-        super().__init__(
-            timeout, max_retries, backoff_factor, enable_rate_limit,
-            return_json=return_json,
-        )
 
     def markets(self):
         data = self.get('markets')
@@ -57,3 +45,41 @@ class BudaPublic(Client, ModelMixin):
         if self.return_json:
             return data
         return _m.Trades.create_from_json(data['trades'])
+
+    def _report(self,
+                market_id: str,
+                report_type: _c.ReportType,
+                start_at: datetime=None,
+                end_at: datetime=None):
+        if isinstance(start_at, datetime):
+            start_at = int(start_at.timestamp())
+        if isinstance(end_at, datetime):
+            end_at = int(end_at.timestamp())
+        data = self.get(f'markets/{market_id}/reports', params={
+            'report_type': str(report_type),
+            'from': start_at,
+            'to': end_at,
+        })
+        return data
+
+    def report_average_prices(self,
+                              market_id: str,
+                              start_at: datetime=None,
+                              end_at: datetime=None):
+        data = self._report(market_id, _c.ReportType.AVERAGE_PRICES,
+                            start_at, end_at)
+        if self.return_json:
+            return data
+        return [_m.AveragePrice.create_from_json(report)
+                for report in data['reports']]
+
+    def report_candlestick(self,
+                           market_id: str,
+                           start_at: datetime=None,
+                           end_at: datetime=None):
+        data = self._report(market_id, _c.ReportType.CANDLESTICK,
+                            start_at, end_at)
+        if self.return_json:
+            return data
+        return [_m.Candlestick.create_from_json(report)
+                for report in data['reports']]

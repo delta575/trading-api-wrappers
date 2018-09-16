@@ -38,11 +38,8 @@ class BitfinexAuth(BitfinexPublic, AuthMixin):
                  key: str,
                  secret: str,
                  timeout: int=None,
-                 max_retries: int=None,
-                 backoff_factor: float=None,
-                 enable_rate_limit: bool=None):
-        super().__init__(timeout, max_retries, backoff_factor,
-                         enable_rate_limit)
+                 **kwargs):
+        super().__init__(timeout, **kwargs)
         self.add_auth(key, secret)
 
     # INFO --------------------------------------------------------------------
@@ -159,7 +156,7 @@ class BitfinexAuth(BitfinexPublic, AuthMixin):
     # View your latest inactive orders.
     # Limited to last 3 days and 1 request per minute.
     def orders_history(self, limit: int):
-        return self.post('order/hist', json={'limit': limit})
+        return self.post('orders/hist', json={'limit': limit})
 
     # POSITIONS ---------------------------------------------------------------
     # View your active positions.

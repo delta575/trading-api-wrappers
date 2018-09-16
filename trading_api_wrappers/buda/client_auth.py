@@ -1,5 +1,4 @@
 import base64
-from datetime import datetime
 
 from requests import PreparedRequest as P
 
@@ -35,13 +34,8 @@ class BudaAuth(BudaPublic, AuthMixin):
                  key: str,
                  secret: str,
                  timeout: int=None,
-                 host: str=None,
-                 return_json: bool=False,
-                 max_retries: int=None,
-                 backoff_factor: float=None,
-                 enable_rate_limit: bool=None):
-        super().__init__(timeout, host, return_json, max_retries,
-                         backoff_factor, enable_rate_limit)
+                 **kwargs):
+        super().__init__(timeout, **kwargs)
         self.add_auth(key, secret)
 
     def quotation(self,
@@ -72,45 +66,6 @@ class BudaAuth(BudaPublic, AuthMixin):
                         amount: float,
                         limit: float):
         return self.quotation(market_id, quotation_type, amount, limit)
-
-    # REPORTS -----------------------------------------------------------------
-    def _report(self,
-                market_id: str,
-                report_type: _c.ReportType,
-                start_at: datetime=None,
-                end_at: datetime=None):
-        if isinstance(start_at, datetime):
-            start_at = int(start_at.timestamp())
-        if isinstance(end_at, datetime):
-            end_at = int(end_at.timestamp())
-        data = self.get(f'markets/{market_id}/reports', params={
-            'report_type': str(report_type),
-            'from': start_at,
-            'to': end_at,
-        })
-        return data
-
-    def report_average_prices(self,
-                              market_id: str,
-                              start_at: datetime=None,
-                              end_at: datetime=None):
-        data = self._report(market_id, _c.ReportType.AVERAGE_PRICES,
-                            start_at, end_at)
-        if self.return_json:
-            return data
-        return [_m.AveragePrice.create_from_json(report)
-                for report in data['reports']]
-
-    def report_candlestick(self,
-                           market_id: str,
-                           start_at: datetime = None,
-                           end_at: datetime = None):
-        data = self._report(market_id, _c.ReportType.CANDLESTICK,
-                            start_at, end_at)
-        if self.return_json:
-            return data
-        return [_m.Candlestick.create_from_json(report)
-                for report in data['reports']]
 
     # BALANCES-----------------------------------------------------------------
     def balance(self, currency: str):

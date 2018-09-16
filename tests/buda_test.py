@@ -17,10 +17,13 @@ MARKET_ID = Buda.Market.BTC_CLP
 class BudaPublicTest(unittest.TestCase):
 
     def setUp(self):
-        self.client = Buda.Public(host=HOST)
+        self.client = Buda.Public(base_url=HOST)
 
     def test_instantiate_client(self):
         self.assertIsInstance(self.client, Buda.Public)
+
+    def test_client_base_url(self):
+        self.assertEqual(self.client.base_url, HOST)
 
     def test_markets(self):
         markets = self.client.markets()
@@ -46,14 +49,33 @@ class BudaPublicTest(unittest.TestCase):
         self.assertIsInstance(trades, models.Trades)
         self.assertEqual(trades.timestamp, timestamp)
 
+    def test_report_average_prices(self):
+        end = datetime.now()
+        start = end - timedelta(days=30)
+        report = self.client.report_average_prices(
+            MARKET_ID, start_at=start, end_at=end)
+        for item in report:
+            self.assertIsInstance(item, models.AveragePrice)
+
+    def test_report_candlestick(self):
+        end = datetime.now()
+        start = end - timedelta(days=30)
+        report = self.client.report_candlestick(
+            MARKET_ID, start_at=start, end_at=end)
+        for item in report:
+            self.assertIsInstance(item, models.Candlestick)
+
 
 class BudaAuthTest(unittest.TestCase):
 
     def setUp(self):
-        self.client = Buda.Auth(API_KEY, API_SECRET, host=HOST)
+        self.client = Buda.Auth(API_KEY, API_SECRET, base_url=HOST)
 
     def test_instantiate_client(self):
         self.assertIsInstance(self.client, Buda.Auth)
+
+    def test_client_base_url(self):
+        self.assertEqual(self.client.base_url, HOST)
 
     def test_quotation(self):
         quotation = self.client.quotation(
@@ -72,22 +94,6 @@ class BudaAuthTest(unittest.TestCase):
             MARKET_ID, quotation_type=Buda.QuotationType.ASK_GIVEN_SIZE,
             amount=1, limit=1)
         self.assertIsInstance(quotation, models.Quotation)
-
-    def test_report_average_prices(self):
-        end = datetime.now()
-        start = end - timedelta(days=30)
-        report = self.client.report_average_prices(
-            MARKET_ID, start_at=start, end_at=end)
-        for item in report:
-            self.assertIsInstance(item, models.AveragePrice)
-
-    def test_report_candlestick(self):
-        end = datetime.now()
-        start = end - timedelta(days=30)
-        report = self.client.report_candlestick(
-            MARKET_ID, start_at=start, end_at=end)
-        for item in report:
-            self.assertIsInstance(item, models.Candlestick)
 
     def test_balance(self):
         balance = self.client.balance(Buda.Currency.BTC)
@@ -163,10 +169,13 @@ class BudaAuthTest(unittest.TestCase):
 class BudaAuthTestBadApi(unittest.TestCase):
 
     def setUp(self):
-        self.client = Buda.Auth('BAD_KEY', 'BAD_SECRET', host=HOST)
+        self.client = Buda.Auth('BAD_KEY', 'BAD_SECRET', base_url=HOST)
 
     def test_instantiate_client(self):
         self.assertIsInstance(self.client, Buda.Auth)
+
+    def test_client_base_url(self):
+        self.assertEqual(self.client.base_url, HOST)
 
     def test_key_secret(self):
         with self.assertRaises(TypeError):

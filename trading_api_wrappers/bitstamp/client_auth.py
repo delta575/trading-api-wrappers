@@ -47,11 +47,8 @@ class BitstampAuth(BitstampPublic, AuthMixin):
                  secret: str,
                  customer_id: (str, int),
                  timeout: int=None,
-                 max_retries: int=None,
-                 backoff_factor: float=None,
-                 enable_rate_limit: bool=None):
-        super().__init__(timeout, max_retries, backoff_factor,
-                         enable_rate_limit)
+                 **kwargs):
+        super().__init__(timeout, **kwargs)
         self.add_auth(key, secret, customer_id)
 
     # Private user data -------------------------------------------------------

@@ -6,7 +6,7 @@ __all__ = [
 ]
 
 
-class Bitex(object):
+class Bitex:
     # Models
     models = _m
     # Enum Types

@@ -10,7 +10,7 @@ import requests
 from requests import Response
 from requests import Session
 from requests.auth import AuthBase
-from requests_toolbelt import user_agent
+from requests_toolbelt import user_agent as ua
 
 from .__version__ import __version__
 from .common import clean_empty
@@ -25,7 +25,7 @@ RETRY_CODES = [
 ]
 
 
-class Timestamp(object):
+class Timestamp:
 
     @staticmethod
     def seconds():
@@ -44,11 +44,12 @@ timestamp = Timestamp()
 
 
 class ClientSession(Session):
-    user_agent = user_agent('trading-api-wrappers', __version__)
+    user_agent = ua('trading-api-wrappers', __version__)
 
     def __init__(self,
                  base_url: str,
-                 timeout: int=TIMEOUT):
+                 timeout: int=TIMEOUT,
+                 user_agent: str=None):
         # Init session
         super().__init__()
         # Instance attributes
@@ -57,6 +58,8 @@ class ClientSession(Session):
         self.timeout: int = timeout
         self.last_nonce: int = 0
         self.last_request_timestamp: int = 0
+        if user_agent is not None:
+            self.user_agent = user_agent
 
     def request(self, method, endpoint, *args, **kwargs):
         """Send the request after generating the complete URL."""
@@ -85,7 +88,7 @@ class ClientSession(Session):
         return urljoin(self.base_url, endpoint)
 
 
-class Client(object):
+class Client:
     base_url: str = ''
     error_keys: Iterable[str] = []
     rate_limit: int = 1000  # in milliseconds
@@ -103,8 +106,9 @@ class Client(object):
                  max_retries: int=None,
                  backoff_factor: float=None,
                  enable_rate_limit: bool=None,
+                 user_agent: str=None,
+                 base_url: str=None,
                  **kwargs):
-        super().__init__(**kwargs)
         # Override defaults
         if timeout is not None:
             self.timeout = timeout
@@ -114,9 +118,11 @@ class Client(object):
             self.enable_rate_limit = enable_rate_limit
         if backoff_factor is not None:
             self.backoff_factor = backoff_factor
+        if base_url is not None:
+            self.base_url = base_url
         # Create session
         self.session: ClientSession = self.session_cls(
-            self.base_url, self.timeout)
+            self.base_url, self.timeout, user_agent)
         # Attributes
         self.last_request_timestamp: int = 0
 
@@ -209,7 +215,7 @@ class Client(object):
             self.session.close()
 
 
-class AuthMixin(object):
+class AuthMixin:
     auth_cls = None
 
     @property
@@ -224,7 +230,7 @@ class AuthMixin(object):
         self.auth = self.auth_cls(*credentials)
 
 
-class ModelMixin(object):
+class ModelMixin:
     return_json: bool = False
 
     def __init__(self, return_json: bool=None):

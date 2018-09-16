@@ -17,11 +17,8 @@ class CurrencyLayer(Client, AuthMixin):
     def __init__(self,
                  access_key: str,
                  timeout: int=None,
-                 max_retries: int=None,
-                 backoff_factor: float=None,
-                 enable_rate_limit: bool=None):
-        super().__init__(timeout, max_retries, backoff_factor,
-                         enable_rate_limit)
+                 **kwargs):
+        super().__init__(timeout, **kwargs)
         self.auth = ApiKeyAuth(access_key, api_key_param='access_key')
 
     def currencies(self):
