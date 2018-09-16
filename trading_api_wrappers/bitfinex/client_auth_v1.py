@@ -159,7 +159,7 @@ class BitfinexAuth(BitfinexPublic, AuthMixin):
     # View your latest inactive orders.
     # Limited to last 3 days and 1 request per minute.
     def orders_history(self, limit: int):
-        return self.post('order/hist', json={'limit': limit})
+        return self.post('orders/hist', json={'limit': limit})
 
     # POSITIONS ---------------------------------------------------------------
     # View your active positions.
