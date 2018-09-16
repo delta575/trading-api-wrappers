@@ -109,7 +109,6 @@ class Client:
                  user_agent: str=None,
                  base_url: str=None,
                  **kwargs):
-        super().__init__(**kwargs)
         # Override defaults
         if timeout is not None:
             self.timeout = timeout
