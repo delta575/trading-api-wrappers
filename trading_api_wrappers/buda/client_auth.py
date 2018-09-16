@@ -35,13 +35,8 @@ class BudaAuth(BudaPublic, AuthMixin):
                  key: str,
                  secret: str,
                  timeout: int=None,
-                 host: str=None,
-                 return_json: bool=False,
-                 max_retries: int=None,
-                 backoff_factor: float=None,
-                 enable_rate_limit: bool=None):
-        super().__init__(timeout, host, return_json, max_retries,
-                         backoff_factor, enable_rate_limit)
+                 **kwargs):
+        super().__init__(timeout, **kwargs)
         self.add_auth(key, secret)
 
     def quotation(self,

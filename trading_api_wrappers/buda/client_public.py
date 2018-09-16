@@ -6,21 +6,6 @@ class BudaPublic(Client, ModelMixin):
     base_url = 'https://www.buda.com/api/v2/'
     error_keys = ['message']
 
-    def __init__(self,
-                 timeout: int=None,
-                 host: str=None,
-                 return_json: bool=False,
-                 max_retries: int=None,
-                 backoff_factor: float=None,
-                 enable_rate_limit: bool=None):
-        # Override base_url
-        if host is not None:
-            self.base_url = host
-        super().__init__(
-            timeout, max_retries, backoff_factor, enable_rate_limit,
-            return_json=return_json,
-        )
-
     def markets(self):
         data = self.get('markets')
         if self.return_json:

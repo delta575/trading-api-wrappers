@@ -39,14 +39,8 @@ class CryptoMKTAuth(CryptoMKTPublic, AuthMixin):
                  key: str,
                  secret: str,
                  timeout: int=None,
-                 return_json: bool=None,
-                 max_retries: int=None,
-                 backoff_factor: float=None,
-                 enable_rate_limit: bool=None):
-        super().__init__(
-            timeout, max_retries, backoff_factor, enable_rate_limit,
-            return_json=return_json,
-        )
+                 **kwargs):
+        super().__init__(timeout, **kwargs)
         self.add_auth(key, secret)
 
     # BALANCE------------------------------------------------------------------
