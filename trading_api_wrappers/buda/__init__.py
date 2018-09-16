@@ -8,7 +8,7 @@ __all__ = [
 ]
 
 
-class Buda(object):
+class Buda:
     # Models
     models = _m
     # Enum Types

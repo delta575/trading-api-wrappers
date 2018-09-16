@@ -7,7 +7,7 @@ __all__ = [
 ]
 
 
-class Bitstamp(object):
+class Bitstamp:
     # Enum Types
     CurrencyPair = _c.CurrencyPair
     TimeInterval = _c.TimeInterval

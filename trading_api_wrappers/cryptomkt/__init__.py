@@ -8,7 +8,7 @@ __all__ = [
 ]
 
 
-class CryptoMKT(object):
+class CryptoMKT:
     # Models
     models = _m
     # Enum Types

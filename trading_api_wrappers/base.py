@@ -25,7 +25,7 @@ RETRY_CODES = [
 ]
 
 
-class Timestamp(object):
+class Timestamp:
 
     @staticmethod
     def seconds():
@@ -85,7 +85,7 @@ class ClientSession(Session):
         return urljoin(self.base_url, endpoint)
 
 
-class Client(object):
+class Client:
     base_url: str = ''
     error_keys: Iterable[str] = []
     rate_limit: int = 1000  # in milliseconds
@@ -209,7 +209,7 @@ class Client(object):
             self.session.close()
 
 
-class AuthMixin(object):
+class AuthMixin:
     auth_cls = None
 
     @property
@@ -224,7 +224,7 @@ class AuthMixin(object):
         self.auth = self.auth_cls(*credentials)
 
 
-class ModelMixin(object):
+class ModelMixin:
     return_json: bool = False
 
     def __init__(self, return_json: bool=None):

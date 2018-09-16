@@ -10,7 +10,7 @@ __all__ = [
 ]
 
 
-class Bitfinex(object):
+class Bitfinex:
     # Enum Types
     Currency = _c1.Currency
     Symbol = _c1.Symbol
@@ -19,7 +19,7 @@ class Bitfinex(object):
     Public = BitfinexPublic
 
 
-class BitfinexV2(object):
+class BitfinexV2:
     # Enum Types
     BookPrecision = _c2.BookPrecision
     Symbol = _c2.Symbol

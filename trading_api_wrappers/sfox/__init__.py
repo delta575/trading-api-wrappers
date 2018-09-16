@@ -7,7 +7,7 @@ __all__ = [
 ]
 
 
-class SFOX(object):
+class SFOX:
     # Models
     models = _m
     # Enum Types

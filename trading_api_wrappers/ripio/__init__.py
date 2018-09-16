@@ -6,7 +6,7 @@ __all__ = [
 ]
 
 
-class Ripio(object):
+class Ripio:
     # Models
     models = _m
     # Enum Types
