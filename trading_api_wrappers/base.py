@@ -10,7 +10,7 @@ import requests
 from requests import Response
 from requests import Session
 from requests.auth import AuthBase
-from requests_toolbelt import user_agent
+from requests_toolbelt import user_agent as ua
 
 from .__version__ import __version__
 from .common import clean_empty
@@ -44,11 +44,12 @@ timestamp = Timestamp()
 
 
 class ClientSession(Session):
-    user_agent = user_agent('trading-api-wrappers', __version__)
+    user_agent = ua('trading-api-wrappers', __version__)
 
     def __init__(self,
                  base_url: str,
-                 timeout: int=TIMEOUT):
+                 timeout: int=TIMEOUT,
+                 user_agent: str=None):
         # Init session
         super().__init__()
         # Instance attributes
@@ -57,6 +58,8 @@ class ClientSession(Session):
         self.timeout: int = timeout
         self.last_nonce: int = 0
         self.last_request_timestamp: int = 0
+        if user_agent is not None:
+            self.user_agent = user_agent
 
     def request(self, method, endpoint, *args, **kwargs):
         """Send the request after generating the complete URL."""
@@ -103,6 +106,7 @@ class Client:
                  max_retries: int=None,
                  backoff_factor: float=None,
                  enable_rate_limit: bool=None,
+                 user_agent: str=None,
                  **kwargs):
         super().__init__(**kwargs)
         # Override defaults
@@ -116,7 +120,7 @@ class Client:
             self.backoff_factor = backoff_factor
         # Create session
         self.session: ClientSession = self.session_cls(
-            self.base_url, self.timeout)
+            self.base_url, self.timeout, user_agent)
         # Attributes
         self.last_request_timestamp: int = 0
 
