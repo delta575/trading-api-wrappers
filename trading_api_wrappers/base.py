@@ -107,6 +107,7 @@ class Client:
                  backoff_factor: float=None,
                  enable_rate_limit: bool=None,
                  user_agent: str=None,
+                 base_url: str=None,
                  **kwargs):
         super().__init__(**kwargs)
         # Override defaults
@@ -118,6 +119,8 @@ class Client:
             self.enable_rate_limit = enable_rate_limit
         if backoff_factor is not None:
             self.backoff_factor = backoff_factor
+        if base_url is not None:
+            self.base_url = base_url
         # Create session
         self.session: ClientSession = self.session_cls(
             self.base_url, self.timeout, user_agent)
