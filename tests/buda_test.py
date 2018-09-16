@@ -49,6 +49,22 @@ class BudaPublicTest(unittest.TestCase):
         self.assertIsInstance(trades, models.Trades)
         self.assertEqual(trades.timestamp, timestamp)
 
+    def test_report_average_prices(self):
+        end = datetime.now()
+        start = end - timedelta(days=30)
+        report = self.client.report_average_prices(
+            MARKET_ID, start_at=start, end_at=end)
+        for item in report:
+            self.assertIsInstance(item, models.AveragePrice)
+
+    def test_report_candlestick(self):
+        end = datetime.now()
+        start = end - timedelta(days=30)
+        report = self.client.report_candlestick(
+            MARKET_ID, start_at=start, end_at=end)
+        for item in report:
+            self.assertIsInstance(item, models.Candlestick)
+
 
 class BudaAuthTest(unittest.TestCase):
 
@@ -78,22 +94,6 @@ class BudaAuthTest(unittest.TestCase):
             MARKET_ID, quotation_type=Buda.QuotationType.ASK_GIVEN_SIZE,
             amount=1, limit=1)
         self.assertIsInstance(quotation, models.Quotation)
-
-    def test_report_average_prices(self):
-        end = datetime.now()
-        start = end - timedelta(days=30)
-        report = self.client.report_average_prices(
-            MARKET_ID, start_at=start, end_at=end)
-        for item in report:
-            self.assertIsInstance(item, models.AveragePrice)
-
-    def test_report_candlestick(self):
-        end = datetime.now()
-        start = end - timedelta(days=30)
-        report = self.client.report_candlestick(
-            MARKET_ID, start_at=start, end_at=end)
-        for item in report:
-            self.assertIsInstance(item, models.Candlestick)
 
     def test_balance(self):
         balance = self.client.balance(Buda.Currency.BTC)
