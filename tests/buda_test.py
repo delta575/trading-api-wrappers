@@ -17,10 +17,13 @@ MARKET_ID = Buda.Market.BTC_CLP
 class BudaPublicTest(unittest.TestCase):
 
     def setUp(self):
-        self.client = Buda.Public(host=HOST)
+        self.client = Buda.Public(base_url=HOST)
 
     def test_instantiate_client(self):
         self.assertIsInstance(self.client, Buda.Public)
+
+    def test_client_base_url(self):
+        self.assertEqual(self.client.base_url, HOST)
 
     def test_markets(self):
         markets = self.client.markets()
@@ -50,10 +53,13 @@ class BudaPublicTest(unittest.TestCase):
 class BudaAuthTest(unittest.TestCase):
 
     def setUp(self):
-        self.client = Buda.Auth(API_KEY, API_SECRET, host=HOST)
+        self.client = Buda.Auth(API_KEY, API_SECRET, base_url=HOST)
 
     def test_instantiate_client(self):
         self.assertIsInstance(self.client, Buda.Auth)
+
+    def test_client_base_url(self):
+        self.assertEqual(self.client.base_url, HOST)
 
     def test_quotation(self):
         quotation = self.client.quotation(
@@ -163,10 +169,13 @@ class BudaAuthTest(unittest.TestCase):
 class BudaAuthTestBadApi(unittest.TestCase):
 
     def setUp(self):
-        self.client = Buda.Auth('BAD_KEY', 'BAD_SECRET', host=HOST)
+        self.client = Buda.Auth('BAD_KEY', 'BAD_SECRET', base_url=HOST)
 
     def test_instantiate_client(self):
         self.assertIsInstance(self.client, Buda.Auth)
+
+    def test_client_base_url(self):
+        self.assertEqual(self.client.base_url, HOST)
 
     def test_key_secret(self):
         with self.assertRaises(TypeError):
