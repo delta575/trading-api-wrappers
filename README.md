@@ -181,6 +181,7 @@ https://currencylayer.com/documentation
 
 ## Licence
 [![PyPI - License](https://img.shields.io/pypi/l/trading-api-wrappers.svg)](https://opensource.org/licenses/MIT)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdelta575%2Ftrading-api-wrappers.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdelta575%2Ftrading-api-wrappers?ref=badge_shield)
 
 The MIT License
 
@@ -189,6 +190,9 @@ Copyright © 2017
 
 See [LICENSE](LICENSE)
 
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdelta575%2Ftrading-api-wrappers.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdelta575%2Ftrading-api-wrappers?ref=badge_large)
 
 ## Donations
 
