@@ -1,3 +1,4 @@
+import asyncio
 import json as j
 import time
 from enum import Enum
@@ -142,12 +143,21 @@ class Client:
         return self._fetch('DELETE', endpoint, **kwargs)
 
     def _retry(self, target):
+        # Verify that sync version is not being run from coroutine
+        # Backoff can't run inside a coroutine.
+        try:
+            asyncio.get_event_loop()
+        except RuntimeError:
+            # Event loop not set for this thread.
+            return target
+
         def give_up_retry(e: RequestException):
             give_up = False
             if e.response:
                 code = e.response.status_code
                 give_up = code not in self.retry_codes
             return give_up
+
         return backoff.on_exception(
             backoff.expo,
             RequestException,
