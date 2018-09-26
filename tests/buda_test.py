@@ -110,7 +110,7 @@ class BudaAuthTest(unittest.TestCase):
     def test_withdrawal_pages(self):
         page, per_page = 2, 10
         withdrawal_pages = self.client.withdrawal_pages(
-            MARKET_ID, page=page, per_page=per_page)
+            Buda.Currency.BTC, page=page, per_page=per_page)
         self.assertIsInstance(withdrawal_pages, models.WithdrawalPages)
         self.assertEqual(withdrawal_pages.meta.current_page, page)
         self.assertEqual(len(withdrawal_pages.withdrawals), per_page)
@@ -123,7 +123,7 @@ class BudaAuthTest(unittest.TestCase):
     def test_deposit_pages(self):
         page, per_page = 2, 10
         deposit_pages = self.client.deposit_pages(
-            MARKET_ID, page=page, per_page=per_page)
+            Buda.Currency.BTC, page=page, per_page=per_page)
         self.assertIsInstance(deposit_pages, models.DepositPages)
         self.assertEqual(deposit_pages.meta.current_page, page)
         self.assertEqual(len(deposit_pages.deposits), per_page)
