@@ -92,7 +92,7 @@ class ClientSession(Session):
 class Client:
     base_url: str = ''
     error_keys: Iterable[str] = []
-    rate_limit: int = 1000  # in milliseconds
+    rate_limit: int = 0  # in milliseconds
     session_cls = ClientSession
     timestamp: Timestamp = timestamp
     retry_codes: Iterable[int] = RETRY_CODES
@@ -106,7 +106,7 @@ class Client:
                  timeout: int=None,
                  max_retries: int=None,
                  backoff_factor: float=None,
-                 enable_rate_limit: bool=None,
+                 rate_limit: int=None,
                  user_agent: str=None,
                  base_url: str=None,
                  **kwargs):
@@ -115,8 +115,8 @@ class Client:
             self.timeout = timeout
         if max_retries is not None:
             self.max_retries = max_retries
-        if enable_rate_limit is not None:
-            self.enable_rate_limit = enable_rate_limit
+        if rate_limit is not None:
+            self.rate_limit = rate_limit
         if backoff_factor is not None:
             self.backoff_factor = backoff_factor
         if base_url is not None:
@@ -175,7 +175,7 @@ class Client:
 
     def _fetch_base(self, method, endpoint, *args, **kwargs):
         # Rate limit requests
-        if self.enable_rate_limit:
+        if self.rate_limit:
             self.throttle()
         self.last_request_timestamp = self.timestamp.milliseconds()
         # Send the request
