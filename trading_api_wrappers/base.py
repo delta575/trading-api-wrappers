@@ -110,6 +110,7 @@ class Client:
                  user_agent: str=None,
                  base_url: str=None,
                  **kwargs):
+        super().__init__(**kwargs)
         # Override defaults
         if timeout is not None:
             self.timeout = timeout
@@ -245,7 +246,7 @@ class ModelMixin:
 
     def __init__(self, return_json: bool=None):
         super().__init__()
-        if return_json:
+        if return_json is not None:
             self.return_json = return_json
 
 
