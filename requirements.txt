@@ -1,6 +1,6 @@
 -i https://pypi.python.org/simple
 backoff==1.7.1
-certifi==2018.10.15
+certifi==2018.11.29
 chardet==3.0.4
 idna==2.7
 requests-toolbelt==0.8.0
