@@ -195,7 +195,7 @@ class KrakenAuth(KrakenPublic, AuthMixin):
             'expiretm': expiretm,
             'userref': userref,
             'validate': validate,
-            'close[ordertype]': str(c_ordertype) if order_type else None,
+            'close[ordertype]': str(c_ordertype) if c_ordertype else None,
             'close[price]': c_price,
             'close[price2]': c_price2,
         })
