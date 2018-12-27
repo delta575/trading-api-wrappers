@@ -16,11 +16,10 @@
     "default": {
         "backoff": {
             "hashes": [
-                "sha256:a2d9e32819829be681e2a1264d55172e7ddbb409b93d7388b442b894f630ba33",
-                "sha256:dde694bf8df7478956e9ebc1fa1de48f04ba22de6798cb5e1a237320336fc0a8"
+                "sha256:d340bb6f36d025c04214b8925112d8456970e5f28dda46e4f1133bf5c622cb0a",
+                "sha256:c7187f15339e775aec926dc6e5e42f8a3ad7d3c2b9a6ecae7b535000f70cd838"
             ],
-            "index": "pypi",
-            "version": "==1.7.1"
+            "version": "==1.8.0"
         },
         "certifi": {
             "hashes": [
