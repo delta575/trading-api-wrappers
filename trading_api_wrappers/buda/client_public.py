@@ -46,6 +46,35 @@ class BudaPublic(Client, ModelMixin):
             return data
         return _m.Trades.create_from_json(data['trades'])
 
+    def quotation(self,
+                  market_id: str,
+                  quotation_type: str,
+                  amount: float,
+                  limit: float=None):
+        data = self.post(f'markets/{market_id}/quotations', json={
+            'quotation': {
+                'type': str(quotation_type),
+                'amount': str(amount),
+                'limit': str(limit) if limit else None,
+            },
+        })
+        if self.return_json:
+            return data
+        return _m.Quotation.create_from_json(data['quotation'])
+
+    def quotation_market(self,
+                         market_id: str,
+                         quotation_type: str,
+                         amount: float):
+        return self.quotation(market_id, quotation_type, amount, limit=None)
+
+    def quotation_limit(self,
+                        market_id: str,
+                        quotation_type: str,
+                        amount: float,
+                        limit: float):
+        return self.quotation(market_id, quotation_type, amount, limit)
+
     def _report(self,
                 market_id: str,
                 report_type: _c.ReportType,
