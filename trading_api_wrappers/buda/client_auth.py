@@ -103,6 +103,19 @@ class BudaAuth(BudaPublic, AuthMixin):
             return data
         return _m.OrderPages.create_from_json(data['orders'], data.get('meta'))
 
+    def batch_orders(self,
+                     cancel_list: list=None,
+                     place_list: list=None):
+        diff = {'diff': []}
+        if cancel_list:
+            for idx in cancel_list:
+                diff['diff'].append({'mode': 'cancel', 'order_id': idx})
+        if place_list:
+            for order in place_list:
+                diff['diff'].append({'mode': 'place', 'order': order})
+        data = self.post('orders', json=diff)
+        return data
+
     def order_details(self, order_id: int):
         data = self.get(f'orders/{order_id}')
         if self.return_json:
