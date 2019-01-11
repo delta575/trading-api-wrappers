@@ -38,35 +38,6 @@ class BudaAuth(BudaPublic, AuthMixin):
         super().__init__(timeout, **kwargs)
         self.add_auth(key, secret)
 
-    def quotation(self,
-                  market_id: str,
-                  quotation_type: str,
-                  amount: float,
-                  limit: float=None):
-        data = self.post(f'markets/{market_id}/quotations', json={
-            'quotation': {
-                'type': str(quotation_type),
-                'amount': str(amount),
-                'limit': str(limit) if limit else None,
-            },
-        })
-        if self.return_json:
-            return data
-        return _m.Quotation.create_from_json(data['quotation'])
-
-    def quotation_market(self,
-                         market_id: str,
-                         quotation_type: str,
-                         amount: float):
-        return self.quotation(market_id, quotation_type, amount, limit=None)
-
-    def quotation_limit(self,
-                        market_id: str,
-                        quotation_type: str,
-                        amount: float,
-                        limit: float):
-        return self.quotation(market_id, quotation_type, amount, limit)
-
     # BALANCES-----------------------------------------------------------------
     def balance(self, currency: str):
         data = self.get(f'balances/{currency}')
@@ -131,6 +102,19 @@ class BudaAuth(BudaPublic, AuthMixin):
         if self.return_json:
             return data
         return _m.OrderPages.create_from_json(data['orders'], data.get('meta'))
+
+    def batch_orders(self,
+                     cancel_list: list=None,
+                     place_list: list=None):
+        diff = {'diff': []}
+        if cancel_list:
+            for idx in cancel_list:
+                diff['diff'].append({'mode': 'cancel', 'order_id': idx})
+        if place_list:
+            for order in place_list:
+                diff['diff'].append({'mode': 'place', 'order': order})
+        data = self.post('orders', json=diff)
+        return data
 
     def order_details(self, order_id: int):
         data = self.get(f'orders/{order_id}')

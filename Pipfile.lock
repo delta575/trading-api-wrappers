@@ -16,11 +16,10 @@
     "default": {
         "backoff": {
             "hashes": [
-                "sha256:a2d9e32819829be681e2a1264d55172e7ddbb409b93d7388b442b894f630ba33",
-                "sha256:dde694bf8df7478956e9ebc1fa1de48f04ba22de6798cb5e1a237320336fc0a8"
+                "sha256:d340bb6f36d025c04214b8925112d8456970e5f28dda46e4f1133bf5c622cb0a",
+                "sha256:c7187f15339e775aec926dc6e5e42f8a3ad7d3c2b9a6ecae7b535000f70cd838"
             ],
-            "index": "pypi",
-            "version": "==1.7.1"
+            "version": "==1.8.0"
         },
         "certifi": {
             "hashes": [
@@ -165,11 +164,11 @@
         },
         "more-itertools": {
             "hashes": [
-                "sha256:c187a73da93e7a8acc0001572aebc7e3c69daf7bf6881a2cea10650bd4420092",
-                "sha256:c476b5d3a34e12d40130bc2f935028b5f636df8f372dc2c1c01dc19681b2039e",
-                "sha256:fcbfeaea0be121980e15bc97b3817b5202ca73d0eae185b4550cbfce2a3ebb3d"
+                "sha256:c0a5785b1109a6bd7fac76d6837fd1feca158e54e521ccd2ae8bfe393cc9d4fc",
+                "sha256:fe7a7cae1ccb57d33952113ff4fa1bc5f879963600ed74918f1236e212ee50b9",
+                "sha256:38a936c0a6d98a38bcc2d03fdaaedaba9f412879461dd2ceff8d37564d6522e4"
             ],
-            "version": "==4.3.0"
+            "version": "==5.0.0"
         },
         "pkginfo": {
             "hashes": [
@@ -201,11 +200,10 @@
         },
         "pytest": {
             "hashes": [
-                "sha256:f689bf2fc18c4585403348dd56f47d87780bf217c53ed9ae7a3e2d7faa45f8e9",
-                "sha256:f812ea39a0153566be53d88f8de94839db1e8a05352ed8a49525d7d7f37861e9"
+                "sha256:3e65a22eb0d4f1bdbc1eacccf4a3198bf8d4049dea5112d70a0c61b00e748d02",
+                "sha256:5924060b374f62608a078494b909d341720a050b5224ff87e17e12377486a71d"
             ],
-            "index": "pypi",
-            "version": "==4.0.2"
+            "version": "==4.1.0"
         },
         "python-decouple": {
             "hashes": [
@@ -246,10 +244,10 @@
         },
         "tqdm": {
             "hashes": [
-                "sha256:3c4d4a5a41ef162dd61f1edb86b0e1c7859054ab656b2e7c7b77e7fbf6d9f392",
-                "sha256:5b4d5549984503050883bc126280b386f5f4ca87e6c023c5d015655ad75bdebb"
+                "sha256:7fa801cf60e318bf7d2ac7498254df0f3d7a3ad23c622ae63666257d5f833967",
+                "sha256:79420109a762f82e20e8ecdc3b3bc1bc6c6536884a8de5fa86a50eb99386376a"
             ],
-            "version": "==4.28.1"
+            "version": "==4.29.0"
         },
         "twine": {
             "hashes": [
