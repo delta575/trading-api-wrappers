@@ -9,7 +9,7 @@ from trading_api_wrappers.buda import models
 
 API_KEY = config('BUDA_API_KEY')
 API_SECRET = config('BUDA_API_SECRET')
-HOST = config('BUDA_HOST', default=None)
+HOST = config('BUDA_HOST', default='https://www.buda.com/api/v2/')
 TEST_ORDERS = config('BUDA_TEST_ORDERS', cast=bool, default=False)
 MARKET_ID = Buda.Market.BTC_CLP
 
