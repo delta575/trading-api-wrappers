@@ -165,10 +165,10 @@
         },
         "importlib-metadata": {
             "hashes": [
-                "sha256:23d3d873e008a513952355379d93cbcab874c58f4f034ff657c7a87422fa64e8",
-                "sha256:80d2de76188eabfbfcf27e6a37342c2827801e59c4cc14b0371c56fed43820e3"
+                "sha256:9ff1b1c5a354142de080b8a4e9803e5d0d59283c93aed808617c787d16768375",
+                "sha256:b7143592e374e50584564794fcb8aaf00a23025f9db866627f89a21491847a8d"
             ],
-            "version": "==0.19"
+            "version": "==0.20"
         },
         "more-itertools": {
             "hashes": [
@@ -221,10 +221,10 @@
         },
         "pytest": {
             "hashes": [
-                "sha256:95b1f6db806e5b1b5b443efeb58984c24945508f93a866c1719e1a507a957d7c",
-                "sha256:c3d5020755f70c82eceda3feaf556af9a341334414a8eca521a18f463bcead88"
+                "sha256:95d13143cc14174ca1a01ec68e84d76ba5d9d493ac02716fd9706c949a505210",
+                "sha256:b78fe2881323bd44fd9bd76e5317173d4316577e7b1cddebae9136a4495ec865"
             ],
-            "version": "==5.1.1"
+            "version": "==5.1.2"
         },
         "python-decouple": {
             "hashes": [
@@ -272,11 +272,10 @@
         },
         "twine": {
             "hashes": [
-                "sha256:0fb0bfa3df4f62076cab5def36b1a71a2e4acb4d1fa5c97475b048117b1a6446",
-                "sha256:d6c29c933ecfc74e9b1d9fa13aa1f87c5d5770e119f5a4ce032092f0ff5b14dc"
+                "sha256:b2cec0dc1ac55bd74280d257f43763cf0cf928bdcd0de0fd70be70aa1195e3b0",
+                "sha256:e37d5a73d77b095b85314dde807bfb85b580b5b9d137f5b21332f4636990d97a"
             ],
-            "index": "pypi",
-            "version": "==1.13.0"
+            "version": "==1.14.0"
         },
         "urllib3": {
             "hashes": [
