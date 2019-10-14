@@ -1,5 +1,5 @@
 -i https://pypi.python.org/simple
-backoff==1.8.0
+backoff==1.8.1
 certifi==2019.9.11
 chardet==3.0.4
 idna==2.8
