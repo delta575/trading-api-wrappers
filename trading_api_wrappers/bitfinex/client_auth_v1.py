@@ -119,7 +119,7 @@ class BitfinexAuth(BitfinexPublic, AuthMixin):
             'ocoorder': False,
         }
         payload.update(params or {})
-        return self.post('order/new', payload)
+        return self.post('order/new', json=payload)
 
     # Submit a new order.
     def place_oco_order(self,
