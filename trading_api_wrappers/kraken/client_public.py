@@ -19,11 +19,11 @@ class KrakenPublic(Client):
             'pair': str(symbol),
         })
 
-    def ohcl(self,
+    def ohlc(self,
              symbol: str,
              interval: int=None,
              since: str=None):
-        return self.get('public/OHCL', params={
+        return self.get('public/OHLC', params={
             'pair': str(symbol),
             'interval': interval,
             'since': since,
