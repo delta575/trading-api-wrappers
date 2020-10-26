@@ -187,10 +187,10 @@
         },
         "pkginfo": {
             "hashes": [
-                "sha256:7424f2c8511c186cd5424bbf31045b77435b37a8d604990b79d4e70d741148bb",
-                "sha256:a6d9e40ca61ad3ebd0b72fbadd4fba16e4c0e4df0428c041e01e06eb6ee71f32"
+                "sha256:78d032b5888ec06d7f9d18fbf8c0549a6a3477081b34cb769119a07183624fc1",
+                "sha256:dd008e95b13141ddd05d7e8881f0c0366a998ab90b25c2db794a1714b71583cc"
             ],
-            "version": "==1.5.0.1"
+            "version": "==1.6.0"
         },
         "pluggy": {
             "hashes": [
@@ -208,10 +208,10 @@
         },
         "pygments": {
             "hashes": [
-                "sha256:307543fe65c0947b126e83dd5a61bd8acbd84abec11f43caebaf5534cbc17998",
-                "sha256:926c3f319eda178d1bd90851e4317e6d8cdb5e292a3386aac9bd75eca29cf9c7"
+                "sha256:381985fcc551eb9d37c52088a32914e00517e57f4a21609f48141ba08e193fa0",
+                "sha256:88a0bbcd659fcb9573703957c6b9cff9fab7295e6e76db54c9d00ae42df32773"
             ],
-            "version": "==2.7.1"
+            "version": "==2.7.2"
         },
         "pyparsing": {
             "hashes": [
@@ -244,10 +244,10 @@
         },
         "readme-renderer": {
             "hashes": [
-                "sha256:3176d93d2c21960fb7f7458073b9f1e5dd14a5af0ec6af4afb957337dbb6a326",
-                "sha256:e6871b10341cdd85ade112fb8503b31301d1ca12c0c3b3e1358855329519968b"
+                "sha256:267854ac3b1530633c2394ead828afcd060fc273217c42ac36b6be9c42cd9a9d",
+                "sha256:6b7e5aa59210a40de72eb79931491eaf46fefca2952b9181268bd7c7c65c260a"
             ],
-            "version": "==27.0"
+            "version": "==28.0"
         },
         "requests": {
             "hashes": [
@@ -274,10 +274,10 @@
         },
         "tqdm": {
             "hashes": [
-                "sha256:43ca183da3367578ebf2f1c2e3111d51ea161ed1dc4e6345b86e27c2a93beff7",
-                "sha256:69dfa6714dee976e2425a9aab84b622675b7b1742873041e3db8a8e86132a4af"
+                "sha256:9ad44aaf0fc3697c06f6e05c7cf025dd66bc7bcb7613c66d85f4464c47ac8fad",
+                "sha256:ef54779f1c09f346b2b5a8e5c61f96fbcb639929e640e59f8cf810794f406432"
             ],
-            "version": "==4.50.2"
+            "version": "==4.51.0"
         },
         "twine": {
             "hashes": [
