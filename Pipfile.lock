@@ -180,10 +180,10 @@
         },
         "keyring": {
             "hashes": [
-                "sha256:1746d3ac913d449a090caf11e9e4af00e26c3f7f7e81027872192b2398b98675",
-                "sha256:4be9cbaaaf83e61d6399f733d113ede7d1c73bc75cb6aeb64eee0f6ac39b30ea"
+                "sha256:0744732bdf8bf2c1a30e9d1cb75eca5ac706b4f4dc4295356894dd2c8e31068f",
+                "sha256:0bd9124892bdafd8db3c2ba22498dc6cca19b2b19fbcb32464f556889285241d"
             ],
-            "version": "==21.8.0"
+            "version": "==22.0.0"
         },
         "more-itertools": {
             "hashes": [
