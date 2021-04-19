@@ -169,7 +169,7 @@
         },
         "docutils": {
             "hashes": [],
-            "version": "==0.17"
+            "version": "==0.17.1"
         },
         "idna": {
             "hashes": [
