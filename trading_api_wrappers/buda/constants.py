@@ -14,6 +14,7 @@ class Currency(Currency):
     ETH = dict(value='ETH', decimals=9)
     LTC = dict(value='LTC', decimals=8)
     PEN = dict(value='PEN')
+    USDC = dict(value='USDC')
 
 
 class Market(Market):
@@ -26,6 +27,7 @@ class Market(Market):
     BTC_CLP = dict(value='BTC-CLP', base=Currency.BTC, quote=Currency.CLP)
     BTC_COP = dict(value='BTC-COP', base=Currency.BTC, quote=Currency.COP)
     BTC_PEN = dict(value='BTC-PEN', base=Currency.BTC, quote=Currency.PEN)
+    BTC_USDC = dict(value='BTC-USDC', base=Currency.BTC, quote=Currency.USDC)
     ETH_ARS = dict(value='ETH-ARS', base=Currency.ETH, quote=Currency.ARS)
     ETH_BTC = dict(value='ETH-BTC', base=Currency.ETH, quote=Currency.BTC)
     ETH_CLP = dict(value='ETH-CLP', base=Currency.ETH, quote=Currency.CLP)
