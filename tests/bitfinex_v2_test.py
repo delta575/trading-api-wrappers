@@ -6,9 +6,9 @@ from decouple import config
 from trading_api_wrappers import BitfinexV2 as Bitfinex
 from trading_api_wrappers.bitfinex import models_v2 as models
 
-TEST = config('TEST', cast=bool, default=False)
-API_KEY = config('BFX_API_KEY')
-API_SECRET = config('BFX_API_SECRET')
+TEST = config("TEST", cast=bool, default=False)
+API_KEY = config("BFX_API_KEY")
+API_SECRET = config("BFX_API_SECRET")
 
 # Default parameters
 SYMBOL = Bitfinex.Symbol.BTCUSD
@@ -16,7 +16,6 @@ TIMESTAMP = datetime(2016, 1, 1).timestamp()
 
 
 class BitfinexPublicTest(unittest.TestCase):
-
     def setUp(self):
         self.client = Bitfinex.Public()
 
@@ -43,19 +42,19 @@ class BitfinexPublicTest(unittest.TestCase):
             self.assertIsInstance(book, models.TradingBook)
 
     def test_stats_last_returns_data(self):
-        stat = self.client.stats_last(SYMBOL, key='pos.size', size='1m', side='long')
+        stat = self.client.stats_last(SYMBOL, key="pos.size", size="1m", side="long")
         self.assertIsInstance(stat, models.Stat)
 
     def test_stats_hist_returns_data(self):
-        stats = self.client.stats_hist(SYMBOL, key='pos.size', size='1m', side='long')
+        stats = self.client.stats_hist(SYMBOL, key="pos.size", size="1m", side="long")
         for stat in stats:
             self.assertIsInstance(stat, models.Stat)
 
     def test_candles_last_returns_data(self):
-        candle = self.client.candles_last(SYMBOL, time_frame='1D')
+        candle = self.client.candles_last(SYMBOL, time_frame="1D")
         self.assertIsInstance(candle, models.Candle)
 
     def test_candles_hist_returns_data(self):
-        candles = self.client.candles_hist(SYMBOL, time_frame='1D')
+        candles = self.client.candles_hist(SYMBOL, time_frame="1D")
         for candle in candles:
             self.assertIsInstance(candle, models.Candle)

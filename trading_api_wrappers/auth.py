@@ -10,19 +10,18 @@ from . import base
 
 
 class AuthBase(requests.auth.AuthBase):
-
     def __call__(self, r: P):
-        raise NotImplementedError('Auth hooks must be callable.')
+        raise NotImplementedError("Auth hooks must be callable.")
 
     @staticmethod
     def check_credentials(**credentials):
-        for name, key in credentials.items():
+        for _name, key in credentials.items():
             if not key:
-                raise ValueError('{} Key and Secret are needed!')
+                raise ValueError("{} Key and Secret are needed!")
 
     @staticmethod
     def url_query_split(url: str):
-        _url = url.rsplit('?', 1)[0]
+        _url = url.rsplit("?", 1)[0]
         query = urllib.parse.urlsplit(url).query
         return _url, query
 
@@ -46,11 +45,9 @@ class AuthBase(requests.auth.AuthBase):
 class ApiKeyAuth(AuthBase):
     """Attaches API KEY Authentication to the given Request object."""
 
-    api_key_param: str = 'api_key'
+    api_key_param: str = "api_key"
 
-    def __init__(self,
-                 api_key: str,
-                 api_key_param: str=None):
+    def __init__(self, api_key: str, api_key_param: str = None):
         # Set credentials
         self.api_key: str = api_key
         # Override defaults
@@ -73,9 +70,11 @@ class ApiKeyAuth(AuthBase):
         return r
 
     def __eq__(self, other):
-        return all([
-            self.api_key == getattr(other, 'api_key', None),
-        ])
+        return all(
+            [
+                self.api_key == getattr(other, "api_key", None),
+            ]
+        )
 
     def __ne__(self, other):
         return not self == other
@@ -84,21 +83,23 @@ class ApiKeyAuth(AuthBase):
 class HMACAuth(AuthBase):
     """Attaches HMAC Authentication to the given Request object."""
 
-    api_key_header: str = 'x-auth-key'
-    nonce_header: str = 'x-auth-nonce'
-    signature_header: str = 'x-auth-signature'
-    content_type_header: str = 'content-type'
-    signature_delimiter: str = '\n'
-    algorithm = 'sha256'
+    api_key_header: str = "x-auth-key"
+    nonce_header: str = "x-auth-nonce"
+    signature_header: str = "x-auth-signature"
+    content_type_header: str = "content-type"
+    signature_delimiter: str = "\n"
+    algorithm = "sha256"
     timestamp: base.Timestamp = base.timestamp
 
-    def __init__(self,
-                 api_key: str,
-                 secret: str,
-                 api_key_header: str=None,
-                 nonce_header: str=None,
-                 signature_header: str=None,
-                 algorithm=None):
+    def __init__(
+        self,
+        api_key: str,
+        secret: str,
+        api_key_header: str = None,
+        nonce_header: str = None,
+        signature_header: str = None,
+        algorithm=None,
+    ):
         # Set credentials
         self.api_key: str = api_key
         self.secret: str = secret
@@ -118,7 +119,7 @@ class HMACAuth(AuthBase):
     def _nonce(self):
         return self.timestamp.microseconds()
 
-    def new_nonce(self, nonce: int=None):
+    def new_nonce(self, nonce: int = None):
         nonce = nonce or self._nonce()
         self.last_nonce = nonce
         return str(nonce)
@@ -146,9 +147,9 @@ class HMACAuth(AuthBase):
         """Sign the message"""
         encoded_msg = msg.encode() if isinstance(msg, str) else msg
 
-        h = hmac.new(key=self.secret.encode(),
-                     msg=encoded_msg,
-                     digestmod=self.algorithm)
+        h = hmac.new(
+            key=self.secret.encode(), msg=encoded_msg, digestmod=self.algorithm
+        )
 
         signature = h.hexdigest()
 
@@ -200,16 +201,18 @@ class HMACAuth(AuthBase):
         self.auth_request(r, nonce)
 
         # Register hooks
-        r.register_hook('response', self.handle_401)
-        r.register_hook('response', self.handle_redirect)
+        r.register_hook("response", self.handle_401)
+        r.register_hook("response", self.handle_redirect)
 
         return r
 
     def __eq__(self, other):
-        return all([
-            self.api_key == getattr(other, 'api_key', None),
-            self.secret == getattr(other, 'secret', None)
-        ])
+        return all(
+            [
+                self.api_key == getattr(other, "api_key", None),
+                self.secret == getattr(other, "secret", None),
+            ]
+        )
 
     def __ne__(self, other):
         return not self == other

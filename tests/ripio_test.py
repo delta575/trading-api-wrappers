@@ -4,11 +4,10 @@ from trading_api_wrappers import Ripio
 from trading_api_wrappers.ripio import models
 from trading_api_wrappers.ripio.clients import RipioExchangePublic
 
-MARKET_ID = 'ARS/BTC'
+MARKET_ID = "ARS/BTC"
 
 
 class RipioPublicTest(unittest.TestCase):
-
     def setUp(self):
         self.client = Ripio.Public()
 
@@ -18,8 +17,8 @@ class RipioPublicTest(unittest.TestCase):
     def test_rates_raw(self):
         rates = self.client.rates_raw()
         self.assertEqual(
-            sorted(['base', 'rates', 'names', 'variation']),
-            sorted(list(rates.keys())))
+            sorted(["base", "rates", "names", "variation"]), sorted(list(rates.keys()))
+        )
 
     def test_rates(self):
         rates = self.client.rates()
@@ -27,7 +26,6 @@ class RipioPublicTest(unittest.TestCase):
 
 
 class RipioExchangePublicTest(unittest.TestCase):
-
     def setUp(self):
         self.client = Ripio.Public().exchange
 

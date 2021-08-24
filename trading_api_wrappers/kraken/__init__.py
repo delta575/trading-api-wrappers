@@ -3,7 +3,7 @@ from .client_auth import KrakenAuth
 from .client_public import KrakenPublic
 
 __all__ = [
-    'Kraken',
+    "Kraken",
 ]
 
 

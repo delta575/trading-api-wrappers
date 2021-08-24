@@ -7,26 +7,22 @@ from ..base import AuthMixin
 
 class BitstampHMACAuth(HMACAuth):
 
-    signature_delimiter = ''
+    signature_delimiter = ""
 
-    def __init__(self,
-                 api_key: str,
-                 secret: str,
-                 customer_id: (str, int),
-                 **kwargs):
+    def __init__(self, api_key: str, secret: str, customer_id: (str, int), **kwargs):
         super().__init__(api_key, secret, **kwargs)
         self.customer_id = str(customer_id)
 
     def add_api_key(self, r: P):
-        r.body['key'] = self.api_key
+        r.body["key"] = self.api_key
 
     def add_nonce(self, r: P, nonce: str):
-        r.body['nonce'] = nonce
+        r.body["nonce"] = nonce
 
     def add_signature(self, r: P, nonce: str):
         message = self.build_message(r, nonce)
         signature = self.sign(message)
-        r.body['signature'] = signature.upper()
+        r.body["signature"] = signature.upper()
 
     def auth_request(self, r: P, nonce: str):
         r.body = self.parse_data(r.body)
@@ -42,17 +38,19 @@ class BitstampHMACAuth(HMACAuth):
 class BitstampAuth(BitstampPublic, AuthMixin):
     auth_cls = BitstampHMACAuth
 
-    def __init__(self,
-                 key: str,
-                 secret: str,
-                 customer_id: (str, int),
-                 timeout: int=None,
-                 **kwargs):
+    def __init__(
+        self,
+        key: str,
+        secret: str,
+        customer_id: (str, int),
+        timeout: int = None,
+        **kwargs,
+    ):
         super().__init__(timeout, **kwargs)
         self.add_auth(key, secret, customer_id)
 
     # Private user data -------------------------------------------------------
-    def account_balance(self, currency_pair: str=None):
+    def account_balance(self, currency_pair: str = None):
         """
         Returns amounts available and reserved per currency,
         also fee percentage for the currency pair, or for all currency pairs
@@ -76,40 +74,43 @@ class BitstampAuth(BitstampPublic, AuthMixin):
              }
         """
         endpoint = self._endpoint_for(
-            f'balance/{currency_pair}' if currency_pair else 'balance')
+            f"balance/{currency_pair}" if currency_pair else "balance"
+        )
         return self.post(endpoint)
 
-    def user_transactions(self,
-                          currency_pair: str=None,
-                          offset: int=None,
-                          limit: int=None,
-                          sort_desc: bool=None):
+    def user_transactions(
+        self,
+        currency_pair: str = None,
+        offset: int = None,
+        limit: int = None,
+        sort_desc: bool = None,
+    ):
         """
         Returns descending list of transactions. Every transaction (dictionary)
         contains:
-        
+
             {'usd': '-39.25',
              'datetime': '2013-03-26 18:49:13',
              'fee': '0.20',
              'btc': '0.50000000',
              'type': 2,
              'id': 213642}
-             
+
         Instead of the keys btc and usd, it can contain other currency codes
         """
         payload = {
-            'offset': offset,
-            'limit': limit,
+            "offset": offset,
+            "limit": limit,
         }
         if sort_desc is not None:
-            payload['sort'] = 'desc' if sort_desc else 'asc'
-        endpoint = self._endpoint_for('user_transactions')
+            payload["sort"] = "desc" if sort_desc else "asc"
+        endpoint = self._endpoint_for("user_transactions")
         if currency_pair:
-            endpoint = f'{endpoint}/{currency_pair}/'
+            endpoint = f"{endpoint}/{currency_pair}/"
         return self.post(endpoint, data=payload)
 
     # Orders ------------------------------------------------------------------
-    def open_orders(self, currency_pair: str=None):
+    def open_orders(self, currency_pair: str = None):
         """
         Returns JSON list of open orders. Each order is represented as a
         dictionary.
@@ -129,8 +130,8 @@ class BitstampAuth(BitstampPublic, AuthMixin):
           or  btc, eur, ....
           or  eur, usd, ....
         """
-        endpoint = self._endpoint_for('order_status', version=1)
-        return self.post(endpoint, data={'id': order_id})
+        endpoint = self._endpoint_for("order_status", version=1)
+        return self.post(endpoint, data={"id": order_id})
 
     def cancel_order(self, order_id: int):
         """
@@ -139,8 +140,8 @@ class BitstampAuth(BitstampPublic, AuthMixin):
         Returns dictionary of the canceled order, containing the keys:
         id, type, price, amount
         """
-        endpoint = self._endpoint_for('cancel_order')
-        return self.post(endpoint, data={'id': order_id})
+        endpoint = self._endpoint_for("cancel_order")
+        return self.post(endpoint, data={"id": order_id})
 
     def cancel_all_orders(self):
         """
@@ -148,73 +149,77 @@ class BitstampAuth(BitstampPublic, AuthMixin):
 
         Returns True if it was successful
         """
-        endpoint = self._endpoint_for('cancel_all_orders', version=1)
+        endpoint = self._endpoint_for("cancel_all_orders", version=1)
         return self.post(endpoint)
 
-    def _limit_order(self,
-                     endpoint,
-                     currency_pair: str,
-                     amount: float,
-                     price: float,
-                     limit_price: float,
-                     daily_order: bool=None):
+    def _limit_order(
+        self,
+        endpoint,
+        currency_pair: str,
+        amount: float,
+        price: float,
+        limit_price: float,
+        daily_order: bool = None,
+    ):
         endpoint = self._endpoint_for(endpoint % currency_pair)
-        return self.post(endpoint, data={
-            'amount': amount,
-            'price': price,
-            'limit_price': limit_price,
-            'daily_order': daily_order,
-        })
+        return self.post(
+            endpoint,
+            data={
+                "amount": amount,
+                "price": price,
+                "limit_price": limit_price,
+                "daily_order": daily_order,
+            },
+        )
 
-    def _market_order(self,
-                      endpoint: str,
-                      currency_pair: str,
-                      amount: float):
+    def _market_order(self, endpoint: str, currency_pair: str, amount: float):
         endpoint = self._endpoint_for(endpoint % currency_pair)
-        return self.post(endpoint, data={'amount': amount})
+        return self.post(endpoint, data={"amount": amount})
 
-    def buy_limit_order(self,
-                        currency_pair: str,
-                        amount: float,
-                        price: float,
-                        limit_price: float,
-                        daily_order: bool=None):
+    def buy_limit_order(
+        self,
+        currency_pair: str,
+        amount: float,
+        price: float,
+        limit_price: float,
+        daily_order: bool = None,
+    ):
         """
         Order to buy amount for specified price.
         """
-        return self._limit_order('buy/%s', currency_pair, amount,
-                                 price, limit_price, daily_order)
+        return self._limit_order(
+            "buy/%s", currency_pair, amount, price, limit_price, daily_order
+        )
 
-    def sell_limit_order(self,
-                         currency_pair: str,
-                         amount: float,
-                         price: float,
-                         limit_price: float,
-                         daily_order: bool=None):
+    def sell_limit_order(
+        self,
+        currency_pair: str,
+        amount: float,
+        price: float,
+        limit_price: float,
+        daily_order: bool = None,
+    ):
         """
         Order to sell amount for specified price.
         """
-        return self._limit_order('sell/%s', currency_pair, amount,
-                                 price, limit_price, daily_order)
+        return self._limit_order(
+            "sell/%s", currency_pair, amount, price, limit_price, daily_order
+        )
 
-    def buy_market_order(self,
-                         currency_pair: str,
-                         amount: float):
+    def buy_market_order(self, currency_pair: str, amount: float):
         """
         Order to buy amount for market price.
         """
-        return self._market_order('buy/market/%s', currency_pair, amount)
+        return self._market_order("buy/market/%s", currency_pair, amount)
 
-    def sell_market_order(self,
-                          currency_pair: str,
-                          amount: float):
+    def sell_market_order(self, currency_pair: str, amount: float):
         """
         Order to sell amount for market price.
         """
-        return self._market_order('sell/market/%s', currency_pair, amount)
+        return self._market_order("sell/market/%s", currency_pair, amount)
 
     # Withdrawals -------------------------------------------------------------
-    def withdrawal_requests(self, time_delta: int=None):
+    def withdrawal_requests(self, time_delta: int = None):
         """
         Returns list of withdrawal requests.
 
@@ -222,102 +227,96 @@ class BitstampAuth(BitstampPublic, AuthMixin):
 
         By default, the last 24 hours (86400 seconds) are returned.
         """
-        endpoint = self._endpoint_for('withdrawal-requests')
-        return self.post(endpoint, data={'timedelta': time_delta})
+        endpoint = self._endpoint_for("withdrawal-requests")
+        return self.post(endpoint, data={"timedelta": time_delta})
 
-    def withdrawal(self,
-                   method: str,
-                   address: str,
-                   amount: float,
-                   version: int=2,
-                   **kwargs):
-        endpoint = self._endpoint_for(f'{method}_withdrawal', version)
-        return self.post(endpoint, data={
-            'amount': amount,
-            'address': address,
-            **kwargs
-        })
+    def withdrawal(
+        self, method: str, address: str, amount: float, version: int = 2, **kwargs
+    ):
+        endpoint = self._endpoint_for(f"{method}_withdrawal", version)
+        return self.post(
+            endpoint, data={"amount": amount, "address": address, **kwargs}
+        )
 
-    def bitcoin_withdrawal(self, address: str, amount: float,
-                           instant: bool=None):
+    def bitcoin_withdrawal(self, address: str, amount: float, instant: bool = None):
         """
         Send bitcoin to another bitcoin wallet specified by address.
         """
-        return self.withdrawal('bitcoin', address, amount, **{
-            'version': 1,
-            'instant': (1 if instant else 0) if instant else None,
-        })
+        return self.withdrawal(
+            "bitcoin",
+            address,
+            amount,
+            **{
+                "version": 1,
+                "instant": (1 if instant else 0) if instant else None,
+            },
+        )
 
     def ripple_withdrawal(self, address: str, amount: float, currency: str):
         """
         Returns true if successful.
         """
-        return self.withdrawal('ripple', address, amount,
-                               version=1, currency=currency)
+        return self.withdrawal("ripple", address, amount, version=1, currency=currency)
 
     def litecoin_withdrawal(self, address: str, amount: float):
         """
         Send litecoin to another litecoin wallet specified by address.
         """
-        return self.withdrawal('ltc', address, amount)
+        return self.withdrawal("ltc", address, amount)
 
     def eth_withdrawal(self, address: str, amount: float):
         """
         Send ether to another ether wallet specified by address.
         """
-        return self.withdrawal('eth', address, amount)
+        return self.withdrawal("eth", address, amount)
 
     def bch_withdrawal(self, address: str, amount: float):
         """
         Send bitcoin cash to another bitcoin cash wallet specified by address.
         """
-        return self.withdrawal('bch', address, amount)
+        return self.withdrawal("bch", address, amount)
 
-    def xrp_withdrawal(self, address: str, amount: float,
-                       destination_tag: str=None):
+    def xrp_withdrawal(self, address: str, amount: float, destination_tag: str = None):
         """
         Sends xrp to another xrp wallet specified by address.
         Returns withdrawal id.
         """
-        return self.withdrawal('xrp', address, amount,
-                               destination_tag=destination_tag)
+        return self.withdrawal("xrp", address, amount, destination_tag=destination_tag)
 
     # Deposits ----------------------------------------------------------------
-    def deposit_address(self,
-                        method: str,
-                        version: int=2):
-        endpoint = self._endpoint_for(f'{method}_address', version)
+    def deposit_address(self, method: str, version: int = 2):
+        endpoint = self._endpoint_for(f"{method}_address", version)
         return self.post(endpoint)
 
     def bitcoin_deposit_address(self):
         """
         Returns bitcoin deposit address as unicode string
         """
-        return self.deposit_address('bitcoin_deposit', version=1)
+        return self.deposit_address("bitcoin_deposit", version=1)
 
     def ripple_deposit_address(self):
         """
         Returns ripple deposit address as unicode string.
         """
-        return self.deposit_address('ripple', version=1)
+        return self.deposit_address("ripple", version=1)
 
     def litecoin_deposit_address(self):
         """
         Returns litecoin deposit address as unicode string
         """
-        return self.deposit_address('ltc')
+        return self.deposit_address("ltc")
 
     def eth_deposit_address(self):
         """
         Returns ethereum deposit address as unicode string
         """
-        return self.deposit_address('eth')
+        return self.deposit_address("eth")
 
     def bch_deposit_address(self):
         """
         Returns bitcoin cash deposit address as unicode string
         """
-        return self.deposit_address('bch')
+        return self.deposit_address("bch")
 
     def xrp_deposit_address(self):
         """
@@ -326,7 +325,7 @@ class BitstampAuth(BitstampPublic, AuthMixin):
             {'destination_tag': 53965834,
              'address': 'rDsBeAmAa4FFwbQTJp9Rs84Q56vCiWCaBx'}
         """
-        return self.deposit_address('xrp')
+        return self.deposit_address("xrp")
 
     def unconfirmed_bitcoin_deposits(self):
         """
@@ -340,42 +339,35 @@ class BitstampAuth(BitstampPublic, AuthMixin):
         confirmations
           number of confirmations
         """
-        endpoint = self._endpoint_for('unconfirmed_btc', version=1)
+        endpoint = self._endpoint_for("unconfirmed_btc", version=1)
         return self.post(endpoint)
 
     # Transfers ---------------------------------------------------------------
-    def _transfer(self,
-                  endpoint: str,
-                  amount: float,
-                  currency: str,
-                  sub_account: int=None):
+    def _transfer(
+        self, endpoint: str, amount: float, currency: str, sub_account: int = None
+    ):
         endpoint = self._endpoint_for(endpoint)
-        return self.post(endpoint, data={
-            'amount': amount,
-            'currency': currency,
-            'subAccount': sub_account,
-        })
+        return self.post(
+            endpoint,
+            data={
+                "amount": amount,
+                "currency": currency,
+                "subAccount": sub_account,
+            },
+        )
 
-    def transfer_to_main(self,
-                         amount: float,
-                         currency: str,
-                         sub_account: int=None):
+    def transfer_to_main(self, amount: float, currency: str, sub_account: int = None):
         """
         Returns dictionary with status.
         sub account has to be the numerical id of the sub account, not the name
         """
-        return self._transfer('transfer-to-main',
-                              amount, currency, sub_account)
+        return self._transfer("transfer-to-main", amount, currency, sub_account)
 
-    def transfer_from_main(self,
-                           amount: float,
-                           currency: str,
-                           sub_account: int):
+    def transfer_from_main(self, amount: float, currency: str, sub_account: int):
         """
         Returns dictionary with status.
         sub account has to be the numerical id of the sub account, not the name
         """
-        return self._transfer('transfer-from-main',
-                              amount, currency, sub_account)
+        return self._transfer("transfer-from-main", amount, currency, sub_account)
 
     # TODO: Bank methods

@@ -5,7 +5,7 @@ from ..common import current_utc_date, date_range
 
 
 class CoinDesk(Client):
-    base_url = 'http://api.coindesk.com/v1/'
+    base_url = "http://api.coindesk.com/v1/"
     timeout = 15
 
     def bpi(self, currency: str):
@@ -16,18 +16,16 @@ class CoinDesk(Client):
 
 
 class _BPI(CoinDesk):
-
     def __init__(self, parent, currency: str):
         super().__init__(timeout=parent.timeout)
         self.currency = currency.upper()
 
     def current(self):
-        return self.get(f'bpi/currentprice/{self.currency}.json')
+        return self.get(f"bpi/currentprice/{self.currency}.json")
 
-    def historical(self,
-                   start: datetime,
-                   end: datetime=None,
-                   include_today: bool=False):
+    def historical(
+        self, start: datetime, end: datetime = None, include_today: bool = False
+    ):
         if isinstance(start, datetime):
             start = start.date()
         if isinstance(end, datetime):
@@ -41,24 +39,24 @@ class _BPI(CoinDesk):
         # If start date is today, return only current BPI
         if start == today:
             current = self.bpi(self.currency).current()
-            current['bpi'] = {
-                str(today): current['bpi'][self.currency]['rate_float']}
+            current["bpi"] = {str(today): current["bpi"][self.currency]["rate_float"]}
             return current
         # Normal call for historical BPI
-        response = self.get('bpi/historical/close.json', params={
-            'currency': self.currency,
-            'start': start,
-            'end': end,
-        })
+        response = self.get(
+            "bpi/historical/close.json",
+            params={
+                "currency": self.currency,
+                "start": start,
+                "end": end,
+            },
+        )
         # If end date is today, add current BPI
         if end == today and include_today:
-            response['bpi'][str(today)] = (
-                self.rate(self.currency).current())
+            response["bpi"][str(today)] = self.rate(self.currency).current()
         # Validate response
-        historical_bpi = response['bpi']
+        historical_bpi = response["bpi"]
         for d in date_range(start, end):
-            assert historical_bpi[str(d)], (
-                f'{d} is not present in BPI!')
+            assert historical_bpi[str(d)], f"{d} is not present in BPI!"
 
         return response
 
@@ -67,13 +65,11 @@ class _BPI(CoinDesk):
         if not date:
             return
         current_date = current_utc_date()
-        msg = (f"({date}) must be a date <= current date "
-               f"({current_date})")
+        msg = f"({date}) must be a date <= current date " f"({current_date})"
         assert date <= current_date, msg
 
 
 class _Rate(CoinDesk):
-
     def __init__(self, parent, currency: str):
         super().__init__(timeout=parent.timeout)
         self.currency = currency.upper()
@@ -81,15 +77,14 @@ class _Rate(CoinDesk):
 
     def current(self):
         response = self._bpi.current()
-        rate = response['bpi'][self.currency]['rate_float']
+        rate = response["bpi"][self.currency]["rate_float"]
         return rate
 
-    def historical(self,
-                   start: datetime,
-                   end: datetime=None,
-                   include_today: bool=False):
+    def historical(
+        self, start: datetime, end: datetime = None, include_today: bool = False
+    ):
         response = self._bpi.historical(start, end, include_today)
-        rate_dict = response['bpi']
+        rate_dict = response["bpi"]
         return rate_dict
 
     def for_date(self, date_for: datetime):
@@ -99,17 +94,13 @@ class _Rate(CoinDesk):
         rate = rate_dict[str(date_for)]
         return rate
 
-    def since_date(self,
-                   date_since: datetime,
-                   include_today: bool=False):
+    def since_date(self, date_since: datetime, include_today: bool = False):
         if isinstance(date_since, datetime):
             date_since = date_since.date()
         rate_dict = self.historical(date_since, None, include_today)
         return rate_dict
 
-    def last_n_days(self,
-                    n_days: int,
-                    include_today: bool=False):
+    def last_n_days(self, n_days: int, include_today: bool = False):
         start = current_utc_date() - timedelta(days=n_days)
         rate_dict = self.historical(start, None, include_today)
         return rate_dict

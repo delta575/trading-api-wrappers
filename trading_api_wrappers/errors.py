@@ -13,16 +13,16 @@ class InvalidResponse(APIException):
         message = str(r.status_code)
         # Check for client or server errors
         if 400 <= r.status_code < 500:
-            message = f'{message} Client Error:'
+            message = f"{message} Client Error:"
         elif 500 <= r.status_code < 600:
-            message = f'{message} Server Error:'
+            message = f"{message} Server Error:"
         # Add reason
-        message = f'{message} {r.reason}'
+        message = f"{message} {r.reason}"
         # Add message from source
         if error_msg:
-            message = f'{message} ({error_msg})'
+            message = f"{message} ({error_msg})"
         # Add url
-        message = f'{message} for url: {r.url}'
+        message = f"{message} for url: {r.url}"
 
         super().__init__(message, response=r)
         self.message = message
