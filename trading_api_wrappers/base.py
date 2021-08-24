@@ -8,16 +8,13 @@ from urllib.parse import urljoin
 
 import backoff
 import requests
-from requests import Response
-from requests import Session
+from requests import Response, Session
 from requests.auth import AuthBase
 from requests_toolbelt import user_agent as ua
 
-from .__version__ import __version__
+from . import __version__
 from .common import clean_empty
-from .errors import DecodeError
-from .errors import InvalidResponse
-from .errors import RequestException
+from .errors import DecodeError, InvalidResponse, RequestException
 
 TIMEOUT = 30
 RETRY_CODES = [

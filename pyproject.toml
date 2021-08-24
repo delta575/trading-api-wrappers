@@ -25,6 +25,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.6.2"
 backoff = "^1.11.1"
+importlib-metadata = {version = "^4.6.4", python = "<3.8"}
 requests = "^2.26.0"
 requests-toolbelt = "^0.9.1"
 
