@@ -14,6 +14,7 @@ class Currency(Currency):
     ETH = dict(value='ETH', decimals=9)
     LTC = dict(value='LTC', decimals=8)
     PEN = dict(value='PEN')
+    USDC = dict(value='USDC')
 
 
 class Market(Market):
@@ -36,6 +37,11 @@ class Market(Market):
     LTC_CLP = dict(value='LTC-CLP', base=Currency.LTC, quote=Currency.CLP)
     LTC_COP = dict(value='LTC-COP', base=Currency.LTC, quote=Currency.COP)
     LTC_PEN = dict(value='LTC-PEN', base=Currency.LTC, quote=Currency.PEN)
+    BTC_USDC = dict(value='BTC-USDC', base=Currency.BTC, quote=Currency.USDC)
+    USDC_ARS = dict(value='USDC-ARS', base=Currency.USDC, quote=Currency.ARS)
+    USDC_CLP = dict(value='USDC-CLP', base=Currency.USDC, quote=Currency.CLP)
+    USDC_COP = dict(value='USDC-COP', base=Currency.USDC, quote=Currency.COP)
+    USDC_PEN = dict(value='USDC-PEN', base=Currency.USDC, quote=Currency.PEN)
 
 
 class QuotationType(_Enum):
