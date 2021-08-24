@@ -3,6 +3,24 @@ name = "trading-api-wrappers"
 version = "0.17.1"
 description = "Clients for popular Crypto Exchanges and other useful services"
 authors = ["Felipe Aranguiz <faranguiz575@gmail.com>, Sebastian Aranguiz <sarang575@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/delta575/trading-bots"
+homepage = "https://github.com/snake575/trading-bots"
+classifiers = [
+    # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
+    'Development Status :: 4 - Beta',
+    'Intended Audience :: Developers',
+    'Natural Language :: English',
+    'License :: OSI Approved :: MIT License',
+    "Operating System :: OS Independent",
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: Implementation :: CPython',
+    'Programming Language :: Python :: Implementation :: PyPy'
+]
 
 [tool.poetry.dependencies]
 python = "^3.6"
@@ -14,7 +32,6 @@ requests-toolbelt = "^0.9.1"
 python-decouple = "^3.4"
 coverage = "^5.5"
 pytest = "^6.2.4"
-twine = "^3.4.2"
 
 [build-system]
 requires = ["poetry>=0.12"]
