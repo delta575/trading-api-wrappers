@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "trading-api-wrappers"
-version = "0.17.1"
+version = "0.18.0"
 description = "Clients for popular Crypto Exchanges and other useful services"
 authors = ["Felipe Aranguiz <faranguiz575@gmail.com>, Sebastian Aranguiz <sarang575@gmail.com>"]
 license = "MIT"
