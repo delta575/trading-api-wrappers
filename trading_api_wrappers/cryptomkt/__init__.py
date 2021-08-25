@@ -4,7 +4,7 @@ from .client_auth import CryptoMKTAuth
 from .client_public import CryptoMKTPublic
 
 __all__ = [
-    'CryptoMKT',
+    "CryptoMKT",
 ]
 
 

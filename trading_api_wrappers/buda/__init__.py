@@ -4,7 +4,7 @@ from .client_auth import BudaAuth
 from .client_public import BudaPublic
 
 __all__ = [
-    'Buda',
+    "Buda",
 ]
 
 

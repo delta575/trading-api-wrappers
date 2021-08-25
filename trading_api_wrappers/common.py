@@ -32,8 +32,7 @@ def format_datetime_iso(date_value):
     if date is None:
         return None
     if isinstance(date_value, date):
-        date_value = datetime(
-            date_value.year, date_value.month, date_value.day)
+        date_value = datetime(date_value.year, date_value.month, date_value.day)
     if isinstance(date_value, datetime):
         date_value = date_value.isoformat()
     return date_value

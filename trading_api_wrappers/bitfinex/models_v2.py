@@ -2,20 +2,22 @@ from collections import namedtuple
 
 
 class TradingTicker(
-    namedtuple('trading_ticker', [
-        'BID',
-        'BID_SIZE',
-        'ASK',
-        'ASK_SIZE',
-        'DAILY_CHANGE',
-        'DAILY_CHANGE_PERC',
-        'LAST_PRICE',
-        'VOLUME',
-        'HIGH',
-        'LOW',
-    ])
+    namedtuple(
+        "trading_ticker",
+        [
+            "BID",
+            "BID_SIZE",
+            "ASK",
+            "ASK_SIZE",
+            "DAILY_CHANGE",
+            "DAILY_CHANGE_PERC",
+            "LAST_PRICE",
+            "VOLUME",
+            "HIGH",
+            "LOW",
+        ],
+    )
 ):
-
     @classmethod
     def create_from_json(cls, ticker):
         return cls(
@@ -33,23 +35,25 @@ class TradingTicker(
 
 
 class FoundingTicker(
-    namedtuple('founding_ticker', [
-        'FRR',
-        'BID',
-        'BID_SIZE',
-        'BID_PERIOD',
-        'ASK',
-        'ASK_SIZE',
-        'ASK_PERIOD',
-        'DAILY_CHANGE',
-        'DAILY_CHANGE_PERC',
-        'LAST_PRICE',
-        'VOLUME',
-        'HIGH',
-        'LOW',
-    ])
+    namedtuple(
+        "founding_ticker",
+        [
+            "FRR",
+            "BID",
+            "BID_SIZE",
+            "BID_PERIOD",
+            "ASK",
+            "ASK_SIZE",
+            "ASK_PERIOD",
+            "DAILY_CHANGE",
+            "DAILY_CHANGE_PERC",
+            "LAST_PRICE",
+            "VOLUME",
+            "HIGH",
+            "LOW",
+        ],
+    )
 ):
-
     @classmethod
     def create_from_json(cls, ticker):
         return cls(
@@ -70,14 +74,16 @@ class FoundingTicker(
 
 
 class TradingTrade(
-    namedtuple('trading_trade', [
-        'ID',
-        'MTS',
-        'AMOUNT',
-        'PRICE',
-    ])
+    namedtuple(
+        "trading_trade",
+        [
+            "ID",
+            "MTS",
+            "AMOUNT",
+            "PRICE",
+        ],
+    )
 ):
-
     @classmethod
     def create_from_json(cls, trade):
         return cls(
@@ -89,15 +95,17 @@ class TradingTrade(
 
 
 class FoundingTrade(
-    namedtuple('founding_trade', [
-        'ID',
-        'MTS',
-        'AMOUNT',
-        'RATE',
-        'PERIOD',
-    ])
+    namedtuple(
+        "founding_trade",
+        [
+            "ID",
+            "MTS",
+            "AMOUNT",
+            "RATE",
+            "PERIOD",
+        ],
+    )
 ):
-
     @classmethod
     def create_from_json(cls, trade):
         return cls(
@@ -110,13 +118,15 @@ class FoundingTrade(
 
 
 class TradingBook(
-    namedtuple('trading_book', [
-        'PRICE',
-        'COUNT',
-        'AMOUNT',
-    ])
+    namedtuple(
+        "trading_book",
+        [
+            "PRICE",
+            "COUNT",
+            "AMOUNT",
+        ],
+    )
 ):
-
     @classmethod
     def create_from_json(cls, book):
         return cls(
@@ -127,14 +137,16 @@ class TradingBook(
 
 
 class FoundingBook(
-    namedtuple('founding_book', [
-        'RATE',
-        'PERIOD',
-        'COUNT',
-        'AMOUNT',
-    ])
+    namedtuple(
+        "founding_book",
+        [
+            "RATE",
+            "PERIOD",
+            "COUNT",
+            "AMOUNT",
+        ],
+    )
 ):
-
     @classmethod
     def create_from_json(cls, book):
         return cls(
@@ -146,12 +158,14 @@ class FoundingBook(
 
 
 class Stat(
-    namedtuple('stat', [
-        'MTS',
-        'VALUE',
-    ])
+    namedtuple(
+        "stat",
+        [
+            "MTS",
+            "VALUE",
+        ],
+    )
 ):
-
     @classmethod
     def create_from_json(cls, stat):
         return cls(
@@ -161,16 +175,18 @@ class Stat(
 
 
 class Candle(
-    namedtuple('candle', [
-        'MTS',
-        'OPEN',
-        'CLOSE',
-        'HIGH',
-        'LOW',
-        'VOLUME',
-    ])
+    namedtuple(
+        "candle",
+        [
+            "MTS",
+            "OPEN",
+            "CLOSE",
+            "HIGH",
+            "LOW",
+            "VOLUME",
+        ],
+    )
 ):
-
     @classmethod
     def create_from_json(cls, candle):
         return cls(

@@ -3,7 +3,7 @@ from . import models as _m
 from .client_public import SFOXPublic
 
 __all__ = [
-    'SFOX',
+    "SFOX",
 ]
 
 

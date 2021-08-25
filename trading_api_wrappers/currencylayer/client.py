@@ -9,17 +9,15 @@ class CurrencyLayer(Client, AuthMixin):
     Documentation:
     https://currencylayer.com/documentation
     """
+
     # https is only enabled for paid subscriptions
-    base_url = 'http://apilayer.net/api/'
-    error_keys = ['error']
+    base_url = "http://apilayer.net/api/"
+    error_keys = ["error"]
     timeout = 120
 
-    def __init__(self,
-                 access_key: str,
-                 timeout: int=None,
-                 **kwargs):
+    def __init__(self, access_key: str, timeout: int = None, **kwargs):
         super().__init__(timeout, **kwargs)
-        self.auth = ApiKeyAuth(access_key, api_key_param='access_key')
+        self.auth = ApiKeyAuth(access_key, api_key_param="access_key")
 
     def currencies(self):
         """Returns all currently supported currencies.
@@ -40,11 +38,9 @@ class CurrencyLayer(Client, AuthMixin):
                     }
                 }
         """
-        return self.get('list')
+        return self.get("list")
 
-    def live_rates(self,
-                   base: str=None,
-                   currencies: list=None):
+    def live_rates(self, base: str = None, currencies: list = None):
         """Return real-time exchange rates.
 
         REQUIRED PLAN: FREE
@@ -82,12 +78,9 @@ class CurrencyLayer(Client, AuthMixin):
                     }
                 }
         """
-        return self.get('live', base, currencies)
+        return self.get("live", base, currencies)
 
-    def historical(self,
-                   date_for,
-                   base: str=None, 
-                   currencies: list=None):
+    def historical(self, date_for, base: str = None, currencies: list = None):
         """Return historical exchange rates for the date requested.
 
         REQUIRED PLAN: FREE
@@ -124,15 +117,18 @@ class CurrencyLayer(Client, AuthMixin):
                     }
                 }
         """
-        return self.get('historical', base, currencies, params={
-            'date': format_date_iso(date_for),
-        })
+        return self.get(
+            "historical",
+            base,
+            currencies,
+            params={
+                "date": format_date_iso(date_for),
+            },
+        )
 
-    def time_frame(self,
-                   start: str,
-                   end: str,
-                   base: str=None,
-                   currencies: list=None):
+    def time_frame(
+        self, start: str, end: str, base: str = None, currencies: list = None
+    ):
         """Returns daily historical exchange rates for a time-period.
 
         (maximum range: 365 days)
@@ -178,16 +174,19 @@ class CurrencyLayer(Client, AuthMixin):
                     },
                 }
         """
-        return self.get('timeframe', base, currencies, params={
-            'start_date': format_date_iso(start),
-            'end_date': format_date_iso(end),
-        })
+        return self.get(
+            "timeframe",
+            base,
+            currencies,
+            params={
+                "start_date": format_date_iso(start),
+                "end_date": format_date_iso(end),
+            },
+        )
 
-    def convert(self,
-                amount: float,
-                from_currency: str,
-                to_currency: str,
-                date_for: str=None):
+    def convert(
+        self, amount: float, from_currency: str, to_currency: str, date_for: str = None
+    ):
         """Perform a currency conversion for the amount.
 
         Converts from a `from` currency, to a `to` currency at the latest
@@ -207,16 +206,17 @@ class CurrencyLayer(Client, AuthMixin):
                 End date for the requested time-frame. Accepts `datetime`
                 and `str` in ISO format (2000-01-01).
         """
-        return self.get('convert', params={
-            'amount': amount,
-            'from': from_currency,
-            'to': to_currency,
-            'date': format_date_iso(date_for),
-        })
+        return self.get(
+            "convert",
+            params={
+                "amount": amount,
+                "from": from_currency,
+                "to": to_currency,
+                "date": format_date_iso(date_for),
+            },
+        )
 
-    def change(self,
-               base: str=None,
-               currencies: list=None):
+    def change(self, base: str = None, currencies: list = None):
         """Return the change (margin and percentage) from yesterday's EOD (End Of Day).
 
         REQUIRED PLAN: ENTERPRISE
@@ -262,13 +262,11 @@ class CurrencyLayer(Client, AuthMixin):
                     },
                 }
         """
-        return self.get('change', base, currencies)
+        return self.get("change", base, currencies)
 
-    def change_time_frame(self,
-                          start: str,
-                          end: str,
-                          base: str=None,
-                          currencies: list=None):
+    def change_time_frame(
+        self, start: str, end: str, base: str = None, currencies: list = None
+    ):
         """Return the change (margin and percentage) for a specific time-frame.
 
         REQUIRED PLAN: ENTERPRISE
@@ -319,22 +317,29 @@ class CurrencyLayer(Client, AuthMixin):
                     },
                 }
         """
-        return self.get('change', base, currencies, params={
-            'start': format_date_iso(start),
-            'end': format_date_iso(end),
-        })
+        return self.get(
+            "change",
+            base,
+            currencies,
+            params={
+                "start": format_date_iso(start),
+                "end": format_date_iso(end),
+            },
+        )
 
     # OVERRIDES ---------------------------------------------------------------
-    def get(self,
-            endpoint: str,
-            base: str=None,
-            currencies: list=None,
-            params: dict=None):
+    def get(
+        self,
+        endpoint: str,
+        base: str = None,
+        currencies: list = None,
+        params: dict = None,
+    ):
         params = params or {}
         if base is not None:
-            params['source'] = base
+            params["source"] = base
         if isinstance(currencies, list) or isinstance(currencies, tuple):
-            currencies = ','.join(currencies)
+            currencies = ",".join(currencies)
         if currencies is not None:
-            params['currencies'] = currencies
+            params["currencies"] = currencies
         return super().get(endpoint, params=params)

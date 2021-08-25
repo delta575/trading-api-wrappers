@@ -2,7 +2,7 @@ from . import models as _m
 from .clients import RipioPublic
 
 __all__ = [
-    'Ripio',
+    "Ripio",
 ]
 
 

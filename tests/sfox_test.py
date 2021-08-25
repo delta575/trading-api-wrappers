@@ -5,7 +5,6 @@ from trading_api_wrappers.sfox import models
 
 
 class SFOXPublicTest(unittest.TestCase):
-
     def setUp(self):
         self.client = SFOX.Public()
 
@@ -23,9 +22,19 @@ class SFOXPublicTest(unittest.TestCase):
     def test_order_book_raw(self):
         order_book = self.client.order_book_raw()
         self.assertEqual(
-            sorted(['asks', 'bids', 'currency', 'exchanges', 'lastupdated',
-                    'market_making', 'pair']),
-            sorted(list(order_book.keys())))
+            sorted(
+                [
+                    "asks",
+                    "bids",
+                    "currency",
+                    "exchanges",
+                    "lastupdated",
+                    "market_making",
+                    "pair",
+                ]
+            ),
+            sorted(list(order_book.keys())),
+        )
 
     def test_order_book(self):
         order_book = self.client.order_book()

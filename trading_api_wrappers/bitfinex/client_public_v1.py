@@ -2,8 +2,8 @@ from ..base import Client
 
 
 class BitfinexPublic(Client):
-    base_url = 'https://api.bitfinex.com/v1/'
-    error_keys = ['message']
+    base_url = "https://api.bitfinex.com/v1/"
+    error_keys = ["message"]
 
     def ticker(self, symbol: str):
         """Gets the innermost bid and asks and information on the most recent trade.
@@ -37,7 +37,7 @@ class BitfinexPublic(Client):
                                             information was valid
 
         """
-        return self.get(f'pubticker/{symbol}')
+        return self.get(f"pubticker/{symbol}")
 
     def stats(self, symbol: str):
         """Various statistics about the requested pair.
@@ -58,7 +58,7 @@ class BitfinexPublic(Client):
             volume  [float as str]      Volume in the period
 
         """
-        return self.get(f'stats/{symbol}')
+        return self.get(f"stats/{symbol}")
 
     def today(self, symbol: str):
         """Today's low, high and volume.
@@ -80,12 +80,9 @@ class BitfinexPublic(Client):
             low     [float as str]      Today's low price
 
         """
-        return self.get(f'today/{symbol}')
+        return self.get(f"today/{symbol}")
 
-    def lend_book(self,
-                  currency: str,
-                  limit_bids: int=None,
-                  limit_asks: int=None):
+    def lend_book(self, currency: str, limit_bids: int = None, limit_asks: int = None):
         """Get the full margin funding book.
 
         GET https://api.bitfinex.com/v1/lendbook/[currency]
@@ -122,16 +119,21 @@ class BitfinexPublic(Client):
                                         rate
 
         """
-        return self.get(f'lendbook/{currency}', params={
-            'limit_bids': limit_bids,
-            'limit_asks': limit_asks,
-        })
+        return self.get(
+            f"lendbook/{currency}",
+            params={
+                "limit_bids": limit_bids,
+                "limit_asks": limit_asks,
+            },
+        )
 
-    def order_book(self,
-                   symbol: str,
-                   limit_bids: int=None,
-                   limit_asks: int=None,
-                   group: int=None):
+    def order_book(
+        self,
+        symbol: str,
+        limit_bids: int = None,
+        limit_asks: int = None,
+        group: int = None,
+    ):
         """Get the full order book.
 
         GET https://api.bitfinex.com/v1/book/[symbol]
@@ -169,16 +171,16 @@ class BitfinexPublic(Client):
             timestamp   [float as str]
 
         """
-        return self.get(f'book/{symbol}', params={
-            'limit_bids': limit_bids,
-            'limit_asks': limit_asks,
-            'group': group,
-        })
+        return self.get(
+            f"book/{symbol}",
+            params={
+                "limit_bids": limit_bids,
+                "limit_asks": limit_asks,
+                "group": group,
+            },
+        )
 
-    def trades(self,
-               symbol: str,
-               timestamp: float=None,
-               limit_trades: int=None):
+    def trades(self, symbol: str, timestamp: float = None, limit_trades: int = None):
         """Get a list of the most recent trades for the given symbol.
 
         GET https://api.bitfinex.com/v1/trades/[symbol]
@@ -208,15 +210,15 @@ class BitfinexPublic(Client):
                                         (can be '' if undetermined)
 
         """
-        return self.get(f'trades/{symbol}', params={
-            'timestamp': timestamp,
-            'limit_trades': limit_trades,
-        })
+        return self.get(
+            f"trades/{symbol}",
+            params={
+                "timestamp": timestamp,
+                "limit_trades": limit_trades,
+            },
+        )
 
-    def lends(self,
-              currency: str,
-              timestamp: float=None,
-              limit_lends: int=None):
+    def lends(self, currency: str, timestamp: float = None, limit_lends: int = None):
         """Get a list of the most recent lending data for the given currency:
 
         Total amount lent and rate (in % by 365 days).
@@ -248,10 +250,13 @@ class BitfinexPublic(Client):
             timestamp   [int]
 
         """
-        return self.get(f'lends/{currency}', params={
-            'timestamp': timestamp,
-            'limit_lends': limit_lends,
-        })
+        return self.get(
+            f"lends/{currency}",
+            params={
+                "timestamp": timestamp,
+                "limit_lends": limit_lends,
+            },
+        )
 
     def symbols(self):
         """Get a list of valid symbol IDs.
@@ -262,7 +267,7 @@ class BitfinexPublic(Client):
             list: A list of symbol names as str.
 
         """
-        return self.get('symbols')
+        return self.get("symbols")
 
     def symbols_details(self):
         """Get a list of valid symbol IDs and the pair details.
@@ -284,4 +289,4 @@ class BitfinexPublic(Client):
                                                 contracts/pairs
 
         """
-        return self.get('symbols_details')
+        return self.get("symbols_details")

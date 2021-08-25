@@ -5,13 +5,12 @@ from ..base import Client, ModelMixin
 
 class SFOXPublic(Client, ModelMixin):
     """API Doc: https://www.sfox.com/developers"""
-    base_url = 'https://api.sfox.com/v1/'
+
+    base_url = "https://api.sfox.com/v1/"
 
     def best_price(self, side: str, amount: str):
         """Return the price needed for a limit order to execute fully."""
-        data = self.get(f'offer/{side}', params={
-            'amount': amount
-        })
+        data = self.get(f"offer/{side}", params={"amount": amount})
         if self.return_json:
             return data
         return _m.Price.create_from_json(data)
@@ -25,14 +24,14 @@ class SFOXPublic(Client, ModelMixin):
         return self.best_price(_c.Side.SELL.value, amount)
 
     def order_book_raw(self):
-        return self.get('markets/orderbook')
+        return self.get("markets/orderbook")
 
-    def order_book(self, market_making: bool=False):
+    def order_book(self, market_making: bool = False):
         """Return the blended order book of all the available exchanges."""
         data = self.order_book_raw()
         if market_making:
-            data = data['market_making']
-        order_book = {'bids': data['bids'], 'asks': data['asks']}
+            data = data["market_making"]
+        order_book = {"bids": data["bids"], "asks": data["asks"]}
         if self.return_json:
             return order_book
         return _m.OrderBook.create_from_json(order_book)
@@ -45,4 +44,4 @@ class SFOXPublic(Client, ModelMixin):
     def exchanges(self):
         """Return all the available exchanges."""
         data = self.order_book_raw()
-        return data['exchanges']
+        return data["exchanges"]

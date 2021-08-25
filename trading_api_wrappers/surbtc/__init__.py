@@ -3,12 +3,13 @@ import warnings
 from trading_api_wrappers.buda import Buda, BudaAuth, BudaPublic
 
 __all__ = [
-    'SURBTC',
+    "SURBTC",
 ]
 
 deprecation_warning = (
-    'SurBTC.com has changed to Buda.com, please use the `buda` package.',
-    PendingDeprecationWarning)
+    "SurBTC.com has changed to Buda.com, please use the `buda` package.",
+    PendingDeprecationWarning,
+)
 
 
 class SURBTCAuth(BudaAuth):

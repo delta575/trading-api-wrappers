@@ -6,8 +6,8 @@ from .client_public_v1 import BitfinexPublic
 from .client_public_v2 import BitfinexPublic as BitfinexPublicV2
 
 __all__ = [
-    'Bitfinex',
-    'BitfinexV2',
+    "Bitfinex",
+    "BitfinexV2",
 ]
 
 

@@ -8,49 +8,50 @@ from urllib.parse import urljoin
 
 import backoff
 import requests
-from requests import Response
-from requests import Session
+from requests import Response, Session
 from requests.auth import AuthBase
 from requests_toolbelt import user_agent as ua
 
-from .__version__ import __version__
+from . import __version__
 from .common import clean_empty
-from .errors import DecodeError
-from .errors import InvalidResponse
-from .errors import RequestException
+from .errors import DecodeError, InvalidResponse, RequestException
 
 TIMEOUT = 30
 RETRY_CODES = [
-    400, 401, 403, 404, 408, 429,
-    500, 502, 503, 504,
+    400,
+    401,
+    403,
+    404,
+    408,
+    429,
+    500,
+    502,
+    503,
+    504,
 ]
 
 
 class Timestamp:
-
     @staticmethod
     def seconds():
         return int(time.time())
 
     @staticmethod
     def milliseconds():
-        return int(time.time() * 1E3)
+        return int(time.time() * 1e3)
 
     @staticmethod
     def microseconds():
-        return int(time.time() * 1E6)
+        return int(time.time() * 1e6)
 
 
 timestamp = Timestamp()
 
 
 class ClientSession(Session):
-    user_agent = ua('trading-api-wrappers', __version__)
+    user_agent = ua("trading-api-wrappers", __version__)
 
-    def __init__(self,
-                 base_url: str,
-                 timeout: int=TIMEOUT,
-                 user_agent: str=None):
+    def __init__(self, base_url: str, timeout: int = TIMEOUT, user_agent: str = None):
         # Init session
         super().__init__()
         # Instance attributes
@@ -64,24 +65,26 @@ class ClientSession(Session):
 
     def request(self, method, endpoint, *args, **kwargs):
         """Send the request after generating the complete URL."""
-        kwargs.setdefault('allow_redirects', True)
+        kwargs.setdefault("allow_redirects", True)
         url = self.url_for(endpoint)
         # Clean empty values
-        for key in ['data', 'json', 'params']:
+        for key in ["data", "json", "params"]:
             value = kwargs.get(key)
             if value:
                 cleaned = clean_empty(value)
                 kwargs[key] = cleaned
         # Set default user-agent
-        headers = kwargs.pop('headers', {})
-        headers['User-Agent'] = self.user_agent
+        headers = kwargs.pop("headers", {})
+        headers["User-Agent"] = self.user_agent
         # Send the request
         return super().request(
-            method, url,
+            method,
+            url,
             headers=headers,
             auth=self.auth,
             timeout=self.timeout,
-            *args, **kwargs,
+            *args,
+            **kwargs,
         )
 
     def url_for(self, endpoint: str):
@@ -90,7 +93,7 @@ class ClientSession(Session):
 
 
 class Client:
-    base_url: str = ''
+    base_url: str = ""
     error_keys: Iterable[str] = []
     rate_limit: int = 0  # in milliseconds
     session_cls = ClientSession
@@ -102,14 +105,16 @@ class Client:
     max_retries: int = 3
     timeout: int = TIMEOUT
 
-    def __init__(self,
-                 timeout: int=None,
-                 max_retries: int=None,
-                 backoff_factor: float=None,
-                 rate_limit: int=None,
-                 user_agent: str=None,
-                 base_url: str=None,
-                 **kwargs):
+    def __init__(
+        self,
+        timeout: int = None,
+        max_retries: int = None,
+        backoff_factor: float = None,
+        rate_limit: int = None,
+        user_agent: str = None,
+        base_url: str = None,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         # Override defaults
         if timeout is not None:
@@ -124,24 +129,25 @@ class Client:
             self.base_url = base_url
         # Create session
         self.session: ClientSession = self.session_cls(
-            self.base_url, self.timeout, user_agent)
+            self.base_url, self.timeout, user_agent
+        )
         # Attributes
         self.last_request_timestamp: int = 0
 
     def get(self, endpoint, **kwargs):
-        return self._fetch('GET', endpoint, **kwargs)
+        return self._fetch("GET", endpoint, **kwargs)
 
     def post(self, endpoint, data=None, json=None, **kwargs):
-        return self._fetch('POST', endpoint, data=data, json=json, **kwargs)
+        return self._fetch("POST", endpoint, data=data, json=json, **kwargs)
 
     def put(self, endpoint, data=None, **kwargs):
-        return self._fetch('PUT', endpoint, data=data, **kwargs)
+        return self._fetch("PUT", endpoint, data=data, **kwargs)
 
     def patch(self, endpoint, data=None, **kwargs):
-        return self._fetch('PATCH', endpoint, data=data, **kwargs)
+        return self._fetch("PATCH", endpoint, data=data, **kwargs)
 
     def delete(self, endpoint, **kwargs):
-        return self._fetch('DELETE', endpoint, **kwargs)
+        return self._fetch("DELETE", endpoint, **kwargs)
 
     def _retry(self, target):
         # Verify that sync version is not being run from coroutine
@@ -171,7 +177,8 @@ class Client:
     def _fetch(self, method, endpoint, *args, **kwargs):
         @self._retry
         def fetch():
-            return self._fetch_base(method, endpoint, *args, ** kwargs)
+            return self._fetch_base(method, endpoint, *args, **kwargs)
+
         return fetch()
 
     def _fetch_base(self, method, endpoint, *args, **kwargs):
@@ -197,8 +204,8 @@ class Client:
                 json = data.json() if isinstance(data, Response) else data
                 message = json[error_key]
                 if message:
-                    msg = j.dumps(message).replace('"', '').rstrip('.')
-                    msg = f'{error_key}: {msg}'
+                    msg = j.dumps(message).replace('"', "").rstrip(".")
+                    msg = f"{error_key}: {msg}"
                     return msg
             except (JSONDecodeError, KeyError, TypeError):
                 continue
@@ -207,7 +214,7 @@ class Client:
         try:
             json = response.json()
         except JSONDecodeError as e:
-            error_msg = 'Unable to decode JSON from response (no content)'
+            error_msg = "Unable to decode JSON from response (no content)"
             raise DecodeError(error_msg, response) from e
         error_msg = self._get_error_message(json)
         if error_msg:
@@ -219,7 +226,7 @@ class Client:
         elapsed = now - self.last_request_timestamp
         if elapsed < self.rate_limit:
             delay = self.rate_limit - elapsed
-            time.sleep(delay / 1E3)
+            time.sleep(delay / 1e3)
 
     def __del__(self):
         if self.session:
@@ -244,7 +251,7 @@ class AuthMixin:
 class ModelMixin:
     return_json: bool = False
 
-    def __init__(self, return_json: bool=None):
+    def __init__(self, return_json: bool = None):
         super().__init__()
         if return_json is not None:
             self.return_json = return_json
@@ -273,28 +280,28 @@ class _Enum(Enum):
 class Currency(_Enum):
     @property
     def value(self):
-        return super().value['value']
+        return super().value["value"]
 
     @property
     def decimals(self):
-        return super().value.get('decimals', 2)
+        return super().value.get("decimals", 2)
 
 
 class Market(_Enum):
     @staticmethod
     def _format_value(value):
-        value = str(value).replace('-', '')
-        value = f'{value[:3]}_{value[3:]}'
+        value = str(value).replace("-", "")
+        value = f"{value[:3]}_{value[3:]}"
         return value.upper()
 
     @property
     def value(self):
-        return super().value['value']
+        return super().value["value"]
 
     @property
     def base(self):
-        return super().value['base']
+        return super().value["base"]
 
     @property
     def quote(self):
-        return super().value['quote']
+        return super().value["quote"]

@@ -21,22 +21,22 @@ Supported APIs:
 - [Kraken](https://www.kraken.com)
 - [OpenExchangeRates](https://openexchangerates.org)
 
-
 ## Installation
 
 ### Requirements
-* Python 3.6 or 3.7
 
-To install, simply use `pipenv` (or `pip`, of course):
+- Python 3.6+
+
+To install, simply use `poetry` (or `pip`, of course):
 
 ```bash
-$ pipenv install trading-api-wrappers
+$ poetry add trading-api-wrappers
 ```
 
 ### Dev setup
 
 ```bash
-$ pipenv install -d
+$ poetry install
 ```
 
 Rename `.env.example` to `.env` and configure your credentials (for tests)
@@ -50,7 +50,7 @@ Public API:
 ```python
 from trading_api_wrappers import Buda
 client = Buda.Public()
-```    
+```
 
 Authenticated API:
 
@@ -69,14 +69,14 @@ Public API:
 ```python
 from trading_api_wrappers import Bitfinex
 client = Bitfinex.Public()
-```    
+```
 
 Authenticated API:
 
 ```python
 from trading_api_wrappers import Bitfinex
 client = Bitfinex.Auth(API_KEY, API_SECRET)
-```    
+```
 
 Bitfinex API Doc:
 https://bitfinex.readme.io/v1/docs
@@ -88,7 +88,7 @@ Public API:
 ```python
 from trading_api_wrappers import Bitstamp
 client = Bitstamp.Public()
-```    
+```
 
 Authenticated API:
 
@@ -114,7 +114,7 @@ Authenticated API:
 ```python
 from trading_api_wrappers import Kraken
 client = Kraken.Auth(API_KEY, API_SECRET)
-```    
+```
 
 Kraken API Doc:
 https://www.kraken.com/help/api
@@ -125,7 +125,7 @@ https://www.kraken.com/help/api
 from trading_api_wrappers import CoinDesk
 client = CoinDesk()
 ```
-      
+
 CoinDesk API Doc:
 https://www.coindesk.com/api
 
@@ -135,7 +135,7 @@ https://www.coindesk.com/api
 from trading_api_wrappers import CoinMarketCap
 client = CoinMarketCap()
 ```
-      
+
 CoinMarketCap API Doc:
 https://coinmarketcap.com/api
 
@@ -147,7 +147,7 @@ Public API:
 from trading_api_wrappers import CryptoMKT
 client = CryptoMKT.Public()
 ```
-    
+
 Authenticated API:
 
 ```python
@@ -164,7 +164,7 @@ https://developers.cryptomkt.com
 from trading_api_wrappers import OXR
 client = OXR(APP_ID)
 ```
-      
+
 OpenExchangeRates API Doc:
 https://docs.openexchangerates.org
 
@@ -174,12 +174,12 @@ https://docs.openexchangerates.org
 from trading_api_wrappers import CurrencyLayer
 client = CurrencyLayer(ACCESS_KEY)
 ```
-      
+
 CurrencyLayer API Doc:
 https://currencylayer.com/documentation
 
-
 ## Licence
+
 [![PyPI - License](https://img.shields.io/pypi/l/trading-api-wrappers.svg)](https://opensource.org/licenses/MIT)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdelta575%2Ftrading-api-wrappers.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdelta575%2Ftrading-api-wrappers?ref=badge_shield)
 
@@ -189,8 +189,6 @@ Copyright © 2017
 [Felipe Aránguiz](mailto://faranguiz575@gmail.com) | [Sebastián Aránguiz](mailto://sarang575@gmail.com)
 
 See [LICENSE](LICENSE)
-
-
 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdelta575%2Ftrading-api-wrappers.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdelta575%2Ftrading-api-wrappers?ref=badge_large)
 
