@@ -2,7 +2,7 @@
 name = "trading-api-wrappers"
 version = "0.18.0"
 description = "Clients for popular Crypto Exchanges and other useful services"
-authors = ["Felipe Aranguiz <faranguiz575@gmail.com>, Sebastian Aranguiz <sarang575@gmail.com>"]
+authors = ["Felipe Aranguiz <faranguiz575@gmail.com>", "Sebastian Aranguiz <sarang575@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/delta575/trading-bots"
