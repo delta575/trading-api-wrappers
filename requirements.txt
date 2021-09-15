@@ -4,9 +4,9 @@ backoff==1.11.1; (python_version >= "2.7" and python_full_version < "3.0.0") or 
 certifi==2021.5.30; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" \
     --hash=sha256:50b1e4f8446b06f41be7dd6338db18e0990601dce795c2b1686458aa7e8fa7d8 \
     --hash=sha256:2bbf76fd432960138b3ef6dda3dde0544f27cbf8546c458e60baf371917ba9ee
-charset-normalizer==2.0.4; python_full_version >= "3.6.0" and python_version >= "3" \
-    --hash=sha256:f23667ebe1084be45f6ae0538e4a5a865206544097e4e8bbcacf42cd02a348f3 \
-    --hash=sha256:0c8911edd15d19223366a194a513099a302055a962bca2cec0f54b8b63175d8b
+charset-normalizer==2.0.5; python_full_version >= "3.6.0" and python_version >= "3" \
+    --hash=sha256:7098e7e862f6370a2a8d1a6398cd359815c45d12626267652c3f13dec58e2367 \
+    --hash=sha256:fa471a601dfea0f492e4f4fca035cd82155e65dc45c9b83bf4322dfab63755dd
 idna==3.2; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.5" \
     --hash=sha256:14475042e284991034cb48e06f6851428fb14c4dc953acd9be9a5e95c7b6dd7a \
     --hash=sha256:467fbad99067910785144ce333826c71fb0e63a425657295239737f7ecd125f3
