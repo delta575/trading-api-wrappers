@@ -12,7 +12,7 @@ from requests import Response, Session
 from requests.auth import AuthBase
 from requests_toolbelt import user_agent as ua
 
-from . import __version__
+from ._version import __version__
 from .common import clean_empty
 from .errors import DecodeError, InvalidResponse, RequestException
 
