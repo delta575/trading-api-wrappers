@@ -9,7 +9,7 @@ def parse_datetime(datetime_str):
 
 def parse_iso_datetime(datetime_str):
     if datetime_str:
-        return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%f")
+        return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%f%z")
 
 
 def check_null(value):
@@ -59,14 +59,14 @@ class Ticker(
     def create_from_json(cls, ticker):
         ticker = ticker[0]
         return cls(
-            high=float(ticker["high"]),
-            low=float(ticker["low"]),
-            ask=float(ticker["ask"]),
-            bid=float(ticker["bid"]),
-            last_price=float(ticker["last_price"]),
-            volume=float(ticker["volume"]),
-            market=ticker["market"],
-            timestamp=parse_iso_datetime(ticker["timestamp"]),
+            high=float(ticker.get("high")),
+            low=float(ticker.get("low")),
+            ask=float(ticker.get("ask")),
+            bid=float(ticker.get("bid")),
+            last_price=float(ticker.get("last_price", ticker["last"])),
+            volume=float(ticker.get("volume")),
+            market=ticker.get("market"),
+            timestamp=parse_iso_datetime(ticker.get("timestamp")),
             json=ticker,
         )
 
@@ -77,18 +77,14 @@ class OrderBookEntry(
         [
             "price",
             "amount",
-            "timestamp",
-            "json",
         ],
     )
 ):
     @classmethod
     def create_from_json(cls, book_entry):
         return cls(
-            price=float(book_entry["price"]),
-            amount=float(book_entry["amount"]),
-            timestamp=parse_iso_datetime(book_entry["timestamp"]),
-            json=book_entry,
+            price=float(book_entry[0]),
+            amount=float(book_entry[1]),
         )
 
 
@@ -96,30 +92,33 @@ class OrderBook(
     namedtuple(
         "order_book",
         [
-            "order_book",
-            "pagination",
+            "asks",
+            "bids",
+            "json",
         ],
     )
 ):
     @classmethod
-    def create_from_json(cls, order_book, pagination):
+    def create_from_json(cls, order_book):
         return cls(
-            order_book=[
-                OrderBookEntry.create_from_json(book_entry) for book_entry in order_book
+            asks=[
+                OrderBookEntry.create_from_json(entry) for entry in order_book["ask"]
             ],
-            pagination=Pagination.create_from_json(pagination),
+            bids=[
+                OrderBookEntry.create_from_json(entry) for entry in order_book["bid"]
+            ],
+            json=order_book,
         )
-
 
 class TradesEntry(
     namedtuple(
         "trades_entry",
         [
-            "market_taker",
-            "timestamp",
+            "id",
             "price",
-            "amount",
-            "market",
+            "qty",
+            "side",
+            "timestamp",
             "json",
         ],
     )
@@ -127,11 +126,11 @@ class TradesEntry(
     @classmethod
     def create_from_json(cls, trades_entry):
         return cls(
-            market_taker=trades_entry["market_taker"],
-            timestamp=parse_iso_datetime(trades_entry["timestamp"]),
-            price=float(trades_entry["price"]),
-            amount=float(trades_entry["amount"]),
-            market=trades_entry["market"],
+            id= trades_entry["id"],
+            price= float(trades_entry["price"]),
+            qty= float(trades_entry["qty"]),
+            side= trades_entry["side"],
+            timestamp= parse_iso_datetime(trades_entry["timestamp"]),
             json=trades_entry,
         )
 
@@ -141,17 +140,15 @@ class Trades(
         "trades",
         [
             "trades",
-            "pagination",
         ],
     )
 ):
     @classmethod
-    def create_from_json(cls, trades, pagination):
+    def create_from_json(cls, trades):
         return cls(
             trades=[
                 TradesEntry.create_from_json(trades_entry) for trades_entry in trades
             ],
-            pagination=Pagination.create_from_json(pagination),
         )
 
 
