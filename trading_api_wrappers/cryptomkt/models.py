@@ -152,17 +152,13 @@ class Trades(
         )
 
 
-class WalletBalance(
-    namedtuple(
-        "wallet_balance",
-        [
-            "available",
-            "balance",
-            "wallet",
-            "json",
-        ],
-    )
-):
+class WalletBalance:
+    def __init__(self, data: dict):
+        self.currency = data["currency"]
+        self.avaliable = data["available"]
+        self.reserved = data["reserved"]
+        self.reserved_margin = data["reserved_margin"]
+
     @classmethod
     def create_from_json(cls, balance):
         return cls(
@@ -173,18 +169,19 @@ class WalletBalance(
         )
 
 
-class Balance(
-    namedtuple(
-        "balance",
-        [
-            "ARS",
-            "CLP",
-            "ETH",
-        ],
-    )
-):
+class Balance:
+
+    def __init__(self, balances):
+        if type(balances) is list:
+            self.balances = {balance["currency"]: WalletBalance(balance) for balance in balances}
+        else:
+            self.balances = balances
+
+    def get(self, wallet):
+        return self.balances[wallet]
+
     @classmethod
-    def create_from_json(cls, balance):
+    def create_from_json(cls, balance: list):
         return cls(
             ARS=cls.get_wallet_balance(balance, "ARS"),
             CLP=cls.get_wallet_balance(balance, "CLP"),
@@ -192,7 +189,7 @@ class Balance(
         )
 
     @staticmethod
-    def get_wallet_balance(balance, wallet: str):
+    def get_wallet_balance(balance: list, wallet: str):
         wallet = [b for b in balance if b["wallet"] == wallet]
         return WalletBalance.create_from_json(wallet[0]) if wallet else None
 
