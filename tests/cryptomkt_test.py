@@ -1,4 +1,5 @@
 import unittest
+import pytz
 from datetime import datetime, timedelta
 
 from decouple import config
@@ -22,30 +23,31 @@ class CryptoMKTPublicTest(unittest.TestCase):
     def test_instantiate_client(self):
         self.assertIsInstance(self.client, CryptoMKT.Public)
 
+    @unittest.skip("Deprecated")
     def test_markets(self):
         markets = self.client.markets()
         self.assertEqual(len(markets), len(CryptoMKT.Market))
 
     def test_ticker(self):
-        ticker = self.client.ticker(MARKET_ID)
+        ticker = self.client.ticker(MARKET_ID.value)
         self.assertIsInstance(ticker, models.Ticker)
 
     def test_order_book(self):
-        order_book = self.client.order_book(MARKET_ID, CryptoMKT.OrderType.BUY)
+        order_book = self.client.order_book(MARKET_ID)
         self.assertIsInstance(order_book, models.OrderBook)
 
     def test_trades(self):
-        page, limit = 2, 10
-        trades = self.client.trades(MARKET_ID, page=page, limit=limit)
+        limit = 10
+        trades = self.client.trades(MARKET_ID, limit=limit)
         self.assertIsInstance(trades, models.Trades)
-        self.assertEqual(trades.pagination.page, page)
         self.assertEqual(len(trades.trades), limit)
 
     def test_trades_dates(self):
+        utc=pytz.UTC
         end = datetime.now() - timedelta(days=1)
         trades = self.client.trades(MARKET_ID, end=end)
         self.assertIsInstance(trades, models.Trades)
-        self.assertLess(trades.trades[0].timestamp, end)
+        self.assertLess(trades.trades[0].timestamp.replace(tzinfo=utc), end.replace(tzinfo=utc))
 
 
 class CryptoMKTAuthTest(unittest.TestCase):

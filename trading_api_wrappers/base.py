@@ -67,6 +67,10 @@ class ClientSession(Session):
         """Send the request after generating the complete URL."""
         kwargs.setdefault("allow_redirects", True)
         url = self.url_for(endpoint)
+        if "spot" in kwargs and kwargs["spot"]:
+            url = url.replace("public", "spot")
+            kwargs.pop("spot")
+            
         # Clean empty values
         for key in ["data", "json", "params"]:
             value = kwargs.get(key)
