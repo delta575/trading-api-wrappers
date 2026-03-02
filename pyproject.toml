@@ -30,7 +30,7 @@ requests = "^2.26.0"
 requests-toolbelt = "^0.9.1"
 
 [tool.poetry.dev-dependencies]
-python-decouple = "^3.4"
+python-decouple = "^3.8"
 coverage = "^5.5"
 pytest = "^6.2.4"
 black = {version = "^21.7b0", allow-prereleases = true}
