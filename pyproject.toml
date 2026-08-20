@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "trading-api-wrappers"
-version = "0.19.0"
-description = "Clients for popular Crypto Exchanges and other useful services"
+version = "0.20.0"
+description = "LATAM-first crypto trading API clients, plus major global venues"
 authors = ["Felipe Aranguiz <faranguiz575@gmail.com>", "Sebastian Aranguiz <sarang575@gmail.com>"]
 license = "MIT"
 readme = "README.md"

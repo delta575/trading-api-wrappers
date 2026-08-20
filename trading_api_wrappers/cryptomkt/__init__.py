@@ -1,17 +1,40 @@
-from . import constants as _c
-from . import models as _m
-from .client_auth import CryptoMKTAuth
-from .client_public import CryptoMKTPublic
+"""Compatibility alias. The live venue is NotBank, the CryptoMKT successor."""
 
-__all__ = [
-    "CryptoMKT",
-]
+from __future__ import annotations
+
+import warnings
+
+from .. import market as _m
+from ..notbank import NotBank
+from ..notbank.client_auth import NotBankAuth
+from ..notbank.client_public import NotBankPublic
+
+__all__ = ["CryptoMKT"]
 
 
-class CryptoMKT:
+def _warn():
+    warnings.warn(
+        "CryptoMKT is a compatibility alias of NotBank; use NotBank.",
+        DeprecationWarning,
+        stacklevel=3,
+    )
+
+
+class CryptoMKTPublic(NotBankPublic):
+    def __init__(self, *args, **kwargs):
+        _warn()
+        super().__init__(*args, **kwargs)
+
+
+class CryptoMKTAuth(NotBankAuth):
+    def __init__(self, *args, **kwargs):
+        _warn()
+        super().__init__(*args, **kwargs)
+
+
+class CryptoMKT(NotBank):
+    """Deprecated alias of :class:`~trading_api_wrappers.notbank.NotBank`."""
+
     models = _m
-    Currency = _c.Currency
-    Market = _c.Market
-    OrderType = _c.OrderType
     Auth = CryptoMKTAuth
     Public = CryptoMKTPublic

@@ -1,84 +1,55 @@
 import unittest
+import warnings
 
-from tests.helpers import env, skip_unless_host, skip_without
-from trading_api_wrappers import CryptoMKT, InvalidResponse
-from trading_api_wrappers.cryptomkt import models
-
-POST_ORDERS = False
-API_KEY = env("CRYPTOMKT_API_KEY")
-API_SECRET = env("CRYPTOMKT_API_SECRET")
-HOST = "api.exchange.cryptomkt.com"
+from tests.helpers import skip_without
+from trading_api_wrappers import CryptoMKT, NotBank
+from trading_api_wrappers.market import OrderBook, Ticker
 
 
-@skip_unless_host(HOST)
+class CryptoMKTAliasTest(unittest.TestCase):
+    def test_public_is_notbank_subclass(self):
+        self.assertTrue(issubclass(CryptoMKT.Public, NotBank.Public))
+
+    def test_auth_is_notbank_subclass(self):
+        self.assertTrue(issubclass(CryptoMKT.Auth, NotBank.Auth))
+
+    def test_public_warns(self):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            CryptoMKT.Public()
+        self.assertTrue(any(item.category is DeprecationWarning for item in caught))
+
+
 class CryptoMKTPublicTest(unittest.TestCase):
     def setUp(self):
-        self.client = CryptoMKT.Public()
-
-    def test_instantiate_client(self):
-        self.assertIsInstance(self.client, CryptoMKT.Public)
-
-    def test_markets(self):
-        markets = self.client.markets()
-        self.assertGreater(len(markets), 0)
-        first = next(iter(markets.values()))
-        self.assertIsInstance(first, models.Market)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            self.client = CryptoMKT.Public()
 
     def test_ticker(self):
-        symbol = next(iter(self.client.markets()))
-        ticker = self.client.ticker(symbol)
-        self.assertIsInstance(ticker, models.Ticker)
-        self.assertEqual(ticker.symbol, symbol)
+        ticker = self.client.ticker("BTCCLP")
+        self.assertIsInstance(ticker, Ticker)
+        self.assertTrue(ticker.last or ticker.bid or ticker.ask)
 
     def test_order_book(self):
-        symbol = next(iter(self.client.markets()))
-        order_book = self.client.order_book(symbol, depth=5)
-        self.assertIsInstance(order_book, models.OrderBook)
-
-    def test_trades(self):
-        symbol = next(iter(self.client.markets()))
-        trades = self.client.trades(symbol, limit=5)
-        self.assertIsInstance(trades, list)
-        if trades:
-            self.assertIsInstance(trades[0], models.Trade)
+        book = self.client.order_book("BTCCLP", depth=5)
+        self.assertIsInstance(book, OrderBook)
+        self.assertGreater(len(book.bids) + len(book.asks), 0)
 
 
-@skip_unless_host(HOST)
-@skip_without("CRYPTOMKT_API_KEY", "CRYPTOMKT_API_SECRET")
+@skip_without("CRYPTOMKT_API_KEY", "CRYPTOMKT_API_SECRET", "CRYPTOMKT_USER_ID")
 class CryptoMKTAuthTest(unittest.TestCase):
     def setUp(self):
-        self.client = CryptoMKT.Auth(API_KEY, API_SECRET)
+        from tests.helpers import env
 
-    def test_instantiate_client(self):
-        self.assertIsInstance(self.client, CryptoMKT.Auth)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            self.client = CryptoMKT.Auth(
+                env("CRYPTOMKT_API_KEY"),
+                env("CRYPTOMKT_API_SECRET"),
+                env("CRYPTOMKT_USER_ID"),
+            )
 
-    def test_balance(self):
-        balance = self.client.balance()
-        self.assertIsInstance(balance, list)
-
-    @unittest.skipUnless(POST_ORDERS, "Only run if explicitly set")
-    def test_create_order_cancel_order(self):
-        symbol = next(iter(self.client.markets()))
-        new_order = self.client.create_order(
-            symbol, CryptoMKT.OrderType.SELL, quantity=0.001, price=1000000
-        )
-        canceled_order = self.client.cancel_order(new_order.client_order_id)
-        self.assertIsInstance(new_order, models.Order)
-        self.assertIsInstance(canceled_order, models.Order)
-
-
-@skip_unless_host(HOST)
-class CryptoMKTAuthTestBadApi(unittest.TestCase):
-    def setUp(self):
-        self.client = CryptoMKT.Auth("BAD_KEY", "BAD_SECRET")
-
-    def test_instantiate_client(self):
-        self.assertIsInstance(self.client, CryptoMKT.Auth)
-
-    def test_key_secret(self):
-        with self.assertRaises(TypeError):
-            CryptoMKT.Auth()
-
-    def test_balance_returns_error(self):
-        with self.assertRaises(InvalidResponse):
-            self.client.balance()
+    def test_balances(self):
+        balances = self.client.balances()
+        self.assertIsNotNone(balances)
