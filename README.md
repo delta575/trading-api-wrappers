@@ -2,9 +2,6 @@
 
 Python 3.10+ clients for popular **crypto exchanges** and related services.
 
-> **Disclaimer:** Some upstream APIs have changed or shut down since this
-> library was first written. See [API status](#api-status) below.
-
 [![PyPI - License](https://img.shields.io/pypi/l/trading-api-wrappers.svg)](https://opensource.org/licenses/MIT)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/trading-api-wrappers.svg)
 [![PyPI](https://img.shields.io/pypi/v/trading-api-wrappers.svg)](https://pypi.org/project/trading-api-wrappers/)
@@ -14,20 +11,19 @@ Python 3.10+ clients for popular **crypto exchanges** and related services.
 
 | Client | Public API | Notes |
 | --- | --- | --- |
-| Buda | Active | Markets updated (SOL, USDT). ARS pairs removed. |
-| Bitfinex v1 / v2 | Active | v2 authenticated client is not implemented. |
+| Buda | Active | Markets include SOL and USDT. |
+| Bitfinex v1 / v2 | Active | v2 authenticated client is implemented. |
 | Bitstamp | Active | |
 | Kraken | Active | |
 | SFOX | Active | |
 | Bitcoinity | Active | |
-| Ripio rates | Active | Exchange order-book client is deprecated. |
+| Ripio | Active | Retail rates plus Ripio Trade v4 public books. |
 | Open Exchange Rates | Active | Requires an app id. |
 | CurrencyLayer | Active | Requires an access key. |
-| CoinDesk | **Deprecated** | BPI host `api.coindesk.com` is gone. |
-| CoinMarketCap | **Deprecated** | Public v1 API was shut down. |
-| CryptoMKT | **Deprecated** | v1 API is retired; migrate to exchange API v3. |
-| Bitex | **Deprecated** | `bitex.la` is gone. |
-| SURBTC | **Deprecated** | Rebranded to Buda years ago. Use `Buda`. |
+| CoinMarketCap | Active | Keyless public API by default; pass `api_key` for Pro. |
+| CryptoMKT | Active | Exchange API v3 (`api.exchange.cryptomkt.com`). |
+
+Removed in 0.19.0: CoinDesk BPI, Bitex (`bitex.la`), and the SURBTC alias (use `Buda`).
 
 ## Installation
 
@@ -85,15 +81,17 @@ https://api.buda.com
 Public API:
 
 ```python
-from trading_api_wrappers import Bitfinex
+from trading_api_wrappers import Bitfinex, BitfinexV2
 client = Bitfinex.Public()
+client_v2 = BitfinexV2.Public()
 ```
 
 Authenticated API:
 
 ```python
-from trading_api_wrappers import Bitfinex
+from trading_api_wrappers import Bitfinex, BitfinexV2
 client = Bitfinex.Auth(API_KEY, API_SECRET)
+client_v2 = BitfinexV2.Auth(API_KEY, API_SECRET)
 ```
 
 Bitfinex API Doc:
@@ -137,32 +135,44 @@ client = Kraken.Auth(API_KEY, API_SECRET)
 Kraken API Doc:
 https://docs.kraken.com/api/
 
-### CoinDesk
-
-```python
-from trading_api_wrappers import CoinDesk
-client = CoinDesk()
-```
-
-Deprecated: the public BPI API is no longer available.
-
 ### CoinMarketCap
 
 ```python
 from trading_api_wrappers import CoinMarketCap
-client = CoinMarketCap()
+client = CoinMarketCap()                 # keyless public API
+client = CoinMarketCap(api_key=API_KEY)  # Pro API
 ```
 
-Deprecated: the public v1 API was shut down. Use the [CoinMarketCap Pro API](https://coinmarketcap.com/api/).
+CoinMarketCap API Doc:
+https://coinmarketcap.com/api/
 
 ### CryptoMKT
+
+Public API:
 
 ```python
 from trading_api_wrappers import CryptoMKT
 client = CryptoMKT.Public()
 ```
 
-Deprecated: API v1 returns `This API is deprecated, please change to api.exchange.cryptomkt.com`.
+Authenticated API:
+
+```python
+from trading_api_wrappers import CryptoMKT
+client = CryptoMKT.Auth(API_KEY, API_SECRET)
+```
+
+CryptoMarket API Doc:
+https://api.exchange.cryptomkt.com/
+
+### Ripio
+
+```python
+from trading_api_wrappers import Ripio
+client = Ripio.Public()
+rates = client.rates()
+book = client.exchange.order_book("BTC_BRL")
+```
 
 ### OpenExchangeRates
 

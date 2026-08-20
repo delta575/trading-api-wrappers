@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import socket
 import unittest
 
 from decouple import config
@@ -20,3 +21,13 @@ def skip_without(*names: str):
     missing = [name for name in names if not env(name)]
     reason = f"missing credentials: {', '.join(missing)}"
     return unittest.skipIf(bool(missing), reason)
+
+
+def skip_unless_host(host: str, port: int = 443):
+    """Skip when a remote API host cannot be resolved."""
+    try:
+        socket.getaddrinfo(host, port)
+        reachable = True
+    except OSError:
+        reachable = False
+    return unittest.skipUnless(reachable, f"{host} is not reachable")

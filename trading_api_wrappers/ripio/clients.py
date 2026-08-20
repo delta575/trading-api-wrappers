@@ -1,56 +1,52 @@
-import warnings
 
 from ..base import Client, ModelMixin
+from ..errors import InvalidResponse
 from . import models as _m
 
 
 class RipioExchangePublic(Client, ModelMixin):
-    """API Doc: https://www.ripio.com/docs/#ripio-exchange"""
+    """Ripio Trade public REST API (v4)."""
 
-    base_url = "https://exchange.ripio.com/api/v1/"
-    error_keys = ["detail"]
+    base_url = "https://api.ripiotrade.co/v4/"
+    error_keys = ["message"]
 
-    def __init__(self, *args, **kwargs):
-        warnings.warn(
-            "Ripio Exchange API v1 is no longer available (moved to Ripio Trade). "
-            "This client is deprecated.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        super().__init__(*args, **kwargs)
+    def _decode_response(self, response):
+        payload = super()._decode_response(response)
+        if isinstance(payload, dict) and "data" in payload:
+            if payload.get("error_code"):
+                raise InvalidResponse(payload.get("message") or str(payload["error_code"]), response)
+            return payload["data"]
+        return payload
+
+    def pairs(self):
+        return self.get("public/pairs")
+
+    def tickers(self):
+        return self.get("public/tickers")
+
+    def ticker(self, pair: str):
+        pair = str(pair)
+        for item in self.tickers():
+            if item.get("pair") == pair:
+                return item
+        raise KeyError(pair)
 
     def order_books(self):
-        """Fetch order books for all markets"""
-        data = self.get("book/")
-        if self.return_json:
-            return data
-        return {
-            market: _m.OrderBook.create_from_json(book) for market, book in data.items()
-        }
+        """Return tickers for all pairs (Trade API has no bulk order-book)."""
+        return {item["pair"]: item for item in self.tickers()}
 
-    def order_book(self, market: str):
-        """Fetch order book for the provided market"""
-        data = self.order_books()
-        return data[market]
-
-
-# TODO: Ripio Auth not implemented
-class RipioExchangeAuth(RipioExchangePublic):
-    def trades(self, page: int = None):
-        """Fetch last trades"""
+    def order_book(self, pair: str, limit: int | None = None):
         data = self.get(
-            "trades/",
-            params={
-                "page": page,
-            },
+            "public/orders/level-2",
+            params={"pair": str(pair), "limit": limit},
         )
         if self.return_json:
             return data
-        return _m.Trades.create_from_json(data)
+        return _m.OrderBook.create_from_json(data)
 
 
 class RipioPublic(Client, ModelMixin):
-    """API Doc: https://www.ripio.com/docs/#transactions"""
+    """Ripio retail rates API."""
 
     base_url = "https://ripio.com/api/v1/"
     error_keys = ["detail"]
@@ -71,7 +67,6 @@ class RipioPublic(Client, ModelMixin):
         return self.get("rates/")
 
     def rates(self):
-        """Fetch rates"""
         data = self.rates_raw()
         data = {"base": data["base"], "rates": data["rates"]}
         if self.return_json:
@@ -79,6 +74,5 @@ class RipioPublic(Client, ModelMixin):
         return _m.Rates.create_from_json(data)
 
     def variation(self):
-        """Fetch rates variation"""
         data = self.rates_raw()
         return data["variation"]

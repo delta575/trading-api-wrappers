@@ -2,71 +2,78 @@ from collections import namedtuple
 from datetime import datetime
 
 
-def parse_datetime(datetime_str):
-    if datetime_str:
-        return datetime.strptime(datetime_str, "%Y-%m-%d %H:%M")
+def parse_datetime(value):
+    if not value:
+        return None
+    if isinstance(value, datetime):
+        return value
+    text = str(value).replace("Z", "+00:00")
+    try:
+        return datetime.fromisoformat(text)
+    except ValueError:
+        return None
 
 
-def parse_iso_datetime(datetime_str):
-    if datetime_str:
-        return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%f")
+def float_or_none(value):
+    if value in (None, ""):
+        return None
+    return float(value)
 
 
-def check_null(value):
-    return value if value != "null" else None
-
-
-def int_or_null(value):
-    value = check_null(value)
-    return int(value) if value else None
-
-
-def float_or_null(value):
-    value = check_null(value)
-    return float(value) if value else None
-
-
-class Pagination(namedtuple("pagination", ["previous", "limit", "page", "next"])):
+class Market(
+    namedtuple(
+        "market",
+        [
+            "id",
+            "base_currency",
+            "quote_currency",
+            "status",
+            "json",
+        ],
+    )
+):
     @classmethod
-    def create_from_json(cls, meta):
-        if meta:
-            return cls(
-                previous=int_or_null(meta["previous"]),
-                limit=int(meta["limit"]),
-                page=int(meta["page"]),
-                next=int_or_null(meta["next"]),
-            )
-        return meta
+    def create_from_json(cls, symbol, market):
+        return cls(
+            id=symbol,
+            base_currency=market.get("base_currency"),
+            quote_currency=market.get("quote_currency"),
+            status=market.get("status"),
+            json=market,
+        )
 
 
 class Ticker(
     namedtuple(
         "ticker",
         [
-            "high",
-            "low",
+            "symbol",
             "ask",
             "bid",
-            "last_price",
+            "last",
+            "low",
+            "high",
+            "open",
             "volume",
-            "market",
+            "volume_quote",
             "timestamp",
             "json",
         ],
     )
 ):
     @classmethod
-    def create_from_json(cls, ticker):
-        ticker = ticker[0]
+    def create_from_json(cls, symbol, ticker):
         return cls(
-            high=float(ticker["high"]),
-            low=float(ticker["low"]),
-            ask=float(ticker["ask"]),
-            bid=float(ticker["bid"]),
-            last_price=float(ticker["last_price"]),
-            volume=float(ticker["volume"]),
-            market=ticker["market"],
-            timestamp=parse_iso_datetime(ticker["timestamp"]),
+            symbol=symbol,
+            ask=float_or_none(ticker.get("ask")),
+            bid=float_or_none(ticker.get("bid")),
+            last=float_or_none(ticker.get("last")),
+            low=float_or_none(ticker.get("low")),
+            high=float_or_none(ticker.get("high")),
+            open=float_or_none(ticker.get("open")),
+            volume=float_or_none(ticker.get("volume")),
+            volume_quote=float_or_none(ticker.get("volume_quote")),
+            timestamp=parse_datetime(ticker.get("timestamp")),
             json=ticker,
         )
 
@@ -77,81 +84,63 @@ class OrderBookEntry(
         [
             "price",
             "amount",
-            "timestamp",
-            "json",
         ],
     )
 ):
     @classmethod
     def create_from_json(cls, book_entry):
-        return cls(
-            price=float(book_entry["price"]),
-            amount=float(book_entry["amount"]),
-            timestamp=parse_iso_datetime(book_entry["timestamp"]),
-            json=book_entry,
-        )
+        return cls(price=float(book_entry[0]), amount=float(book_entry[1]))
 
 
 class OrderBook(
     namedtuple(
         "order_book",
         [
-            "order_book",
-            "pagination",
-        ],
-    )
-):
-    @classmethod
-    def create_from_json(cls, order_book, pagination):
-        return cls(
-            order_book=[
-                OrderBookEntry.create_from_json(book_entry) for book_entry in order_book
-            ],
-            pagination=Pagination.create_from_json(pagination),
-        )
-
-
-class TradesEntry(
-    namedtuple(
-        "trades_entry",
-        [
-            "market_taker",
+            "bids",
+            "asks",
             "timestamp",
-            "price",
-            "amount",
-            "market",
             "json",
         ],
     )
 ):
     @classmethod
-    def create_from_json(cls, trades_entry):
+    def create_from_json(cls, order_book):
         return cls(
-            market_taker=trades_entry["market_taker"],
-            timestamp=parse_iso_datetime(trades_entry["timestamp"]),
-            price=float(trades_entry["price"]),
-            amount=float(trades_entry["amount"]),
-            market=trades_entry["market"],
-            json=trades_entry,
+            bids=[
+                OrderBookEntry.create_from_json(entry)
+                for entry in order_book.get("bid") or []
+            ],
+            asks=[
+                OrderBookEntry.create_from_json(entry)
+                for entry in order_book.get("ask") or []
+            ],
+            timestamp=parse_datetime(order_book.get("timestamp")),
+            json=order_book,
         )
 
 
-class Trades(
+class Trade(
     namedtuple(
-        "trades",
+        "trade",
         [
-            "trades",
-            "pagination",
+            "id",
+            "price",
+            "quantity",
+            "side",
+            "timestamp",
+            "json",
         ],
     )
 ):
     @classmethod
-    def create_from_json(cls, trades, pagination):
+    def create_from_json(cls, trade):
         return cls(
-            trades=[
-                TradesEntry.create_from_json(trades_entry) for trades_entry in trades
-            ],
-            pagination=Pagination.create_from_json(pagination),
+            id=trade.get("id"),
+            price=float_or_none(trade.get("price")),
+            quantity=float_or_none(trade.get("qty")),
+            side=trade.get("side"),
+            timestamp=parse_datetime(trade.get("timestamp")),
+            json=trade,
         )
 
 
@@ -159,9 +148,9 @@ class WalletBalance(
     namedtuple(
         "wallet_balance",
         [
+            "currency",
             "available",
-            "balance",
-            "wallet",
+            "reserved",
             "json",
         ],
     )
@@ -169,53 +158,10 @@ class WalletBalance(
     @classmethod
     def create_from_json(cls, balance):
         return cls(
-            available=float(balance["available"]),
-            balance=float(balance["balance"]),
-            wallet=balance["wallet"],
+            currency=balance.get("currency"),
+            available=float_or_none(balance.get("available")),
+            reserved=float_or_none(balance.get("reserved")),
             json=balance,
-        )
-
-
-class Balance(
-    namedtuple(
-        "balance",
-        [
-            "ARS",
-            "CLP",
-            "ETH",
-        ],
-    )
-):
-    @classmethod
-    def create_from_json(cls, balance):
-        return cls(
-            ARS=cls.get_wallet_balance(balance, "ARS"),
-            CLP=cls.get_wallet_balance(balance, "CLP"),
-            ETH=cls.get_wallet_balance(balance, "ETH"),
-        )
-
-    @staticmethod
-    def get_wallet_balance(balance, wallet: str):
-        wallet = [b for b in balance if b["wallet"] == wallet]
-        return WalletBalance.create_from_json(wallet[0]) if wallet else None
-
-
-class OrderAmount(
-    namedtuple(
-        "wallet_balance",
-        [
-            "original",
-            "remaining",
-            "executed",
-        ],
-    )
-):
-    @classmethod
-    def create_from_json(cls, amount):
-        return cls(
-            original=float(amount["original"]),
-            remaining=float_or_null(amount.get("remaining")),
-            executed=float_or_null(amount.get("executed")),
         )
 
 
@@ -224,16 +170,14 @@ class Order(
         "order",
         [
             "id",
+            "client_order_id",
+            "symbol",
+            "side",
             "status",
             "type",
+            "quantity",
             "price",
-            "amount",
-            "execution_price",
-            "avg_execution_price",
-            "market",
             "created_at",
-            "updated_at",
-            "executed_at",
             "json",
         ],
     )
@@ -241,45 +185,14 @@ class Order(
     @classmethod
     def create_from_json(cls, order):
         return cls(
-            # Order ID
-            id=order["id"],
-            # Order status, 'active' or 'executed'
-            status=order["status"],
-            # Order type, 'buy' or 'sell'
-            type=order["type"],
-            # Order limit price
-            price=float(order["price"]),
-            # Order amount
-            amount=OrderAmount.create_from_json(order["amount"]),
-            # Order execution price
-            execution_price=float_or_null(order.get("execution_price")),
-            # Order weighted average execution, 0 if not executed
-            avg_execution_price=float_or_null(order.get("avg_execution_price")),
-            # Market pair
-            market=order["market"],
-            # Order creation timestamp
-            created_at=parse_iso_datetime(order["created_at"]),
-            # Order update timestamp. Only on active orders
-            updated_at=parse_iso_datetime(order.get("created_at")),
-            # Order execution timestamp. Only on executed orders
-            executed_at=parse_iso_datetime(order.get("executed_at")),
-            # Order JSON data
+            id=order.get("id"),
+            client_order_id=order.get("client_order_id"),
+            symbol=order.get("symbol"),
+            side=order.get("side"),
+            status=order.get("status"),
+            type=order.get("type"),
+            quantity=float_or_none(order.get("quantity")),
+            price=float_or_none(order.get("price")),
+            created_at=parse_datetime(order.get("created_at")),
             json=order,
-        )
-
-
-class Orders(
-    namedtuple(
-        "orders",
-        [
-            "orders",
-            "pagination",
-        ],
-    )
-):
-    @classmethod
-    def create_from_json(cls, orders, pagination):
-        return cls(
-            orders=[Order.create_from_json(order) for order in orders],
-            pagination=Pagination.create_from_json(pagination),
         )

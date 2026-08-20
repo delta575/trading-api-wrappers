@@ -9,12 +9,9 @@ __all__ = [
 
 
 class CryptoMKT:
-    # Models
     models = _m
-    # Enum Types
     Currency = _c.Currency
     Market = _c.Market
     OrderType = _c.OrderType
-    # Clients
     Auth = CryptoMKTAuth
     Public = CryptoMKTPublic

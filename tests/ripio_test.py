@@ -4,7 +4,7 @@ from trading_api_wrappers import Ripio
 from trading_api_wrappers.ripio import models
 from trading_api_wrappers.ripio.clients import RipioExchangePublic
 
-MARKET_ID = "ARS/BTC"
+MARKET_ID = "BTC_BRL"
 
 
 class RipioPublicTest(unittest.TestCase):
@@ -25,7 +25,6 @@ class RipioPublicTest(unittest.TestCase):
         self.assertIsInstance(rates, models.Rates)
 
 
-@unittest.skip("Ripio Exchange API v1 is no longer available")
 class RipioExchangePublicTest(unittest.TestCase):
     def setUp(self):
         self.client = Ripio.Public().exchange
@@ -33,11 +32,12 @@ class RipioExchangePublicTest(unittest.TestCase):
     def test_instantiate_client(self):
         self.assertIsInstance(self.client, RipioExchangePublic)
 
-    def test_order_books(self):
-        order_books = self.client.order_books()
-        for order_book in order_books.values():
-            self.assertIsInstance(order_book, models.OrderBook)
+    def test_tickers(self):
+        tickers = self.client.tickers()
+        self.assertGreater(len(tickers), 0)
+        self.assertIn("pair", tickers[0])
 
     def test_order_book(self):
-        order_book = self.client.order_book(MARKET_ID)
+        order_book = self.client.order_book(MARKET_ID, limit=5)
         self.assertIsInstance(order_book, models.OrderBook)
+        self.assertGreater(len(order_book.bids) + len(order_book.asks), 0)

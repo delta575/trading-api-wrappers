@@ -1,8 +1,9 @@
 import unittest
 from datetime import datetime
 
-from tests.helpers import env
+from tests.helpers import env, skip_without
 from trading_api_wrappers import BitfinexV2 as Bitfinex
+from trading_api_wrappers import InvalidResponse
 from trading_api_wrappers.bitfinex import models_v2 as models
 
 TEST = env("TEST") == "True"
@@ -57,3 +58,32 @@ class BitfinexPublicTest(unittest.TestCase):
         candles = self.client.candles_hist(SYMBOL, time_frame="1D")
         for candle in candles:
             self.assertIsInstance(candle, models.Candle)
+
+
+@skip_without("BFX_API_KEY", "BFX_API_SECRET")
+class BitfinexAuthTest(unittest.TestCase):
+    def setUp(self):
+        self.client = Bitfinex.Auth(API_KEY, API_SECRET)
+
+    def test_instantiate_client(self):
+        self.assertIsInstance(self.client, Bitfinex.Auth)
+
+    def test_wallets_returns_data(self):
+        response = self.client.wallets()
+        self.assertIsInstance(response, list)
+
+
+class BitfinexAuthTestBadApi(unittest.TestCase):
+    def setUp(self):
+        self.client = Bitfinex.Auth("BAD_KEY", "BAD_SECRET")
+
+    def test_instantiate_client(self):
+        self.assertIsInstance(self.client, Bitfinex.Auth)
+
+    def test_key_secret(self):
+        with self.assertRaises(TypeError):
+            Bitfinex.Auth()
+
+    def test_wallets_returns_error(self):
+        with self.assertRaises(InvalidResponse):
+            self.client.wallets()
