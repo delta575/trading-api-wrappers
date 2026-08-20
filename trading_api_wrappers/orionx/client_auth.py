@@ -24,6 +24,51 @@ query {
 }
 """
 
+TRANSFERS_QUERY = """
+query {
+  me {
+    deposits { _id amount status }
+    withdrawals { _id amount status }
+  }
+}
+"""
+
+ORDERS_QUERY = """
+query orders($onlyOpen: Boolean, $limit: Int) {
+  orders(onlyOpen: $onlyOpen, limit: $limit) {
+    _id
+    amount
+    limitPrice
+    sell
+    status
+    type
+    market { code }
+  }
+}
+"""
+
+PLACE_LIMIT = """
+mutation placeLimit($marketCode: ID, $amount: BigInt, $limitPrice: BigInt, $sell: Boolean) {
+  placeLimitOrder(marketCode: $marketCode, amount: $amount, limitPrice: $limitPrice, sell: $sell) {
+    _id type amount limitPrice status
+  }
+}
+"""
+
+PLACE_MARKET = """
+mutation placeMarket($marketCode: ID, $amount: BigInt, $sell: Boolean) {
+  placeMarketOrder(marketCode: $marketCode, amount: $amount, sell: $sell) {
+    _id type amount status
+  }
+}
+"""
+
+CANCEL_ORDER = """
+mutation cancel($orderId: ID) {
+  cancelOrder(orderId: $orderId) { _id status }
+}
+"""
+
 
 class OrionxHMACAuth(AuthBase):
     """Sign the raw JSON body: HMAC-SHA512(secret, timestamp + body)."""
@@ -63,3 +108,52 @@ class OrionxAuth(OrionxPublic, AuthMixin):
     def balances(self):
         me = (self.me() or {}).get("me") or {}
         return me.get("wallets") or []
+
+    def deposits(self):
+        me = (self.graphql(TRANSFERS_QUERY) or {}).get("me") or {}
+        return me.get("deposits") or []
+
+    def withdrawals(self):
+        me = (self.graphql(TRANSFERS_QUERY) or {}).get("me") or {}
+        return me.get("withdrawals") or []
+
+    def order_pages(self, only_open: bool = True, limit: int = 50):
+        data = self.graphql(ORDERS_QUERY, {"onlyOpen": only_open, "limit": limit})
+        return (data or {}).get("orders") or []
+
+    def open_orders(self, limit: int = 50):
+        return self.order_pages(only_open=True, limit=limit)
+
+    def order_details(self, order_id: str):
+        for order in self.order_pages(only_open=False, limit=100):
+            if str(order.get("_id")) == str(order_id):
+                return order
+        raise KeyError(order_id)
+
+    def new_order(
+        self,
+        market_code: str,
+        amount: int,
+        sell: bool,
+        limit_price: int | None = None,
+    ):
+        if limit_price is None:
+            data = self.graphql(
+                PLACE_MARKET,
+                {"marketCode": market_code, "amount": int(amount), "sell": bool(sell)},
+            )
+            return (data or {}).get("placeMarketOrder")
+        data = self.graphql(
+            PLACE_LIMIT,
+            {
+                "marketCode": market_code,
+                "amount": int(amount),
+                "limitPrice": int(limit_price),
+                "sell": bool(sell),
+            },
+        )
+        return (data or {}).get("placeLimitOrder")
+
+    def cancel_order(self, order_id: str):
+        data = self.graphql(CANCEL_ORDER, {"orderId": str(order_id)})
+        return (data or {}).get("cancelOrder")

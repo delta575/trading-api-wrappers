@@ -16,7 +16,10 @@ working books, not twenty thin wrappers.
 
 Native pair ids are used as-is (`BTCCLP`, `btc_mxn`, `BTC-BRL`, `btcbrl`,
 `BTCUSDT`). Public clients expose `markets()`, `ticker()`, `order_book()`,
-and `trades()`.
+`trades()`, `candles()`, and `quotation()` (Buda-style book walk). Auth
+clients expose `balances()`, `new_order()`, `cancel_order()`,
+`order_details()`, `open_orders()` / `order_pages()`, `deposits()`, and
+`withdrawals()` where the venue API has those calls.
 
 ### LATAM
 

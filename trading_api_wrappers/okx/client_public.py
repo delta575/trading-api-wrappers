@@ -2,10 +2,11 @@
 
 from ..base import Client, ModelMixin
 from ..errors import InvalidResponse
-from ..market import Market, OrderBook, Ticker, Trade
+from ..market import Candlestick, Market, OrderBook, Ticker, Trade
+from ..trading import BookQuotationMixin
 
 
-class OKXPublic(Client, ModelMixin):
+class OKXPublic(BookQuotationMixin, Client, ModelMixin):
     """OKX REST API v5 public market data."""
 
     base_url = "https://www.okx.com/api/v5/"
@@ -69,4 +70,24 @@ class OKXPublic(Client, ModelMixin):
                 timestamp=item.get("ts"),
             )
             for item in items
+        ]
+
+    def candles(self, inst_id: str = "BTC-USDT", bar: str = "1H", limit: int = 100):
+        rows = self.get(
+            "market/candles",
+            params={"instId": str(inst_id), "bar": bar, "limit": limit},
+        )
+        if self.return_json:
+            return rows
+        return [
+            Candlestick.create(
+                row,
+                timestamp=row[0],
+                open_price=row[1],
+                high=row[2],
+                low=row[3],
+                close=row[4],
+                volume=row[5],
+            )
+            for row in rows
         ]

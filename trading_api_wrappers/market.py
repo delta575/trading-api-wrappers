@@ -118,6 +118,131 @@ class OrderBook(
         )
 
 
+class Candlestick(
+    namedtuple(
+        "candlestick",
+        [
+            "timestamp",
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+            "json",
+        ],
+    )
+):
+    @classmethod
+    def create(
+        cls,
+        data,
+        *,
+        timestamp=None,
+        open_price=None,
+        high=None,
+        low=None,
+        close=None,
+        volume=None,
+    ):
+        return cls(
+            timestamp=timestamp,
+            open=_float(open_price),
+            high=_float(high),
+            low=_float(low),
+            close=_float(close),
+            volume=_float(volume),
+            json=data,
+        )
+
+
+class Quotation(
+    namedtuple(
+        "quotation",
+        [
+            "side",
+            "base_exchanged",
+            "quote_exchanged",
+            "average_price",
+            "incomplete",
+            "json",
+        ],
+    )
+):
+    pass
+
+
+_BUY_TYPES = {
+    "bid",
+    "buy",
+    "bid_given_size",
+    "bid_given_earned_base",
+    "bid_given_spent_quote",
+}
+_QUOTE_TYPES = {
+    "bid_given_spent_quote",
+    "ask_given_earned_quote",
+}
+
+
+def quote_from_book(book, quotation_type, amount, limit=None):
+    """Walk an order book the way Buda's quotation endpoint does.
+
+    ``quotation_type`` accepts Buda names (``bid_given_size``,
+    ``ask_given_spent_base``, …) or simply ``buy`` / ``sell``.
+    """
+    qtype = str(quotation_type).lower()
+    buy = qtype in _BUY_TYPES or qtype.startswith("bid")
+    quote_amount = qtype in _QUOTE_TYPES
+    levels = list(book.asks if buy else book.bids)
+    reverse = not buy
+    levels = sorted(levels, key=lambda entry: float(entry.price), reverse=reverse)
+
+    remaining = float(amount)
+    base = 0.0
+    quote = 0.0
+    limit_px = float(limit) if limit not in (None, "") else None
+
+    for entry in levels:
+        price = float(entry.price)
+        available = float(entry.amount)
+        if limit_px is not None:
+            if buy and price > limit_px:
+                continue
+            if not buy and price < limit_px:
+                continue
+        if quote_amount:
+            take_quote = min(remaining, available * price)
+            take_base = take_quote / price if price else 0.0
+            remaining -= take_quote
+        else:
+            take_base = min(remaining, available)
+            take_quote = take_base * price
+            remaining -= take_base
+        base += take_base
+        quote += take_quote
+        if remaining <= 1e-12:
+            remaining = 0.0
+            break
+
+    avg = (quote / base) if base else None
+    payload = {
+        "side": "buy" if buy else "sell",
+        "base_exchanged": base,
+        "quote_exchanged": quote,
+        "average_price": avg,
+        "incomplete": remaining > 1e-12,
+        "remaining": remaining,
+    }
+    return Quotation(
+        side=payload["side"],
+        base_exchanged=base,
+        quote_exchanged=quote,
+        average_price=avg,
+        incomplete=payload["incomplete"],
+        json=payload,
+    )
+
+
 class Trade(
     namedtuple(
         "trade",

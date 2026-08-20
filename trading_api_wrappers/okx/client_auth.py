@@ -57,3 +57,56 @@ class OKXAuth(OKXPublic, AuthMixin):
 
     def balances(self):
         return self.get("account/balance")
+
+    def new_order(
+        self,
+        inst_id: str,
+        side: str,
+        sz: float,
+        px: float | None = None,
+        ord_type: str = "limit",
+        td_mode: str = "cash",
+        **kwargs,
+    ):
+        payload = {
+            "instId": str(inst_id),
+            "tdMode": td_mode,
+            "side": str(side).lower(),
+            "ordType": str(ord_type).lower(),
+            "sz": str(sz),
+            "px": str(px) if px is not None else None,
+            **kwargs,
+        }
+        return self.post("trade/order", json=payload)
+
+    def cancel_order(self, inst_id: str, ord_id: str | None = None, **kwargs):
+        payload = {"instId": str(inst_id), "ordId": ord_id, **kwargs}
+        return self.post("trade/cancel-order", json=payload)
+
+    def order_details(self, inst_id: str, ord_id: str | None = None, **kwargs):
+        return self.get(
+            "trade/order",
+            params={"instId": str(inst_id), "ordId": ord_id, **kwargs},
+        )
+
+    def open_orders(self, inst_type: str = "SPOT", inst_id: str | None = None):
+        return self.get(
+            "trade/orders-pending",
+            params={"instType": inst_type, "instId": inst_id},
+        )
+
+    def order_pages(self, inst_type: str = "SPOT", **params):
+        return self.get(
+            "trade/orders-history",
+            params={"instType": inst_type, **params},
+        )
+
+    def deposits(self, **params):
+        return self.get("asset/deposit-history", params=params)
+
+    def withdrawals(self, **params):
+        return self.get("asset/withdrawal-history", params=params)
+
+    def withdrawal(self, ccy: str, amt: float, to_addr: str, **kwargs):
+        payload = {"ccy": ccy, "amt": str(amt), "toAddr": to_addr, **kwargs}
+        return self.post("asset/withdrawal", json=payload)

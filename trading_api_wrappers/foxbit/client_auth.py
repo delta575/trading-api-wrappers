@@ -50,3 +50,49 @@ class FoxbitAuth(FoxbitPublic, AuthMixin):
 
     def open_orders(self, market_symbol: str | None = None):
         return self.get("orders", params={"market_symbol": market_symbol})
+
+    def new_order(
+        self,
+        market_symbol: str,
+        side: str,
+        quantity: float,
+        price: float | None = None,
+        order_type: str = "LIMIT",
+        **kwargs,
+    ):
+        payload = {
+            "market_symbol": str(market_symbol),
+            "side": str(side).upper(),
+            "type": str(order_type).upper(),
+            "quantity": str(quantity),
+            "price": str(price) if price is not None else None,
+            **kwargs,
+        }
+        return self.post("orders", json=payload)
+
+    def cancel_order(self, order_id: str, **kwargs):
+        payload = {"id": order_id, **kwargs}
+        return self.put("orders/cancel", json=payload)
+
+    def order_details(self, order_id: str):
+        return self.get(f"orders/by-order-id/{order_id}")
+
+    def order_pages(self, market_symbol: str | None = None, **params):
+        return self.get("orders", params={"market_symbol": market_symbol, **params})
+
+    def deposits(self, **params):
+        return self.get("deposits", params=params)
+
+    def withdrawals(self, **params):
+        return self.get("withdrawals", params=params)
+
+    def withdrawal(self, currency_symbol: str, amount: float, **kwargs):
+        payload = {
+            "currency_symbol": str(currency_symbol),
+            "amount": str(amount),
+            **kwargs,
+        }
+        return self.post("withdrawals", json=payload)
+
+    def deposit_address(self, **params):
+        return self.get("deposits/address", params=params)

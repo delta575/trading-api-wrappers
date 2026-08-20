@@ -48,3 +48,54 @@ class BinanceAuth(BinancePublic, AuthMixin):
 
     def balances(self):
         return self.account().get("balances")
+
+    def new_order(
+        self,
+        symbol: str,
+        side: str,
+        quantity: float,
+        price: float | None = None,
+        order_type: str = "LIMIT",
+        **kwargs,
+    ):
+        params = {
+            "symbol": str(symbol),
+            "side": str(side).upper(),
+            "type": str(order_type).upper(),
+            "quantity": quantity,
+            "price": price,
+            **kwargs,
+        }
+        return self.post("order", params=params)
+
+    def cancel_order(self, symbol: str, order_id: int | None = None, **kwargs):
+        params = {"symbol": str(symbol), "orderId": order_id, **kwargs}
+        return self.delete("order", params=params)
+
+    def order_details(self, symbol: str, order_id: int | None = None, **kwargs):
+        params = {"symbol": str(symbol), "orderId": order_id, **kwargs}
+        return self.get("order", params=params)
+
+    def open_orders(self, symbol: str | None = None):
+        return self.get("openOrders", params={"symbol": symbol})
+
+    def order_pages(self, symbol: str, **params):
+        return self.get("allOrders", params={"symbol": str(symbol), **params})
+
+    def deposits(self, coin: str | None = None, **params):
+        return self.get(
+            "/sapi/v1/capital/deposit/hisrec",
+            params={"coin": coin, **params},
+        )
+
+    def withdrawals(self, coin: str | None = None, **params):
+        return self.get(
+            "/sapi/v1/capital/withdraw/history",
+            params={"coin": coin, **params},
+        )
+
+    def withdrawal(self, coin: str, address: str, amount: float, **kwargs):
+        return self.post(
+            "/sapi/v1/capital/withdraw/apply",
+            params={"coin": coin, "address": address, "amount": amount, **kwargs},
+        )

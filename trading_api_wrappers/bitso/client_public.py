@@ -2,10 +2,11 @@
 
 from ..base import Client, ModelMixin
 from ..errors import InvalidResponse
-from ..market import Market, OrderBook, Ticker, Trade
+from ..market import Candlestick, Market, OrderBook, Ticker, Trade
+from ..trading import BookQuotationMixin
 
 
-class BitsoPublic(Client, ModelMixin):
+class BitsoPublic(BookQuotationMixin, Client, ModelMixin):
     """Bitso public trading API v3."""
 
     base_url = "https://api.bitso.com/api/v3/"
@@ -68,6 +69,26 @@ class BitsoPublic(Client, ModelMixin):
                 amount=item.get("amount"),
                 side=item.get("maker_side") or item.get("side"),
                 timestamp=item.get("created_at"),
+            )
+            for item in items
+        ]
+
+    def candles(self, book: str = "btc_mxn", time_bucket: int = 3600):
+        items = self.get(
+            "ohlc/",
+            params={"book": str(book), "time_bucket": time_bucket},
+        )
+        if self.return_json:
+            return items
+        return [
+            Candlestick.create(
+                item,
+                timestamp=item.get("bucket_start_time"),
+                open_price=item.get("first_rate"),
+                high=item.get("max_rate"),
+                low=item.get("min_rate"),
+                close=item.get("last_rate"),
+                volume=item.get("volume"),
             )
             for item in items
         ]

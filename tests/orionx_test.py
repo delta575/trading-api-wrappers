@@ -2,7 +2,7 @@ import unittest
 
 from tests.helpers import env, skip_http, skip_without
 from trading_api_wrappers import Orionx
-from trading_api_wrappers.market import OrderBook, Ticker
+from trading_api_wrappers.market import OrderBook, Quotation, Ticker
 
 
 class OrionxPublicTest(unittest.TestCase):
@@ -27,6 +27,11 @@ class OrionxPublicTest(unittest.TestCase):
         book = self.client.order_book("BTCCLP", limit=5)
         self.assertIsInstance(book, OrderBook)
         self.assertGreater(len(book.bids) + len(book.asks), 0)
+
+    @skip_http(500)
+    def test_quotation(self):
+        quoted = self.client.quotation("BTCCLP", "buy", 0.0001)
+        self.assertIsInstance(quoted, Quotation)
 
 
 @skip_without("ORIONX_API_KEY", "ORIONX_API_SECRET")

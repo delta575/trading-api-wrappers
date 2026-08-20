@@ -54,3 +54,74 @@ class BybitAuth(BybitPublic, AuthMixin):
         return self.get(
             "account/wallet-balance", params={"accountType": account_type}
         )
+
+    def new_order(
+        self,
+        symbol: str,
+        side: str,
+        qty: float,
+        price: float | None = None,
+        order_type: str = "Limit",
+        category: str | None = None,
+        **kwargs,
+    ):
+        payload = {
+            "category": category or self.category,
+            "symbol": str(symbol),
+            "side": str(side).capitalize(),
+            "orderType": order_type,
+            "qty": str(qty),
+            "price": str(price) if price is not None else None,
+            **kwargs,
+        }
+        return self.post("order/create", json=payload)
+
+    def cancel_order(
+        self, symbol: str, order_id: str | None = None, category: str | None = None, **kwargs
+    ):
+        payload = {
+            "category": category or self.category,
+            "symbol": str(symbol),
+            "orderId": order_id,
+            **kwargs,
+        }
+        return self.post("order/cancel", json=payload)
+
+    def order_details(
+        self, symbol: str, order_id: str | None = None, category: str | None = None, **kwargs
+    ):
+        return self.get(
+            "order/realtime",
+            params={
+                "category": category or self.category,
+                "symbol": str(symbol),
+                "orderId": order_id,
+                **kwargs,
+            },
+        )
+
+    def open_orders(self, symbol: str | None = None, category: str | None = None):
+        return self.get(
+            "order/realtime",
+            params={"category": category or self.category, "symbol": symbol},
+        )
+
+    def order_pages(self, symbol: str | None = None, category: str | None = None, **params):
+        return self.get(
+            "order/history",
+            params={
+                "category": category or self.category,
+                "symbol": symbol,
+                **params,
+            },
+        )
+
+    def deposits(self, **params):
+        return self.get("asset/deposit/query-record", params=params)
+
+    def withdrawals(self, **params):
+        return self.get("asset/withdraw/query-record", params=params)
+
+    def withdrawal(self, coin: str, amount: float, address: str, **kwargs):
+        payload = {"coin": coin, "amount": str(amount), "address": address, **kwargs}
+        return self.post("asset/withdraw/create", json=payload)

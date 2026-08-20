@@ -1,10 +1,11 @@
 """Binance public REST client (spot)."""
 
 from ..base import Client, ModelMixin
-from ..market import Market, OrderBook, Ticker, Trade
+from ..market import Candlestick, Market, OrderBook, Ticker, Trade
+from ..trading import BookQuotationMixin
 
 
-class BinancePublic(Client, ModelMixin):
+class BinancePublic(BookQuotationMixin, Client, ModelMixin):
     """Binance Spot REST API v3."""
 
     base_url = "https://api.binance.com/api/v3/"
@@ -61,4 +62,24 @@ class BinancePublic(Client, ModelMixin):
                 timestamp=item.get("time"),
             )
             for item in items
+        ]
+
+    def candles(self, symbol: str = "BTCUSDT", interval: str = "1h", limit: int = 100):
+        rows = self.get(
+            "klines",
+            params={"symbol": str(symbol), "interval": interval, "limit": limit},
+        )
+        if self.return_json:
+            return rows
+        return [
+            Candlestick.create(
+                row,
+                timestamp=row[0],
+                open_price=row[1],
+                high=row[2],
+                low=row[3],
+                close=row[4],
+                volume=row[5],
+            )
+            for row in rows
         ]

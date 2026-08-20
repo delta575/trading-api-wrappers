@@ -2,7 +2,14 @@ import unittest
 
 from tests.helpers import env, skip_http, skip_without
 from trading_api_wrappers import Binance
-from trading_api_wrappers.market import Market, OrderBook, Ticker, Trade
+from trading_api_wrappers.market import (
+    Candlestick,
+    Market,
+    OrderBook,
+    Quotation,
+    Ticker,
+    Trade,
+)
 
 SYMBOL = "BTCUSDT"
 
@@ -38,6 +45,18 @@ class BinancePublicTest(unittest.TestCase):
         self.assertIsInstance(trades, list)
         if trades:
             self.assertIsInstance(trades[0], Trade)
+
+    @skip_http(403, 451)
+    def test_candles(self):
+        candles = self.client.candles(SYMBOL, interval="1h", limit=3)
+        self.assertGreater(len(candles), 0)
+        self.assertIsInstance(candles[0], Candlestick)
+
+    @skip_http(403, 451)
+    def test_quotation(self):
+        quoted = self.client.quotation(SYMBOL, "buy", 0.001)
+        self.assertIsInstance(quoted, Quotation)
+        self.assertGreater(quoted.base_exchanged, 0)
 
 
 @skip_without("BINANCE_API_KEY", "BINANCE_API_SECRET")

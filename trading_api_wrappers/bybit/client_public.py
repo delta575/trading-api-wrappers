@@ -2,10 +2,11 @@
 
 from ..base import Client, ModelMixin
 from ..errors import InvalidResponse
-from ..market import Market, OrderBook, Ticker, Trade
+from ..market import Candlestick, Market, OrderBook, Ticker, Trade
+from ..trading import BookQuotationMixin
 
 
-class BybitPublic(Client, ModelMixin):
+class BybitPublic(BookQuotationMixin, Client, ModelMixin):
     """Bybit v5 public market data. Defaults to spot."""
 
     base_url = "https://api.bybit.com/v5/"
@@ -96,4 +97,36 @@ class BybitPublic(Client, ModelMixin):
                 timestamp=item.get("time"),
             )
             for item in items or []
+        ]
+
+    def candles(
+        self,
+        symbol: str = "BTCUSDT",
+        interval: str = "60",
+        limit: int = 100,
+        category: str | None = None,
+    ):
+        data = self.get(
+            "market/kline",
+            params={
+                "category": category or self.category,
+                "symbol": str(symbol),
+                "interval": interval,
+                "limit": limit,
+            },
+        )
+        rows = data.get("list") if isinstance(data, dict) else data
+        if self.return_json:
+            return rows
+        return [
+            Candlestick.create(
+                row,
+                timestamp=row[0],
+                open_price=row[1],
+                high=row[2],
+                low=row[3],
+                close=row[4],
+                volume=row[5],
+            )
+            for row in rows or []
         ]

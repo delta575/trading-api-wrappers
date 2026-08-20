@@ -2,7 +2,7 @@ import unittest
 
 from tests.helpers import env, skip_without
 from trading_api_wrappers import NotBank
-from trading_api_wrappers.market import Market, OrderBook, Ticker, Trade
+from trading_api_wrappers.market import Market, OrderBook, Quotation, Ticker, Trade
 
 
 class NotBankPublicTest(unittest.TestCase):
@@ -34,6 +34,15 @@ class NotBankPublicTest(unittest.TestCase):
         self.assertIsInstance(trades, list)
         if trades:
             self.assertIsInstance(trades[0], Trade)
+
+    def test_quotation(self):
+        quoted = self.client.quotation("BTCCLP", "buy", 0.0001)
+        self.assertIsInstance(quoted, Quotation)
+        self.assertGreater(quoted.base_exchanged, 0)
+
+    def test_candles(self):
+        candles = self.client.candles("BTCCLP")
+        self.assertIsInstance(candles, list)
 
 
 @skip_without("NOTBANK_API_KEY", "NOTBANK_API_SECRET", "NOTBANK_USER_ID")

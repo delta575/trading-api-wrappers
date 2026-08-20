@@ -2,7 +2,14 @@ import unittest
 
 from tests.helpers import env, skip_without
 from trading_api_wrappers import OKX
-from trading_api_wrappers.market import Market, OrderBook, Ticker, Trade
+from trading_api_wrappers.market import (
+    Candlestick,
+    Market,
+    OrderBook,
+    Quotation,
+    Ticker,
+    Trade,
+)
 
 SYMBOL = "BTC-USDT"
 
@@ -34,6 +41,16 @@ class OKXPublicTest(unittest.TestCase):
         self.assertIsInstance(trades, list)
         if trades:
             self.assertIsInstance(trades[0], Trade)
+
+    def test_candles(self):
+        candles = self.client.candles(SYMBOL, bar="1H", limit=3)
+        self.assertGreater(len(candles), 0)
+        self.assertIsInstance(candles[0], Candlestick)
+
+    def test_quotation(self):
+        quoted = self.client.quotation(SYMBOL, "buy", 0.0001)
+        self.assertIsInstance(quoted, Quotation)
+        self.assertGreater(quoted.base_exchanged, 0)
 
 
 @skip_without("OKX_API_KEY", "OKX_API_SECRET", "OKX_PASSPHRASE")

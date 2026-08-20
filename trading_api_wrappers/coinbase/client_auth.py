@@ -65,3 +65,52 @@ class CoinbaseAuth(CoinbasePublic, AuthMixin):
 
     def balances(self):
         return self.accounts()
+
+    def new_order(
+        self,
+        product_id: str,
+        side: str,
+        size: float,
+        price: float | None = None,
+        order_type: str = "limit",
+        **kwargs,
+    ):
+        payload = {
+            "product_id": str(product_id),
+            "side": str(side).lower(),
+            "size": str(size),
+            "type": str(order_type).lower(),
+            "price": str(price) if price is not None else None,
+            **kwargs,
+        }
+        return self.post("orders", json=payload)
+
+    def cancel_order(self, order_id: str):
+        return self.delete(f"orders/{order_id}")
+
+    def order_details(self, order_id: str):
+        return self.get(f"orders/{order_id}")
+
+    def open_orders(self, product_id: str | None = None, **params):
+        return self.get(
+            "orders",
+            params={"product_id": product_id, "status": "open", **params},
+        )
+
+    def order_pages(self, product_id: str | None = None, **params):
+        return self.get("orders", params={"product_id": product_id, **params})
+
+    def deposits(self, **params):
+        return self.get("transfers", params={"type": "deposit", **params})
+
+    def withdrawals(self, **params):
+        return self.get("transfers", params={"type": "withdraw", **params})
+
+    def withdrawal(self, currency: str, amount: float, crypto_address: str, **kwargs):
+        payload = {
+            "currency": currency,
+            "amount": str(amount),
+            "crypto_address": crypto_address,
+            **kwargs,
+        }
+        return self.post("withdrawals/crypto", json=payload)

@@ -1,10 +1,13 @@
 """Mercado Bitcoin public REST client (Brazil, BRL)."""
 
+import time
+
 from ..base import Client, ModelMixin
-from ..market import Market, OrderBook, Ticker, Trade
+from ..market import Candlestick, Market, OrderBook, Ticker, Trade
+from ..trading import BookQuotationMixin
 
 
-class MercadoBitcoinPublic(Client, ModelMixin):
+class MercadoBitcoinPublic(BookQuotationMixin, Client, ModelMixin):
     """Mercado Bitcoin Data API v4."""
 
     base_url = "https://api.mercadobitcoin.net/api/v4/"
@@ -61,3 +64,43 @@ class MercadoBitcoinPublic(Client, ModelMixin):
             )
             for item in items
         ]
+
+    def candles(
+        self,
+        symbol: str = "BTC-BRL",
+        resolution: str = "1h",
+        to: int | None = None,
+        from_time: int | None = None,
+    ):
+        params = {
+            "symbol": str(symbol),
+            "resolution": resolution,
+            "to": to or int(time.time()),
+            "from": from_time or int(time.time()) - 86_400 * 2,
+        }
+        data = self.get("candles", params=params)
+        if self.return_json:
+            return data
+        stamps = data.get("t") or []
+        candles = []
+        for i, ts in enumerate(stamps):
+            row = {
+                "t": ts,
+                "o": (data.get("o") or [None])[i] if i < len(data.get("o") or []) else None,
+                "h": (data.get("h") or [None])[i] if i < len(data.get("h") or []) else None,
+                "l": (data.get("l") or [None])[i] if i < len(data.get("l") or []) else None,
+                "c": (data.get("c") or [None])[i] if i < len(data.get("c") or []) else None,
+                "v": (data.get("v") or [None])[i] if i < len(data.get("v") or []) else None,
+            }
+            candles.append(
+                Candlestick.create(
+                    row,
+                    timestamp=ts,
+                    open_price=row["o"],
+                    high=row["h"],
+                    low=row["l"],
+                    close=row["c"],
+                    volume=row["v"],
+                )
+            )
+        return candles

@@ -1,10 +1,11 @@
 """Coinbase Exchange public REST client (USD book)."""
 
 from ..base import Client, ModelMixin
-from ..market import Market, OrderBook, Ticker, Trade
+from ..market import Candlestick, Market, OrderBook, Ticker, Trade
+from ..trading import BookQuotationMixin
 
 
-class CoinbasePublic(Client, ModelMixin):
+class CoinbasePublic(BookQuotationMixin, Client, ModelMixin):
     """Coinbase Exchange (pro) public API, not Advanced Trade retail."""
 
     base_url = "https://api.exchange.coinbase.com/"
@@ -58,4 +59,24 @@ class CoinbasePublic(Client, ModelMixin):
                 timestamp=item.get("time"),
             )
             for item in items
+        ]
+
+    def candles(self, product_id: str = "BTC-USD", granularity: int = 3600):
+        rows = self.get(
+            f"products/{product_id}/candles",
+            params={"granularity": granularity},
+        )
+        if self.return_json:
+            return rows
+        return [
+            Candlestick.create(
+                row,
+                timestamp=row[0],
+                open_price=row[3],
+                high=row[2],
+                low=row[1],
+                close=row[4],
+                volume=row[5],
+            )
+            for row in rows
         ]

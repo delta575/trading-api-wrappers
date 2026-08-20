@@ -106,3 +106,8 @@ class BudaPublic(Client, ModelMixin):
         if self.return_json:
             return data
         return [_m.Candlestick.create_from_json(report) for report in data["reports"]]
+
+    def candles(
+        self, market_id: str, start_at: datetime = None, end_at: datetime = None
+    ):
+        return self.report_candlestick(market_id, start_at, end_at)

@@ -7,7 +7,8 @@ for a working book.
 
 from ..base import Client, ModelMixin
 from ..errors import InvalidResponse
-from ..market import Market, OrderBook, Ticker, Trade
+from ..market import Candlestick, Market, OrderBook, Ticker, Trade
+from ..trading import BookQuotationMixin
 
 MARKETS_QUERY = """
 query {
@@ -55,8 +56,22 @@ query trades($code: ID, $limit: Int) {
 }
 """
 
+STATS_QUERY = """
+query stats($code: ID!, $aggregation: MarketStatsAggregation!) {
+  marketStats(marketCode: $code, aggregation: $aggregation) {
+    open
+    close
+    high
+    low
+    volume
+    fromDate
+    toDate
+  }
+}
+"""
 
-class OrionxPublic(Client, ModelMixin):
+
+class OrionxPublic(BookQuotationMixin, Client, ModelMixin):
     """Orionx GraphQL API without request signing."""
 
     base_url = "https://api2.orionx.com/"
@@ -121,6 +136,28 @@ class OrionxPublic(Client, ModelMixin):
                 amount=item.get("amount"),
                 side=item.get("type"),
                 timestamp=item.get("datetime"),
+            )
+            for item in items
+        ]
+
+    def candles(self, market_code: str = "BTCCLP", aggregation: str = "h1"):
+        data = self.graphql(
+            STATS_QUERY, {"code": str(market_code), "aggregation": aggregation}
+        )
+        items = (data or {}).get("marketStats") or []
+        if isinstance(items, dict):
+            items = [items]
+        if self.return_json:
+            return items
+        return [
+            Candlestick.create(
+                item,
+                timestamp=item.get("fromDate") or item.get("toDate"),
+                open_price=item.get("open"),
+                high=item.get("high"),
+                low=item.get("low"),
+                close=item.get("close"),
+                volume=item.get("volume"),
             )
             for item in items
         ]

@@ -77,3 +77,42 @@ class MercadoBitcoinAuth(Client, AuthMixin, ModelMixin):
 
     def list_orders(self, coin_pair: str, **params):
         return self._tapi("list_orders", coin_pair=str(coin_pair), **params)
+
+    def order_pages(self, coin_pair: str, **params):
+        return self.list_orders(coin_pair, **params)
+
+    def order_details(self, coin_pair: str, order_id: int):
+        return self._tapi("get_order", coin_pair=str(coin_pair), order_id=order_id)
+
+    def new_order(
+        self,
+        coin_pair: str,
+        side: str,
+        quantity: float,
+        limit_price: float | None = None,
+        **kwargs,
+    ):
+        side = str(side).lower()
+        method = "place_buy_order" if side in {"buy", "bid"} else "place_sell_order"
+        payload = {"coin_pair": str(coin_pair), "quantity": str(quantity), **kwargs}
+        if limit_price is not None:
+            payload["limit_price"] = str(limit_price)
+        return self._tapi(method, **payload)
+
+    def cancel_order(self, coin_pair: str, order_id: int):
+        return self._tapi("cancel_order", coin_pair=str(coin_pair), order_id=order_id)
+
+    def withdrawals(self, coin: str, **params):
+        return self._tapi("list_withdrawals", coin=str(coin), **params)
+
+    def withdrawal(self, coin: str, quantity: float, destiny: str, **kwargs):
+        return self._tapi(
+            "withdraw_coin",
+            coin=str(coin),
+            quantity=str(quantity),
+            destiny=destiny,
+            **kwargs,
+        )
+
+    def deposits(self, coin: str, **params):
+        return self._tapi("list_deposits", coin=str(coin), **params)

@@ -2,10 +2,11 @@
 
 from ..base import Client, ModelMixin
 from ..errors import InvalidResponse
-from ..market import Market, OrderBook, Ticker, Trade
+from ..market import Candlestick, Market, OrderBook, Ticker, Trade
+from ..trading import BookQuotationMixin
 
 
-class FoxbitPublic(Client, ModelMixin):
+class FoxbitPublic(BookQuotationMixin, Client, ModelMixin):
     """Foxbit REST API v3 public market data."""
 
     base_url = "https://api.foxbit.com.br/rest/v3/"
@@ -80,3 +81,25 @@ class FoxbitPublic(Client, ModelMixin):
             )
             for item in items
         ]
+
+    def candles(self, symbol: str = "btcbrl", interval: str = "1h", limit: int = 100):
+        rows = self.get(
+            f"markets/{symbol}/candlesticks",
+            params={"interval": interval, "limit": limit},
+        )
+        if self.return_json:
+            return rows
+        candles = []
+        for row in rows:
+            candles.append(
+                Candlestick.create(
+                    row,
+                    timestamp=row[0],
+                    open_price=row[1],
+                    high=row[2],
+                    low=row[3],
+                    close=row[4],
+                    volume=row[6] if len(row) > 6 else None,
+                )
+            )
+        return candles

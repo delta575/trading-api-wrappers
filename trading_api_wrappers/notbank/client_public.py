@@ -6,7 +6,8 @@ import json
 
 from ..base import Client, ModelMixin
 from ..errors import InvalidResponse
-from ..market import Market, OrderBook, OrderBookEntry, Ticker, Trade
+from ..market import Candlestick, Market, OrderBook, OrderBookEntry, Ticker, Trade
+from ..trading import BookQuotationMixin
 
 # AlphaPoint GetL2Snapshot row:
 # MDUpdateID, Accounts, ActionDateTime, ActionType, LastTradePrice,
@@ -25,7 +26,7 @@ _T_TS = 6
 _T_SIDE = 7
 
 
-class NotBankPublic(Client, ModelMixin):
+class NotBankPublic(BookQuotationMixin, Client, ModelMixin):
     """NotBank public market data. POST JSON to /AP/{Method}."""
 
     base_url = "https://api.notbank.exchange/AP/"
@@ -43,6 +44,8 @@ class NotBankPublic(Client, ModelMixin):
         return self.post(method, json=body)
 
     def _decode_response(self, response):
+        if not response.content:
+            return []
         payload = super()._decode_response(response)
         if isinstance(payload, dict) and payload.get("result") is False:
             raise InvalidResponse(payload.get("errormsg") or str(payload), response)
@@ -156,3 +159,51 @@ class NotBankPublic(Client, ModelMixin):
                 )
             )
         return trades
+
+    def candles(
+        self,
+        symbol: str = "BTCCLP",
+        interval: int = 60,
+        from_date: int | None = None,
+        to_date: int | None = None,
+    ):
+        import time
+
+        instrument_id = self._instrument_id(symbol)
+        now_ms = int(time.time() * 1000)
+        payload = {
+            "InstrumentId": instrument_id,
+            "Interval": interval,
+            "FromDate": from_date or (now_ms - 86_400_000),
+            "ToDate": to_date or now_ms,
+        }
+        rows = self._call("GetTickerHistory", payload)
+        if self.return_json:
+            return rows
+        candles = []
+        for row in rows or []:
+            if isinstance(row, (list, tuple)) and len(row) >= 5:
+                candles.append(
+                    Candlestick.create(
+                        row,
+                        timestamp=row[0],
+                        open_price=row[1],
+                        high=row[2],
+                        low=row[3],
+                        close=row[4],
+                        volume=row[5] if len(row) > 5 else None,
+                    )
+                )
+            elif isinstance(row, dict):
+                candles.append(
+                    Candlestick.create(
+                        row,
+                        timestamp=row.get("DateTime") or row.get("timestamp"),
+                        open_price=row.get("Open") or row.get("open"),
+                        high=row.get("High") or row.get("high"),
+                        low=row.get("Low") or row.get("low"),
+                        close=row.get("Close") or row.get("close"),
+                        volume=row.get("Volume") or row.get("volume"),
+                    )
+                )
+        return candles

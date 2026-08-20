@@ -48,3 +48,51 @@ class BitsoAuth(BitsoPublic, AuthMixin):
 
     def open_orders(self, book: str | None = None):
         return self.get("open_orders/", params={"book": book})
+
+    def new_order(
+        self,
+        book: str,
+        side: str,
+        amount: float,
+        price: float | None = None,
+        order_type: str = "limit",
+        **kwargs,
+    ):
+        payload = {
+            "book": str(book),
+            "side": str(side).lower(),
+            "type": str(order_type).lower(),
+            "major": str(amount),
+            "price": str(price) if price is not None else None,
+            **kwargs,
+        }
+        return self.post("orders/", json=payload)
+
+    def cancel_order(self, order_id: str):
+        return self.delete(f"orders/{order_id}/")
+
+    def order_details(self, order_id: str):
+        return self.get(f"orders/{order_id}/")
+
+    def order_pages(self, book: str | None = None, **params):
+        return self.get("orders/", params={"book": book, **params})
+
+    def ledger(self, **params):
+        return self.get("ledger/", params=params)
+
+    def deposits(self, **params):
+        return self.get("fundings/", params=params)
+
+    def withdrawals(self, **params):
+        return self.get("withdrawals/", params=params)
+
+    def withdrawal(
+        self, currency: str, amount: float, address: str | None = None, **kwargs
+    ):
+        payload = {
+            "currency": str(currency),
+            "amount": str(amount),
+            "address": address,
+            **kwargs,
+        }
+        return self.post("withdrawals/", json=payload)
