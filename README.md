@@ -1,36 +1,48 @@
 # Trading API Wrappers
 
-> Python 3.6+ clients for popular **Crypto Exchanges** and other useful services.
+Python 3.10+ clients for popular **crypto exchanges** and related services.
 
-> **Disclaimer:** Still at an early stage of development. Rapidly evolving APIs.
+> **Disclaimer:** Some upstream APIs have changed or shut down since this
+> library was first written. See [API status](#api-status) below.
 
 [![PyPI - License](https://img.shields.io/pypi/l/trading-api-wrappers.svg)](https://opensource.org/licenses/MIT)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/trading-api-wrappers.svg)
 [![PyPI](https://img.shields.io/pypi/v/trading-api-wrappers.svg)](https://pypi.org/project/trading-api-wrappers/)
 ![PyPI - Status](https://img.shields.io/pypi/status/trading-api-wrappers.svg)
-[![Updates](https://pyup.io/repos/github/delta575/trading-api-wrappers/shield.svg)](https://pyup.io/repos/github/delta575/trading-api-wrappers/)
 
-Supported APIs:
+## API status
 
-- [Buda](https://www.buda.com)
-- [Bitfinex](https://www.bitfinex.com)
-- [Bitstamp](https://www.bitstamp.net)
-- [CoinDesk](https://www.coindesk.com)
-- [CoinMarketCap](https://coinmarketcap.com)
-- [CryptoMKT](https://www.cryptomkt.com)
-- [Kraken](https://www.kraken.com)
-- [OpenExchangeRates](https://openexchangerates.org)
+| Client | Public API | Notes |
+| --- | --- | --- |
+| Buda | Active | Markets updated (SOL, USDT). ARS pairs removed. |
+| Bitfinex v1 / v2 | Active | v2 authenticated client is not implemented. |
+| Bitstamp | Active | |
+| Kraken | Active | |
+| SFOX | Active | |
+| Bitcoinity | Active | |
+| Ripio rates | Active | Exchange order-book client is deprecated. |
+| Open Exchange Rates | Active | Requires an app id. |
+| CurrencyLayer | Active | Requires an access key. |
+| CoinDesk | **Deprecated** | BPI host `api.coindesk.com` is gone. |
+| CoinMarketCap | **Deprecated** | Public v1 API was shut down. |
+| CryptoMKT | **Deprecated** | v1 API is retired; migrate to exchange API v3. |
+| Bitex | **Deprecated** | `bitex.la` is gone. |
+| SURBTC | **Deprecated** | Rebranded to Buda years ago. Use `Buda`. |
 
 ## Installation
 
 ### Requirements
 
-- Python 3.6+
+- Python 3.10+
 
-To install, simply use `poetry` (or `pip`, of course):
+To install, use `poetry` (or `pip`):
 
 ```bash
 $ poetry add trading-api-wrappers
+```
+
+```bash
+$ pip install trading-api-wrappers
 ```
 
 ### Dev setup
@@ -39,7 +51,13 @@ $ poetry add trading-api-wrappers
 $ poetry install
 ```
 
-Rename `.env.example` to `.env` and configure your credentials (for tests)
+Copy `.env.example` to `.env` and fill in credentials if you want to run
+authenticated tests. Public tests skip auth classes when keys are missing.
+
+```bash
+$ poetry run pytest
+$ poetry run ruff check .
+```
 
 ## Usage
 
@@ -79,7 +97,7 @@ client = Bitfinex.Auth(API_KEY, API_SECRET)
 ```
 
 Bitfinex API Doc:
-https://bitfinex.readme.io/v1/docs
+https://docs.bitfinex.com/docs
 
 ### Bitstamp
 
@@ -117,7 +135,7 @@ client = Kraken.Auth(API_KEY, API_SECRET)
 ```
 
 Kraken API Doc:
-https://www.kraken.com/help/api
+https://docs.kraken.com/api/
 
 ### CoinDesk
 
@@ -126,8 +144,7 @@ from trading_api_wrappers import CoinDesk
 client = CoinDesk()
 ```
 
-CoinDesk API Doc:
-https://www.coindesk.com/api
+Deprecated: the public BPI API is no longer available.
 
 ### CoinMarketCap
 
@@ -136,27 +153,16 @@ from trading_api_wrappers import CoinMarketCap
 client = CoinMarketCap()
 ```
 
-CoinMarketCap API Doc:
-https://coinmarketcap.com/api
+Deprecated: the public v1 API was shut down. Use the [CoinMarketCap Pro API](https://coinmarketcap.com/api/).
 
 ### CryptoMKT
-
-Public API:
 
 ```python
 from trading_api_wrappers import CryptoMKT
 client = CryptoMKT.Public()
 ```
 
-Authenticated API:
-
-```python
-from trading_api_wrappers import CryptoMKT
-client = CryptoMKT.Auth(API_KEY, API_SECRET)
-```
-
-CryptoMKT API Doc:
-https://developers.cryptomkt.com
+Deprecated: API v1 returns `This API is deprecated, please change to api.exchange.cryptomkt.com`.
 
 ### OpenExchangeRates
 
@@ -181,23 +187,10 @@ https://currencylayer.com/documentation
 ## Licence
 
 [![PyPI - License](https://img.shields.io/pypi/l/trading-api-wrappers.svg)](https://opensource.org/licenses/MIT)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdelta575%2Ftrading-api-wrappers.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdelta575%2Ftrading-api-wrappers?ref=badge_shield)
 
 The MIT License
 
-Copyright © 2017
+Copyright © 2017-2026
 [Felipe Aránguiz](mailto://faranguiz575@gmail.com) | [Sebastián Aránguiz](mailto://sarang575@gmail.com)
 
 See [LICENSE](LICENSE)
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdelta575%2Ftrading-api-wrappers.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdelta575%2Ftrading-api-wrappers?ref=badge_large)
-
-## Donations
-
-Bitcoin:
-
-    186kDw9LFcPvup17YSrWZbFqdZzELUFad3
-
-Ether:
-
-    0xeF38fA6c0a37A1BdB60CADd7f6e71F351F6d2583

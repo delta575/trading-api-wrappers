@@ -1,13 +1,24 @@
+import warnings
 from datetime import datetime
 
+from ..base import Client, ModelMixin
 from . import constants as _c
 from . import models as _m
-from ..base import Client, ModelMixin
 
 
 class CryptoMKTPublic(Client, ModelMixin):
     base_url = "https://api.cryptomkt.com/v1/"
     error_keys = ["message"]
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "CryptoMKT API v1 is deprecated. The exchange now uses "
+            "api.exchange.cryptomkt.com (API v2/v3). This client will be "
+            "removed or rewritten in a future release.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
     def markets(self):
         data = self.get("market")

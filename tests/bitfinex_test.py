@@ -1,13 +1,11 @@
 import unittest
 from datetime import datetime
 
-from decouple import config
+from tests.helpers import env, skip_without
+from trading_api_wrappers import Bitfinex, InvalidResponse
 
-from trading_api_wrappers import Bitfinex
-from trading_api_wrappers import InvalidResponse
-
-API_KEY = config("BFX_API_KEY")
-API_SECRET = config("BFX_API_SECRET")
+API_KEY = env("BFX_API_KEY")
+API_SECRET = env("BFX_API_SECRET")
 
 # Default parameters
 SYMBOL = Bitfinex.Symbol.BTCUSD
@@ -59,6 +57,7 @@ class BitfinexPublicTest(unittest.TestCase):
         self.assertIn("pair", response[0].keys())
 
 
+@skip_without("BFX_API_KEY", "BFX_API_SECRET")
 class BitfinexAuthTest(unittest.TestCase):
     def setUp(self):
         self.client = Bitfinex.Auth(API_KEY, API_SECRET)

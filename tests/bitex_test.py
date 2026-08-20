@@ -6,6 +6,7 @@ from trading_api_wrappers.bitex import models
 MARKET_ID = "btc_usd"
 
 
+@unittest.skip("bitex.la is no longer available")
 class BitexPublicTest(unittest.TestCase):
     def setUp(self):
         self.client = Bitex.Public()

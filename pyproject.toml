@@ -1,42 +1,58 @@
 [tool.poetry]
 name = "trading-api-wrappers"
-version = "0.18.1"
+version = "0.19.0"
 description = "Clients for popular Crypto Exchanges and other useful services"
 authors = ["Felipe Aranguiz <faranguiz575@gmail.com>", "Sebastian Aranguiz <sarang575@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/delta575/trading-bots"
-homepage = "https://github.com/snake575/trading-bots"
+repository = "https://github.com/delta575/trading-api-wrappers"
+homepage = "https://github.com/delta575/trading-api-wrappers"
+packages = [{ include = "trading_api_wrappers" }]
 classifiers = [
-    # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
-    'Development Status :: 4 - Beta',
-    'Intended Audience :: Developers',
-    'Natural Language :: English',
-    'License :: OSI Approved :: MIT License',
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.6',
-    'Programming Language :: Python :: 3.7',
-    'Programming Language :: Python :: Implementation :: CPython',
-    'Programming Language :: Python :: Implementation :: PyPy'
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6.2"
-backoff = "^1.11.1"
-importlib-metadata = {version = "^4.6.4", python = "<3.8"}
-requests = "^2.26.0"
-requests-toolbelt = "^0.9.1"
+python = ">=3.10,<4.0"
+backoff = "^2.2.1"
+requests = "^2.32.0"
+requests-toolbelt = "^1.0.0"
 
-[tool.poetry.dev-dependencies]
-python-decouple = "^3.4"
-coverage = "^5.5"
-pytest = "^6.2.4"
-black = {version = "^21.7b0", allow-prereleases = true}
-flake8 = "^3.9.2"
-flake8-bugbear = "^21.4.3"
+[tool.poetry.group.dev.dependencies]
+python-decouple = "^3.8"
+pytest = "^8.4.0"
+ruff = ">=0.8"
 
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "I", "UP"]
+ignore = [
+    "E501",  # line length handled by formatter / historical style
+    "B904",  # exception chaining; noisy on existing error wrappers
+]
+
+[tool.ruff.lint.per-file-ignores]
+"trading_api_wrappers/__init__.py" = ["F401", "F403"]
+"tests/*" = ["B018"]

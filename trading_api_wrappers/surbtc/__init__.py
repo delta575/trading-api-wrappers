@@ -8,20 +8,21 @@ __all__ = [
 
 deprecation_warning = (
     "SurBTC.com has changed to Buda.com, please use the `buda` package.",
-    PendingDeprecationWarning,
+    DeprecationWarning,
+    2,
 )
 
 
 class SURBTCAuth(BudaAuth):
     def __init__(self, *args, **kwargs):
         warnings.warn(*deprecation_warning)
-        super(SURBTCAuth, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class SURBTCPublic(BudaPublic):
     def __init__(self, *args, **kwargs):
         warnings.warn(*deprecation_warning)
-        super(SURBTCPublic, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class SURBTC(Buda):

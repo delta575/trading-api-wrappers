@@ -1,8 +1,8 @@
 from datetime import datetime
 
+from ..base import Client, ModelMixin
 from . import constants as _c
 from . import models as _m
-from ..base import Client, ModelMixin
 
 
 class BudaPublic(Client, ModelMixin):

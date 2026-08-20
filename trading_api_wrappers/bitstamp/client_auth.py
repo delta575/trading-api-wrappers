@@ -1,8 +1,8 @@
 from requests import PreparedRequest as P
 
-from .client_public import BitstampPublic
 from ..auth import HMACAuth
 from ..base import AuthMixin
+from .client_public import BitstampPublic
 
 
 class BitstampHMACAuth(HMACAuth):

@@ -1,4 +1,4 @@
-from ..base import _Enum, Currency, Market
+from ..base import Currency, Market, _Enum
 
 # Limits
 ORDERS_LIMIT = 300
@@ -6,7 +6,6 @@ TRANSFERS_LIMIT = 300
 
 
 class Currency(Currency):
-    ARS = dict(value="ARS")
     BCH = dict(value="BCH", decimals=8)
     BTC = dict(value="BTC", decimals=8)
     CLP = dict(value="CLP")
@@ -14,34 +13,38 @@ class Currency(Currency):
     ETH = dict(value="ETH", decimals=9)
     LTC = dict(value="LTC", decimals=8)
     PEN = dict(value="PEN")
+    SOL = dict(value="SOL", decimals=9)
     USDC = dict(value="USDC")
+    USDT = dict(value="USDT")
 
 
 class Market(Market):
-    BCH_ARS = dict(value="BCH-ARS", base=Currency.BCH, quote=Currency.ARS)
     BCH_BTC = dict(value="BCH-BTC", base=Currency.BCH, quote=Currency.BTC)
     BCH_CLP = dict(value="BCH-CLP", base=Currency.BCH, quote=Currency.CLP)
     BCH_COP = dict(value="BCH-COP", base=Currency.BCH, quote=Currency.COP)
-    BTC_ARS = dict(value="BTC-ARS", base=Currency.BTC, quote=Currency.ARS)
     BCH_PEN = dict(value="BCH-PEN", base=Currency.BCH, quote=Currency.PEN)
     BTC_CLP = dict(value="BTC-CLP", base=Currency.BTC, quote=Currency.CLP)
     BTC_COP = dict(value="BTC-COP", base=Currency.BTC, quote=Currency.COP)
     BTC_PEN = dict(value="BTC-PEN", base=Currency.BTC, quote=Currency.PEN)
-    ETH_ARS = dict(value="ETH-ARS", base=Currency.ETH, quote=Currency.ARS)
+    BTC_USDC = dict(value="BTC-USDC", base=Currency.BTC, quote=Currency.USDC)
     ETH_BTC = dict(value="ETH-BTC", base=Currency.ETH, quote=Currency.BTC)
     ETH_CLP = dict(value="ETH-CLP", base=Currency.ETH, quote=Currency.CLP)
     ETH_COP = dict(value="ETH-COP", base=Currency.ETH, quote=Currency.COP)
     ETH_PEN = dict(value="ETH-PEN", base=Currency.ETH, quote=Currency.PEN)
-    LTC_ARS = dict(value="LTC-ARS", base=Currency.LTC, quote=Currency.ARS)
     LTC_BTC = dict(value="LTC-BTC", base=Currency.LTC, quote=Currency.BTC)
     LTC_CLP = dict(value="LTC-CLP", base=Currency.LTC, quote=Currency.CLP)
     LTC_COP = dict(value="LTC-COP", base=Currency.LTC, quote=Currency.COP)
     LTC_PEN = dict(value="LTC-PEN", base=Currency.LTC, quote=Currency.PEN)
-    BTC_USDC = dict(value="BTC-USDC", base=Currency.BTC, quote=Currency.USDC)
-    USDC_ARS = dict(value="USDC-ARS", base=Currency.USDC, quote=Currency.ARS)
+    SOL_CLP = dict(value="SOL-CLP", base=Currency.SOL, quote=Currency.CLP)
+    SOL_COP = dict(value="SOL-COP", base=Currency.SOL, quote=Currency.COP)
+    SOL_PEN = dict(value="SOL-PEN", base=Currency.SOL, quote=Currency.PEN)
     USDC_CLP = dict(value="USDC-CLP", base=Currency.USDC, quote=Currency.CLP)
     USDC_COP = dict(value="USDC-COP", base=Currency.USDC, quote=Currency.COP)
     USDC_PEN = dict(value="USDC-PEN", base=Currency.USDC, quote=Currency.PEN)
+    USDT_CLP = dict(value="USDT-CLP", base=Currency.USDT, quote=Currency.CLP)
+    USDT_COP = dict(value="USDT-COP", base=Currency.USDT, quote=Currency.COP)
+    USDT_PEN = dict(value="USDT-PEN", base=Currency.USDT, quote=Currency.PEN)
+    USDT_USDC = dict(value="USDT-USDC", base=Currency.USDT, quote=Currency.USDC)
 
 
 class QuotationType(_Enum):

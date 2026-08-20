@@ -3,6 +3,7 @@ import unittest
 from trading_api_wrappers import CoinMarketCap
 
 
+@unittest.skip("CoinMarketCap public v1 API was shut down")
 class CoinMarketCapTest(unittest.TestCase):
     def setUp(self):
         self.client = CoinMarketCap()

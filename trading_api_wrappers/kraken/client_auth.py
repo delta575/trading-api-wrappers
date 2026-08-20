@@ -4,9 +4,9 @@ import hmac
 
 from requests import PreparedRequest as P
 
-from .client_public import KrakenPublic
 from ..auth import HMACAuth
 from ..base import AuthMixin
+from .client_public import KrakenPublic
 
 
 class KrakenHMACAuth(HMACAuth):

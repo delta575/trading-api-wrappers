@@ -1,14 +1,13 @@
 import unittest
 from datetime import datetime
 
-from decouple import config
-
+from tests.helpers import env
 from trading_api_wrappers import BitfinexV2 as Bitfinex
 from trading_api_wrappers.bitfinex import models_v2 as models
 
-TEST = config("TEST", cast=bool, default=False)
-API_KEY = config("BFX_API_KEY")
-API_SECRET = config("BFX_API_SECRET")
+TEST = env("TEST") == "True"
+API_KEY = env("BFX_API_KEY")
+API_SECRET = env("BFX_API_SECRET")
 
 # Default parameters
 SYMBOL = Bitfinex.Symbol.BTCUSD

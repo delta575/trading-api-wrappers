@@ -1,7 +1,7 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 
-def clean_empty(d: (dict, list)):
+def clean_empty(d: dict | list):
     if not isinstance(d, (dict, list)):
         return d
     if isinstance(d, list):
@@ -15,7 +15,7 @@ def date_range(start_date, end_date):
 
 
 def current_utc_date():
-    return datetime.utcnow().date()
+    return datetime.now(timezone.utc).date()
 
 
 def format_date_iso(date_value):

@@ -1,5 +1,7 @@
-from . import models as _m
+import warnings
+
 from ..base import Client, ModelMixin
+from . import models as _m
 
 
 class RipioExchangePublic(Client, ModelMixin):
@@ -7,6 +9,15 @@ class RipioExchangePublic(Client, ModelMixin):
 
     base_url = "https://exchange.ripio.com/api/v1/"
     error_keys = ["detail"]
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "Ripio Exchange API v1 is no longer available (moved to Ripio Trade). "
+            "This client is deprecated.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
     def order_books(self):
         """Fetch order books for all markets"""
@@ -44,9 +55,17 @@ class RipioPublic(Client, ModelMixin):
     base_url = "https://ripio.com/api/v1/"
     error_keys = ["detail"]
 
-    def __init__(self, timeout: int = None, **kwargs):
+    def __init__(self, timeout: int | None = None, **kwargs):
         super().__init__(timeout, **kwargs)
-        self.exchange = RipioExchangePublic(timeout, **kwargs)
+        self._exchange = None
+        self._timeout = timeout
+        self._kwargs = kwargs
+
+    @property
+    def exchange(self):
+        if self._exchange is None:
+            self._exchange = RipioExchangePublic(self._timeout, **self._kwargs)
+        return self._exchange
 
     def rates_raw(self):
         return self.get("rates/")

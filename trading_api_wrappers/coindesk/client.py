@@ -1,3 +1,4 @@
+import warnings
 from datetime import datetime, timedelta
 
 from ..base import Client
@@ -7,6 +8,16 @@ from ..common import current_utc_date, date_range
 class CoinDesk(Client):
     base_url = "http://api.coindesk.com/v1/"
     timeout = 15
+
+    def __init__(self, *args, **kwargs):
+        if type(self) is CoinDesk:
+            warnings.warn(
+                "The CoinDesk BPI API (api.coindesk.com) is no longer available. "
+                "This client is deprecated and will be removed in a future release.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+        super().__init__(*args, **kwargs)
 
     def bpi(self, currency: str):
         return _BPI(self, currency)

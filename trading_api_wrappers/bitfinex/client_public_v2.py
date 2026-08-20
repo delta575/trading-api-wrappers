@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from . import models_v2 as _m
 from ..base import Client, ModelMixin
+from . import models_v2 as _m
 
 
 class BitfinexPublic(Client, ModelMixin):

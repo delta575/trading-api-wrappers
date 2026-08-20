@@ -71,5 +71,5 @@ class BitstampPublic(Client):
 
             {'buy': 'buy conversion rate', 'sell': 'sell conversion rate'}
         """
-        endpoint = self._endpoint_for("eur_usd", version=1)
+        endpoint = self._endpoint_for("eur_usd")
         return self.get(endpoint)

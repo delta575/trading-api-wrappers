@@ -3,11 +3,11 @@ from urllib.parse import urlsplit
 
 from requests import PreparedRequest as P
 
+from ..auth import HMACAuth
+from ..base import AuthMixin
 from . import constants as _c
 from . import models as _m
 from .client_public import CryptoMKTPublic
-from ..auth import HMACAuth
-from ..base import AuthMixin
 
 
 class CryptoMKTHMACAuth(HMACAuth):

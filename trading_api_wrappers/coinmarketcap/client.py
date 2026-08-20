@@ -1,3 +1,5 @@
+import warnings
+
 from ..base import Client
 
 
@@ -5,6 +7,15 @@ class CoinMarketCap(Client):
     base_url = "https://api.coinmarketcap.com/v1/"
     currencies = None
     timeout = 120
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "CoinMarketCap's public v1 API was shut down. This client is deprecated "
+            "and will be removed in a future release. Use the CoinMarketCap Pro API.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
     def ticker(
         self,

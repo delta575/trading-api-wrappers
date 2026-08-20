@@ -2,9 +2,9 @@ import base64
 
 from requests import PreparedRequest as P
 
-from .client_public_v1 import BitfinexPublic
 from ..auth import HMACAuth
 from ..base import AuthMixin
+from .client_public_v1 import BitfinexPublic
 
 
 class BitfinexHMACAuth(HMACAuth):

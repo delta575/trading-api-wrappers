@@ -26,8 +26,7 @@ class SFOXPublicTest(unittest.TestCase):
                 [
                     "asks",
                     "bids",
-                    "currency",
-                    "exchanges",
+                    "lastpublished",
                     "lastupdated",
                     "market_making",
                     "pair",

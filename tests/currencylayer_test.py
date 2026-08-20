@@ -1,15 +1,14 @@
 import unittest
 
-from decouple import config
+from tests.helpers import env, skip_without
+from trading_api_wrappers import CurrencyLayer, InvalidResponse
 
-from trading_api_wrappers import CurrencyLayer
-from trading_api_wrappers import InvalidResponse
-
-ACCESS_KEY = config("CURRENCYLAYER_ACCESS_KEY")
+ACCESS_KEY = env("CURRENCYLAYER_ACCESS_KEY")
 
 # TODO: Improve tests with a paid plan
 
 
+@skip_without("CURRENCYLAYER_ACCESS_KEY")
 class CurrencyLayerTest(unittest.TestCase):
     def setUp(self):
         self.client = CurrencyLayer(ACCESS_KEY)

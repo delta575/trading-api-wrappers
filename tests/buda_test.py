@@ -1,16 +1,14 @@
 import unittest
 from datetime import datetime, timedelta
 
-from decouple import config
-
-from trading_api_wrappers import Buda
-from trading_api_wrappers import InvalidResponse
+from tests.helpers import env, skip_without
+from trading_api_wrappers import Buda, InvalidResponse
 from trading_api_wrappers.buda import models
 
-API_KEY = config("BUDA_API_KEY")
-API_SECRET = config("BUDA_API_SECRET")
-HOST = config("BUDA_HOST", default="https://www.buda.com/api/v2/")
-TEST_ORDERS = config("BUDA_TEST_ORDERS", cast=bool, default=False)
+API_KEY = env("BUDA_API_KEY")
+API_SECRET = env("BUDA_API_SECRET")
+HOST = env("BUDA_HOST") or "https://www.buda.com/api/v2/"
+TEST_ORDERS = env("BUDA_TEST_ORDERS") == "True"
 MARKET_ID = Buda.Market.BTC_CLP
 
 
@@ -26,9 +24,12 @@ class BudaPublicTest(unittest.TestCase):
 
     def test_markets(self):
         markets = self.client.markets()
-        self.assertEqual(len(markets), len(Buda.Market))
+        market_ids = {market.id for market in markets}
+        self.assertGreaterEqual(len(markets), 1)
         for market in markets:
             self.assertIsInstance(market, models.Market)
+        for known in Buda.Market:
+            self.assertIn(known.value, market_ids)
 
     def test_markets_details(self):
         market = self.client.market_details(MARKET_ID)
@@ -65,6 +66,7 @@ class BudaPublicTest(unittest.TestCase):
             self.assertIsInstance(item, models.Candlestick)
 
 
+@skip_without("BUDA_API_KEY", "BUDA_API_SECRET")
 class BudaAuthTest(unittest.TestCase):
     def setUp(self):
         self.client = Buda.Auth(API_KEY, API_SECRET, base_url=HOST)

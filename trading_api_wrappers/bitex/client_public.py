@@ -1,5 +1,7 @@
-from . import models as _m
+import warnings
+
 from ..base import Client, ModelMixin
+from . import models as _m
 
 
 class BitexPublic(Client, ModelMixin):
@@ -7,6 +9,15 @@ class BitexPublic(Client, ModelMixin):
 
     base_url = "https://bitex.la/api-v1/rest/"
     error_keys = ["error"]
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "bitex.la is no longer available. This client is deprecated and "
+            "will be removed in a future release.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
     def ticker(self, market_id: str):
         """Overview of current market prices and trade volume."""

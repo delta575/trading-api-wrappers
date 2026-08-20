@@ -1,15 +1,16 @@
 import unittest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from trading_api_wrappers import CoinDesk
 
 CURRENCY = "clp"
-TODAY = datetime.utcnow()
+TODAY = datetime.now(timezone.utc)
 YESTERDAY = TODAY - timedelta(days=1)
 TOMORROW = TODAY + timedelta(days=1)
 LAST_WEEK = TODAY - timedelta(days=7)
 
 
+@unittest.skip("CoinDesk BPI API is no longer available")
 class CoinDeskTest(unittest.TestCase):
     def setUp(self):
         self.client = CoinDesk()

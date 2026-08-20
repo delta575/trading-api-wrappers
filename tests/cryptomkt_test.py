@@ -1,20 +1,19 @@
 import unittest
 from datetime import datetime, timedelta
 
-from decouple import config
-
-from trading_api_wrappers import CryptoMKT
-from trading_api_wrappers import InvalidResponse
+from tests.helpers import env
+from trading_api_wrappers import CryptoMKT, InvalidResponse
 from trading_api_wrappers.cryptomkt import models
 
 POST_ORDERS = False  # Only post orders if explicitly set
 
-API_KEY = config("CRYPTOMKT_API_KEY")
-API_SECRET = config("CRYPTOMKT_API_SECRET")
+API_KEY = env("CRYPTOMKT_API_KEY")
+API_SECRET = env("CRYPTOMKT_API_SECRET")
 MARKET_ID = CryptoMKT.Market.ETH_CLP
 CURRENCY = CryptoMKT.Currency.ETH
 
 
+@unittest.skip("CryptoMKT API v1 is deprecated")
 class CryptoMKTPublicTest(unittest.TestCase):
     def setUp(self):
         self.client = CryptoMKT.Public()
@@ -48,6 +47,7 @@ class CryptoMKTPublicTest(unittest.TestCase):
         self.assertLess(trades.trades[0].timestamp, end)
 
 
+@unittest.skip("CryptoMKT API v1 is deprecated")
 class CryptoMKTAuthTest(unittest.TestCase):
     def setUp(self):
         self.client = CryptoMKT.Auth(API_KEY, API_SECRET)
@@ -62,7 +62,7 @@ class CryptoMKTAuthTest(unittest.TestCase):
     def test_wallet_balance(self):
         wallet_balance = self.client.wallet_balance(CURRENCY)
         self.assertIsInstance(wallet_balance, models.WalletBalance)
-        self.assertEquals(wallet_balance.wallet, CURRENCY.value)
+        self.assertEqual(wallet_balance.wallet, CURRENCY.value)
 
     def test_active_orders(self):
         page, limit = 2, 10
@@ -98,6 +98,7 @@ class CryptoMKTAuthTest(unittest.TestCase):
         self.assertIsInstance(canceled_order, models.Order)
 
 
+@unittest.skip("CryptoMKT API v1 is deprecated")
 class CryptoMKTAuthTestBadApi(unittest.TestCase):
     def setUp(self):
         self.client = CryptoMKT.Auth("BAD_KEY", "BAD_SECRET")

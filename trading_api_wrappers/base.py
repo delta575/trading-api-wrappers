@@ -1,9 +1,9 @@
 import asyncio
 import json as j
 import time
+from collections.abc import Iterable
 from enum import Enum
 from json.decoder import JSONDecodeError
-from typing import Iterable
 from urllib.parse import urljoin
 
 import backoff
@@ -18,10 +18,6 @@ from .errors import DecodeError, InvalidResponse, RequestException
 
 TIMEOUT = 30
 RETRY_CODES = [
-    400,
-    401,
-    403,
-    404,
     408,
     429,
     500,
@@ -55,7 +51,7 @@ class ClientSession(Session):
         # Init session
         super().__init__()
         # Instance attributes
-        self.auth: AuthBase = None
+        self.auth: AuthBase | None = None
         self.base_url: str = base_url
         self.timeout: int = timeout
         self.last_nonce: int = 0
@@ -80,10 +76,10 @@ class ClientSession(Session):
         return super().request(
             method,
             url,
+            *args,
             headers=headers,
             auth=self.auth,
             timeout=self.timeout,
-            *args,
             **kwargs,
         )
 
@@ -107,12 +103,12 @@ class Client:
 
     def __init__(
         self,
-        timeout: int = None,
-        max_retries: int = None,
-        backoff_factor: float = None,
-        rate_limit: int = None,
-        user_agent: str = None,
-        base_url: str = None,
+        timeout: int | None = None,
+        max_retries: int | None = None,
+        backoff_factor: float | None = None,
+        rate_limit: int | None = None,
+        user_agent: str | None = None,
+        base_url: str | None = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -150,12 +146,12 @@ class Client:
         return self._fetch("DELETE", endpoint, **kwargs)
 
     def _retry(self, target):
-        # Verify that sync version is not being run from coroutine
-        # Backoff can't run inside a coroutine.
+        # Backoff can't run inside a running event loop.
         try:
-            asyncio.get_event_loop()
+            asyncio.get_running_loop()
         except RuntimeError:
-            # Event loop not set for this thread.
+            pass
+        else:
             return target
 
         def give_up_retry(e: RequestException):
@@ -229,8 +225,9 @@ class Client:
             time.sleep(delay / 1e3)
 
     def __del__(self):
-        if self.session:
-            self.session.close()
+        session = getattr(self, "session", None)
+        if session:
+            session.close()
 
 
 class AuthMixin:
@@ -251,7 +248,7 @@ class AuthMixin:
 class ModelMixin:
     return_json: bool = False
 
-    def __init__(self, return_json: bool = None):
+    def __init__(self, return_json: bool | None = None):
         super().__init__()
         if return_json is not None:
             self.return_json = return_json

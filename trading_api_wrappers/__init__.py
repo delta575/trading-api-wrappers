@@ -1,3 +1,4 @@
+from ._version import __version__  # noqa: F401
 from .bitcoinity import *  # noqa: F401
 from .bitex import *  # noqa: F401
 from .bitfinex import *  # noqa: F401
@@ -13,4 +14,3 @@ from .oxr import *  # noqa: F401
 from .ripio import *  # noqa: F401
 from .sfox import *  # noqa: F401
 from .surbtc import *  # noqa: F401
-from ._version import __version__  # noqa: F40

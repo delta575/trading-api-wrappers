@@ -2,11 +2,11 @@ import base64
 
 from requests import PreparedRequest as P
 
+from ..auth import HMACAuth
+from ..base import AuthMixin
 from . import constants as _c
 from . import models as _m
 from .client_public import BudaPublic
-from ..auth import HMACAuth
-from ..base import AuthMixin
 
 
 class BudaHMACAuth(HMACAuth):

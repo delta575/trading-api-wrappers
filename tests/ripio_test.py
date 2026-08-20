@@ -25,6 +25,7 @@ class RipioPublicTest(unittest.TestCase):
         self.assertIsInstance(rates, models.Rates)
 
 
+@unittest.skip("Ripio Exchange API v1 is no longer available")
 class RipioExchangePublicTest(unittest.TestCase):
     def setUp(self):
         self.client = Ripio.Public().exchange
