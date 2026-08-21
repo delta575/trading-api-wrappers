@@ -56,6 +56,20 @@ class BitfinexPublicTest(unittest.TestCase):
         response = self.client.symbols_details()
         self.assertIn("pair", response[0].keys())
 
+    def test_markets(self):
+        markets = self.client.markets()
+        self.assertGreater(len(markets), 0)
+
+    def test_candles(self):
+        candles = self.client.candles(SYMBOL, time_frame="1h", limit=5)
+        self.assertGreater(len(candles), 0)
+
+    def test_quotation(self):
+        quoted = self.client.quotation(
+            SYMBOL, "buy", 0.001, limit_bids=10, limit_asks=10
+        )
+        self.assertGreater(quoted.base_exchanged, 0)
+
 
 @skip_without("BFX_API_KEY", "BFX_API_SECRET")
 class BitfinexAuthTest(unittest.TestCase):

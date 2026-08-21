@@ -94,6 +94,22 @@ class OrderBookEntry(
         return cls(price=float(entry[0]), amount=float(entry[1]))
 
 
+def _unwrap_book(data):
+    """Accept a raw book or a venue envelope (Kraken ``result``)."""
+    if not isinstance(data, dict):
+        return {}
+    if "bids" in data or "asks" in data or "b" in data or "a" in data:
+        return data
+    result = data.get("result")
+    if isinstance(result, dict):
+        for value in result.values():
+            if isinstance(value, dict) and (
+                "bids" in value or "asks" in value or "b" in value or "a" in value
+            ):
+                return value
+    return data
+
+
 class OrderBook(
     namedtuple(
         "order_book",
@@ -107,9 +123,18 @@ class OrderBook(
 ):
     @classmethod
     def create(cls, data, bids=None, asks=None, timestamp=None):
-        raw_bids = bids if bids is not None else data.get("bids") or data.get("b") or []
-        raw_asks = asks if asks is not None else data.get("asks") or data.get("a") or []
-        ts = timestamp if timestamp is not None else data.get("timestamp", data.get("ts"))
+        payload = _unwrap_book(data)
+        raw_bids = (
+            bids if bids is not None else payload.get("bids") or payload.get("b") or []
+        )
+        raw_asks = (
+            asks if asks is not None else payload.get("asks") or payload.get("a") or []
+        )
+        ts = (
+            timestamp
+            if timestamp is not None
+            else payload.get("timestamp", payload.get("ts"))
+        )
         return cls(
             bids=[OrderBookEntry.create(entry) for entry in raw_bids],
             asks=[OrderBookEntry.create(entry) for entry in raw_asks],

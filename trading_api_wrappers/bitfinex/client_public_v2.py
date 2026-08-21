@@ -1,10 +1,12 @@
 from datetime import datetime
 
 from ..base import Client, ModelMixin
+from ..market import Market, OrderBook
+from ..trading import BookQuotationMixin
 from . import models_v2 as _m
 
 
-class BitfinexPublic(Client, ModelMixin):
+class BitfinexPublic(BookQuotationMixin, Client, ModelMixin):
     base_url = "https://api.bitfinex.com/v2/"
     error_keys = ["message"]
 
@@ -60,6 +62,42 @@ class BitfinexPublic(Client, ModelMixin):
             return data
         return [_m.TradingBook.create_from_json(book) for book in data]
 
+    def order_book(self, symbol: str, precision: str = "P0", length: int = None):
+        rows = self.get(f"book/{symbol}/{precision}", params={"len": length})
+        if self.return_json:
+            return rows
+        bids = []
+        asks = []
+        for row in rows:
+            price, amount = row[0], row[2]
+            entry = [price, abs(amount)]
+            if amount > 0:
+                bids.append(entry)
+            else:
+                asks.append(entry)
+        return OrderBook.create({"bids": bids, "asks": asks}, timestamp=None)
+
+    def markets(self):
+        data = self.get("conf/pub:info:pair")
+        items = (
+            data[0]
+            if isinstance(data, list) and data and isinstance(data[0], list)
+            else data
+        )
+        if self.return_json:
+            return data
+        markets = []
+        for item in items or []:
+            if not isinstance(item, (list, tuple)) or not item:
+                continue
+            pair = item[0]
+            info = item[1] if len(item) > 1 else item
+            base = quote = None
+            if isinstance(pair, str) and len(pair) >= 6:
+                base, quote = pair[:3], pair[3:]
+            markets.append(Market.create(pair, base, quote, info))
+        return markets
+
     def stats(
         self,
         symbol: str,
@@ -94,13 +132,15 @@ class BitfinexPublic(Client, ModelMixin):
     def candles(
         self,
         symbol: str,
-        section: str,
-        time_frame: str,
+        section: str = "hist",
+        time_frame: str = "1h",
         limit: int = None,
         start: float = None,
         end: float = None,
         sort: bool = None,
+        interval: str = None,
     ):
+        time_frame = interval or time_frame
         if isinstance(start, datetime):
             start = start.timestamp() * 1000
         if isinstance(end, datetime):

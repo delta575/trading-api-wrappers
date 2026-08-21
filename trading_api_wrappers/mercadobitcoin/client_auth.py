@@ -81,6 +81,9 @@ class MercadoBitcoinAuth(Client, AuthMixin, ModelMixin):
     def order_pages(self, coin_pair: str, **params):
         return self.list_orders(coin_pair, **params)
 
+    def open_orders(self, coin_pair: str, **params):
+        return self.list_orders(coin_pair, **params)
+
     def order_details(self, coin_pair: str, order_id: int):
         return self._tapi("get_order", coin_pair=str(coin_pair), order_id=order_id)
 

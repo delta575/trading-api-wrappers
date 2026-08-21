@@ -59,6 +59,18 @@ class BitfinexPublicTest(unittest.TestCase):
         for candle in candles:
             self.assertIsInstance(candle, models.Candle)
 
+    def test_markets(self):
+        markets = self.client.markets()
+        self.assertGreater(len(markets), 0)
+
+    def test_order_book(self):
+        book = self.client.order_book(SYMBOL, length=25)
+        self.assertGreater(len(book.bids) + len(book.asks), 0)
+
+    def test_quotation(self):
+        quoted = self.client.quotation(SYMBOL, "buy", 0.001, length=25)
+        self.assertGreater(quoted.base_exchanged, 0)
+
 
 @skip_without("BFX_API_KEY", "BFX_API_SECRET")
 class BitfinexAuthTest(unittest.TestCase):

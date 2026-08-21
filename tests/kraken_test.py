@@ -18,6 +18,18 @@ class KrakenPublicTest(unittest.TestCase):
         response = self.client.server_time()
         self.assertIn("result", response.keys())
 
+    def test_markets(self):
+        markets = self.client.markets()
+        self.assertGreater(len(markets), 0)
+
+    def test_candles(self):
+        candles = self.client.candles("XBTUSD", interval=60)
+        self.assertGreater(len(candles), 0)
+
+    def test_quotation(self):
+        quoted = self.client.quotation("XBTUSD", "buy", 0.0001, count=10)
+        self.assertGreater(quoted.base_exchanged, 0)
+
 
 @skip_without("KRAKEN_API_KEY", "KRAKEN_API_SECRET")
 class KrakenAuthTest(unittest.TestCase):

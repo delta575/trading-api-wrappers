@@ -1,7 +1,10 @@
-from ..base import Client
+from ..base import Client, ModelMixin
+from ..market import Candlestick
+from ..trading import BookQuotationMixin
+from .client_public_v2 import BitfinexPublic as BitfinexPublicV2
 
 
-class BitfinexPublic(Client):
+class BitfinexPublic(BookQuotationMixin, Client, ModelMixin):
     base_url = "https://api.bitfinex.com/v1/"
     error_keys = ["message"]
 
@@ -268,6 +271,31 @@ class BitfinexPublic(Client):
 
         """
         return self.get("symbols")
+
+    def markets(self):
+        return self.symbols_details()
+
+    def candles(self, symbol: str, time_frame: str = "1h", limit: int = 100, **kwargs):
+        pair = str(symbol)
+        if not pair.startswith(("t", "f")):
+            pair = f"t{pair.upper()}"
+        rows = BitfinexPublicV2(timeout=self.timeout, return_json=True).candles(
+            pair, "hist", time_frame, limit=limit, **kwargs
+        )
+        if self.return_json:
+            return rows
+        return [
+            Candlestick.create(
+                row,
+                timestamp=row[0],
+                open_price=row[1],
+                close=row[2],
+                high=row[3],
+                low=row[4],
+                volume=row[5] if len(row) > 5 else None,
+            )
+            for row in rows
+        ]
 
     def symbols_details(self):
         """Get a list of valid symbol IDs and the pair details.

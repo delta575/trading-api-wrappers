@@ -41,3 +41,18 @@ class QuoteFromBookTest(unittest.TestCase):
         quoted = quote_from_book(self.book, "buy", 10)
         self.assertTrue(quoted.incomplete)
         self.assertEqual(quoted.base_exchanged, 3)
+
+    def test_kraken_result_envelope(self):
+        data = {
+            "error": [],
+            "result": {
+                "XXBTZUSD": {
+                    "bids": [["100", "1", "123"]],
+                    "asks": [["101", "2", "123"]],
+                }
+            },
+        }
+        book = OrderBook.create(data)
+        quoted = quote_from_book(book, "bid_given_size", 1)
+        self.assertEqual(quoted.base_exchanged, 1)
+        self.assertEqual(quoted.quote_exchanged, 101)

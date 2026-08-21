@@ -19,7 +19,8 @@ Native pair ids are used as-is (`BTCCLP`, `btc_mxn`, `BTC-BRL`, `btcbrl`,
 `trades()`, `candles()`, and `quotation()` (Buda-style book walk). Auth
 clients expose `balances()`, `new_order()`, `cancel_order()`,
 `order_details()`, `open_orders()` / `order_pages()`, `deposits()`, and
-`withdrawals()` where the venue API has those calls.
+`withdrawals()` where the venue API has those calls. Kraken, Bitfinex, and
+Bitstamp now use the same method names (legacy names remain as aliases).
 
 ### LATAM
 
@@ -44,9 +45,9 @@ old `api.exchange.cryptomkt.com` host is not a venue.
 | OKX | REST v5. |
 | Bybit | v5 spot. Some regions return HTTP 403. |
 | Coinbase | Coinbase Exchange (`api.exchange.coinbase.com`), the USD book. |
-| Kraken | |
+| Kraken | Spot. Same method names as the LATAM clients (`candles`, `quotation`, `new_order`). |
 | Bitfinex | v1 / v2; v2 authenticated client included. |
-| Bitstamp | |
+| Bitstamp | USD book. OHLC via `candles()`, orders via `new_order()`. |
 
 ### Data helpers
 

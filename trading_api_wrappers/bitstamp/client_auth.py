@@ -6,7 +6,6 @@ from .client_public import BitstampPublic
 
 
 class BitstampHMACAuth(HMACAuth):
-
     signature_delimiter = ""
 
     def __init__(self, api_key: str, secret: str, customer_id: (str, int), **kwargs):
@@ -78,6 +77,9 @@ class BitstampAuth(BitstampPublic, AuthMixin):
         )
         return self.post(endpoint)
 
+    def balances(self, currency_pair: str = None):
+        return self.account_balance(currency_pair)
+
     def user_transactions(
         self,
         currency_pair: str = None,
@@ -132,6 +134,12 @@ class BitstampAuth(BitstampPublic, AuthMixin):
         """
         endpoint = self._endpoint_for("order_status", version=1)
         return self.post(endpoint, data={"id": order_id})
+
+    def order_details(self, order_id: int):
+        return self.orders_status(order_id)
+
+    def order_pages(self, currency_pair: str = None):
+        return self.open_orders(currency_pair)
 
     def cancel_order(self, order_id: int):
         """
@@ -217,6 +225,28 @@ class BitstampAuth(BitstampPublic, AuthMixin):
         Order to sell amount for market price.
         """
         return self._market_order("sell/market/%s", currency_pair, amount)
+
+    def new_order(
+        self,
+        currency_pair: str,
+        side: str,
+        amount: float,
+        price: float = None,
+        limit_price: float = None,
+        daily_order: bool = None,
+    ):
+        buy = str(side).lower() in ("buy", "bid")
+        if price is None:
+            if buy:
+                return self.buy_market_order(currency_pair, amount)
+            return self.sell_market_order(currency_pair, amount)
+        if buy:
+            return self.buy_limit_order(
+                currency_pair, amount, price, limit_price, daily_order
+            )
+        return self.sell_limit_order(
+            currency_pair, amount, price, limit_price, daily_order
+        )
 
     # Withdrawals -------------------------------------------------------------
     def withdrawal_requests(self, time_delta: int = None):
@@ -341,6 +371,15 @@ class BitstampAuth(BitstampPublic, AuthMixin):
         """
         endpoint = self._endpoint_for("unconfirmed_btc", version=1)
         return self.post(endpoint)
+
+    def withdrawals(self, time_delta: int = None):
+        return self.withdrawal_requests(time_delta)
+
+    def deposits(self, currency_pair: str = None, **kwargs):
+        txs = self.user_transactions(currency_pair, **kwargs)
+        if isinstance(txs, list):
+            return [tx for tx in txs if tx.get("type") == 0]
+        return txs
 
     # Transfers ---------------------------------------------------------------
     def _transfer(
