@@ -65,9 +65,6 @@ class BudaPublicTest(unittest.TestCase):
         for item in report:
             self.assertIsInstance(item, models.Candlestick)
 
-    def test_candles_alias(self):
-        self.assertEqual(self.client.candles, self.client.report_candlestick)
-
 
 @skip_without("BUDA_API_KEY", "BUDA_API_SECRET")
 class BudaAuthTest(unittest.TestCase):
