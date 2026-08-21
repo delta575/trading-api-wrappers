@@ -1,7 +1,9 @@
-from ..base import Client
+from ..base import Client, ModelMixin
+from ..market import Candlestick
+from ..trading import BookQuotationMixin
 
 
-class BitstampPublic(Client):
+class BitstampPublic(BookQuotationMixin, Client, ModelMixin):
     base_url = "https://www.bitstamp.net/api/"
     error_keys = ["error", "reason"]
 
@@ -71,5 +73,47 @@ class BitstampPublic(Client):
 
             {'buy': 'buy conversion rate', 'sell': 'sell conversion rate'}
         """
-        endpoint = self._endpoint_for("eur_usd", version=1)
+        endpoint = self._endpoint_for("eur_usd")
         return self.get(endpoint)
+
+    def markets(self):
+        return self.trading_pairs_info()
+
+    def trades(self, currency_pair: str, time_interval: str = None):
+        return self.transactions(currency_pair, time_interval)
+
+    def candles(
+        self,
+        currency_pair: str,
+        step: int = 3600,
+        limit: int = 100,
+        start: int = None,
+        end: int = None,
+    ):
+        endpoint = self._endpoint_for(f"ohlc/{currency_pair}")
+        data = self.get(
+            endpoint,
+            params={
+                "step": step,
+                "limit": limit,
+                "start": start,
+                "end": end,
+            },
+        )
+        if self.return_json:
+            return data
+        rows = (
+            (data.get("data") or {}).get("ohlc") if isinstance(data, dict) else None
+        ) or []
+        return [
+            Candlestick.create(
+                row,
+                timestamp=int(row["timestamp"]) if row.get("timestamp") else None,
+                open_price=row.get("open"),
+                high=row.get("high"),
+                low=row.get("low"),
+                close=row.get("close"),
+                volume=row.get("volume"),
+            )
+            for row in rows
+        ]

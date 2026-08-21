@@ -11,9 +11,8 @@ updates:
       dev-dependencies:
         patterns:
           - "pytest*"
-          - "black"
-          - "flake8*"
-          - "coverage"
+          - "ruff"
+          - "python-decouple"
         update-types:
           - "minor"
           - "patch"

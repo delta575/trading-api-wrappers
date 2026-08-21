@@ -1,14 +1,14 @@
 import unittest
 from datetime import datetime
 
-from decouple import config
-
+from tests.helpers import env, skip_without
 from trading_api_wrappers import BitfinexV2 as Bitfinex
+from trading_api_wrappers import InvalidResponse
 from trading_api_wrappers.bitfinex import models_v2 as models
 
-TEST = config("TEST", cast=bool, default=False)
-API_KEY = config("BFX_API_KEY")
-API_SECRET = config("BFX_API_SECRET")
+TEST = env("TEST") == "True"
+API_KEY = env("BFX_API_KEY")
+API_SECRET = env("BFX_API_SECRET")
 
 # Default parameters
 SYMBOL = Bitfinex.Symbol.BTCUSD
@@ -58,3 +58,44 @@ class BitfinexPublicTest(unittest.TestCase):
         candles = self.client.candles_hist(SYMBOL, time_frame="1D")
         for candle in candles:
             self.assertIsInstance(candle, models.Candle)
+
+    def test_markets(self):
+        markets = self.client.markets()
+        self.assertGreater(len(markets), 0)
+
+    def test_order_book(self):
+        book = self.client.order_book(SYMBOL, length=25)
+        self.assertGreater(len(book.bids) + len(book.asks), 0)
+
+    def test_quotation(self):
+        quoted = self.client.quotation(SYMBOL, "buy", 0.001, length=25)
+        self.assertGreater(quoted.base_exchanged, 0)
+
+
+@skip_without("BFX_API_KEY", "BFX_API_SECRET")
+class BitfinexAuthTest(unittest.TestCase):
+    def setUp(self):
+        self.client = Bitfinex.Auth(API_KEY, API_SECRET)
+
+    def test_instantiate_client(self):
+        self.assertIsInstance(self.client, Bitfinex.Auth)
+
+    def test_wallets_returns_data(self):
+        response = self.client.wallets()
+        self.assertIsInstance(response, list)
+
+
+class BitfinexAuthTestBadApi(unittest.TestCase):
+    def setUp(self):
+        self.client = Bitfinex.Auth("BAD_KEY", "BAD_SECRET")
+
+    def test_instantiate_client(self):
+        self.assertIsInstance(self.client, Bitfinex.Auth)
+
+    def test_key_secret(self):
+        with self.assertRaises(TypeError):
+            Bitfinex.Auth()
+
+    def test_wallets_returns_error(self):
+        with self.assertRaises(InvalidResponse):
+            self.client.wallets()

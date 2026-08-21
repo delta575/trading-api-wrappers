@@ -1,5 +1,5 @@
 from . import models as _m
-from .clients import RipioPublic
+from .clients import RipioAuth, RipioPublic
 
 __all__ = [
     "Ripio",
@@ -7,8 +7,6 @@ __all__ = [
 
 
 class Ripio:
-    # Models
     models = _m
-    # Enum Types
-    # Clients
+    Auth = RipioAuth
     Public = RipioPublic

@@ -2,13 +2,12 @@ import base64
 
 from requests import PreparedRequest as P
 
-from .client_public_v1 import BitfinexPublic
 from ..auth import HMACAuth
 from ..base import AuthMixin
+from .client_public_v1 import BitfinexPublic
 
 
 class BitfinexHMACAuth(HMACAuth):
-
     api_key_header = "x-bfx-apikey"
     signature_header = "x-bfx-signature"
     payload_header = "x-bfx-payload"
@@ -116,6 +115,38 @@ class BitfinexAuth(BitfinexPublic, AuthMixin):
         }
         payload.update(params or {})
         return self.post("order/new", json=payload)
+
+    def new_order(
+        self,
+        amount: float,
+        price: float,
+        side: str,
+        ord_type: str,
+        symbol: str,
+        params: dict = None,
+    ):
+        return self.place_order(amount, price, side, ord_type, symbol, params)
+
+    def cancel_order(self, order_id: int):
+        return self.delete_order(order_id)
+
+    def order_details(self, order_id: int):
+        return self.status_order(order_id)
+
+    def open_orders(self):
+        return self.active_orders()
+
+    def order_pages(self, limit: int = 50):
+        return self.orders_history(limit)
+
+    def deposits(self, currency: str, **kwargs):
+        return self.movements(currency, **kwargs)
+
+    def withdrawals(self, currency: str, **kwargs):
+        return self.movements(currency, **kwargs)
+
+    def withdrawal(self, w_type: str, wallet: str, amount: float, address: str):
+        return self.withdraw(w_type, wallet, amount, address)
 
     # Submit a new order.
     def place_oco_order(

@@ -1,6 +1,6 @@
 import unittest
 
-from trading_api_wrappers import CoinMarketCap
+from trading_api_wrappers import CoinMarketCap, InvalidResponse
 
 
 class CoinMarketCapTest(unittest.TestCase):
@@ -10,29 +10,35 @@ class CoinMarketCapTest(unittest.TestCase):
     def test_instantiate_client(self):
         self.assertIsInstance(self.client, CoinMarketCap)
 
-    # Test Ticker -------------------------------------------------------------
     def test_ticker_list(self):
-        ticker = self.client.ticker()
+        ticker = self.client.ticker(limit=5)
         self.assertGreater(len(ticker), 1)
         self.assertIn("symbol", ticker[0].keys())
 
     def test_ticker_list_convert(self):
-        ticker = self.client.ticker(convert="clp")
+        ticker = self.client.ticker(convert="CLP", limit=5)
         self.assertGreater(len(ticker), 1)
-        self.assertIn("price_clp", ticker[0].keys())
+        quotes = ticker[0]["quote"]
+        if isinstance(quotes, list):
+            symbols = {item["symbol"] for item in quotes}
+            self.assertIn("CLP", symbols)
+        else:
+            self.assertIn("CLP", quotes)
 
     def test_ticker_currency(self):
         ticker = self.client.ticker("btc")
-        self.assertIn("symbol", ticker.keys())
+        self.assertEqual(ticker["symbol"], "BTC")
 
     def test_ticker_currency_convert(self):
         ticker = self.client.ticker("btc", "clp")
-        self.assertIn("price_clp", ticker.keys())
+        self.assertEqual(ticker["symbol"], "BTC")
+        price = self.client._quote_price(ticker, "CLP")
+        self.assertIsInstance(price, float)
 
     def test_ticker_bad_currency(self):
-        self.assertRaises(KeyError, lambda: self.client.ticker("clp"))
+        with self.assertRaises((KeyError, InvalidResponse)):
+            self.client.ticker("zzznotacoinzzz")
 
-    # Test Ticker -------------------------------------------------------------
     def test_price_currency(self):
         price = self.client.price("btc")
         self.assertIsInstance(price, float)
@@ -41,5 +47,6 @@ class CoinMarketCapTest(unittest.TestCase):
         price = self.client.price("btc", "clp")
         self.assertIsInstance(price, float)
 
-    def test_price_bad_currency(self):
-        self.assertRaises(KeyError, lambda: self.client.price("clp"))
+    def test_stats(self):
+        stats = self.client.stats()
+        self.assertTrue(stats)

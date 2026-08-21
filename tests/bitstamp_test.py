@@ -1,13 +1,12 @@
 import unittest
 from datetime import datetime
 
-from decouple import config
+from tests.helpers import env, skip_without
+from trading_api_wrappers import Bitstamp, errors
 
-from trading_api_wrappers import errors, Bitstamp
-
-API_KEY = config("BITSTAMP_API_KEY")
-API_SECRET = config("BITSTAMP_API_SECRET")
-CUSTOMER_ID = config("BITSTAMP_CUSTOMER_ID")
+API_KEY = env("BITSTAMP_API_KEY")
+API_SECRET = env("BITSTAMP_API_SECRET")
+CUSTOMER_ID = env("BITSTAMP_CUSTOMER_ID")
 
 # Default parameters
 PAIR = Bitstamp.CurrencyPair.BTC_USD
@@ -47,7 +46,24 @@ class BitstampPublicTest(unittest.TestCase):
         response = self.client.conversion_rate_usd_eur()
         self.assertIn("sell", response.keys())
 
+    def test_markets(self):
+        markets = self.client.markets()
+        self.assertGreater(len(markets), 0)
 
+    def test_trades(self):
+        trades = self.client.trades(PAIR)
+        self.assertIsInstance(trades, list)
+
+    def test_candles(self):
+        candles = self.client.candles(PAIR, step=3600, limit=5)
+        self.assertGreater(len(candles), 0)
+
+    def test_quotation(self):
+        quoted = self.client.quotation(PAIR, "buy", 0.001)
+        self.assertGreater(quoted.base_exchanged, 0)
+
+
+@skip_without("BITSTAMP_API_KEY", "BITSTAMP_API_SECRET", "BITSTAMP_CUSTOMER_ID")
 class BitstampAuthTest(unittest.TestCase):
     def setUp(self):
         self.client = Bitstamp.Auth(API_KEY, API_SECRET, CUSTOMER_ID)

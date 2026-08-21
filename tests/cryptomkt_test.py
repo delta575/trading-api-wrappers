@@ -1,114 +1,55 @@
 import unittest
-from datetime import datetime, timedelta
+import warnings
 
-from decouple import config
+from tests.helpers import skip_without
+from trading_api_wrappers import CryptoMKT, NotBank
+from trading_api_wrappers.market import OrderBook, Ticker
 
-from trading_api_wrappers import CryptoMKT
-from trading_api_wrappers import InvalidResponse
-from trading_api_wrappers.cryptomkt import models
 
-POST_ORDERS = False  # Only post orders if explicitly set
+class CryptoMKTAliasTest(unittest.TestCase):
+    def test_public_is_notbank_subclass(self):
+        self.assertTrue(issubclass(CryptoMKT.Public, NotBank.Public))
 
-API_KEY = config("CRYPTOMKT_API_KEY")
-API_SECRET = config("CRYPTOMKT_API_SECRET")
-MARKET_ID = CryptoMKT.Market.ETH_CLP
-CURRENCY = CryptoMKT.Currency.ETH
+    def test_auth_is_notbank_subclass(self):
+        self.assertTrue(issubclass(CryptoMKT.Auth, NotBank.Auth))
+
+    def test_public_warns(self):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            CryptoMKT.Public()
+        self.assertTrue(any(item.category is DeprecationWarning for item in caught))
 
 
 class CryptoMKTPublicTest(unittest.TestCase):
     def setUp(self):
-        self.client = CryptoMKT.Public()
-
-    def test_instantiate_client(self):
-        self.assertIsInstance(self.client, CryptoMKT.Public)
-
-    def test_markets(self):
-        markets = self.client.markets()
-        self.assertEqual(len(markets), len(CryptoMKT.Market))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            self.client = CryptoMKT.Public()
 
     def test_ticker(self):
-        ticker = self.client.ticker(MARKET_ID)
-        self.assertIsInstance(ticker, models.Ticker)
+        ticker = self.client.ticker("BTCCLP")
+        self.assertIsInstance(ticker, Ticker)
+        self.assertTrue(ticker.last or ticker.bid or ticker.ask)
 
     def test_order_book(self):
-        order_book = self.client.order_book(MARKET_ID, CryptoMKT.OrderType.BUY)
-        self.assertIsInstance(order_book, models.OrderBook)
-
-    def test_trades(self):
-        page, limit = 2, 10
-        trades = self.client.trades(MARKET_ID, page=page, limit=limit)
-        self.assertIsInstance(trades, models.Trades)
-        self.assertEqual(trades.pagination.page, page)
-        self.assertEqual(len(trades.trades), limit)
-
-    def test_trades_dates(self):
-        end = datetime.now() - timedelta(days=1)
-        trades = self.client.trades(MARKET_ID, end=end)
-        self.assertIsInstance(trades, models.Trades)
-        self.assertLess(trades.trades[0].timestamp, end)
+        book = self.client.order_book("BTCCLP", depth=5)
+        self.assertIsInstance(book, OrderBook)
+        self.assertGreater(len(book.bids) + len(book.asks), 0)
 
 
+@skip_without("CRYPTOMKT_API_KEY", "CRYPTOMKT_API_SECRET", "CRYPTOMKT_USER_ID")
 class CryptoMKTAuthTest(unittest.TestCase):
     def setUp(self):
-        self.client = CryptoMKT.Auth(API_KEY, API_SECRET)
+        from tests.helpers import env
 
-    def test_instantiate_client(self):
-        self.assertIsInstance(self.client, CryptoMKT.Auth)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            self.client = CryptoMKT.Auth(
+                env("CRYPTOMKT_API_KEY"),
+                env("CRYPTOMKT_API_SECRET"),
+                env("CRYPTOMKT_USER_ID"),
+            )
 
-    def test_balance(self):
-        balance = self.client.balance()
-        self.assertIsInstance(balance, models.Balance)
-
-    def test_wallet_balance(self):
-        wallet_balance = self.client.wallet_balance(CURRENCY)
-        self.assertIsInstance(wallet_balance, models.WalletBalance)
-        self.assertEquals(wallet_balance.wallet, CURRENCY.value)
-
-    def test_active_orders(self):
-        page, limit = 2, 10
-        active_orders = self.client.active_orders(MARKET_ID, page=page, limit=limit)
-        self.assertIsInstance(active_orders, models.Orders)
-        if active_orders.orders:
-            self.assertEqual(active_orders.pagination.page, page)
-
-    def test_executed_orders(self):
-        page, limit = 2, 10
-        executed_orders = self.client.executed_orders(MARKET_ID, page=page, limit=limit)
-        self.assertIsInstance(executed_orders, models.Orders)
-        if executed_orders.orders:
-            self.assertEqual(executed_orders.pagination.page, page)
-            self.assertEqual(len(executed_orders.orders), limit)
-
-    def test_order_status(self):
-        orders = self.client.executed_orders(MARKET_ID, page=1, limit=1).orders
-        first_order = orders[0]
-        single_order = self.client.order_status(first_order.id)
-        self.assertIsInstance(single_order, models.Order)
-
-    @unittest.skipUnless(POST_ORDERS, "Only run if explicitly set")
-    def test_create_order_cancel_order(self):
-        # New order
-        new_order = self.client.create_order(
-            MARKET_ID, CryptoMKT.OrderType.SELL, amount=0.001, price=1000000
-        )
-        # Cancel order
-        canceled_order = self.client.cancel_order(new_order.id)
-        # Assertions
-        self.assertIsInstance(new_order, models.Order)
-        self.assertIsInstance(canceled_order, models.Order)
-
-
-class CryptoMKTAuthTestBadApi(unittest.TestCase):
-    def setUp(self):
-        self.client = CryptoMKT.Auth("BAD_KEY", "BAD_SECRET")
-
-    def test_instantiate_client(self):
-        self.assertIsInstance(self.client, CryptoMKT.Auth)
-
-    def test_key_secret(self):
-        with self.assertRaises(TypeError):
-            CryptoMKT.Auth()
-
-    def test_balance_returns_error(self):
-        with self.assertRaises(InvalidResponse):
-            self.client.balance()
+    def test_balances(self):
+        balances = self.client.balances()
+        self.assertIsNotNone(balances)

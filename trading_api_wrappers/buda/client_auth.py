@@ -2,15 +2,14 @@ import base64
 
 from requests import PreparedRequest as P
 
+from ..auth import HMACAuth
+from ..base import AuthMixin
 from . import constants as _c
 from . import models as _m
 from .client_public import BudaPublic
-from ..auth import HMACAuth
-from ..base import AuthMixin
 
 
 class BudaHMACAuth(HMACAuth):
-
     api_key_header = "X-SBTC-APIKEY"
     nonce_header = "X-SBTC-NONCE"
     signature_header = "X-SBTC-SIGNATURE"
@@ -131,6 +130,21 @@ class BudaAuth(BudaPublic, AuthMixin):
         if self.return_json:
             return data
         return _m.Order.create_from_json(data["order"])
+
+    def open_orders(
+        self,
+        market_id: str,
+        page: int = None,
+        per_page: int = None,
+        minimum_exchanged: float = None,
+    ):
+        return self.order_pages(
+            market_id,
+            page=page,
+            per_page=per_page,
+            state=_c.OrderState.PENDING,
+            minimum_exchanged=minimum_exchanged,
+        )
 
     def cancel_order(self, order_id: int):
         data = self.put(

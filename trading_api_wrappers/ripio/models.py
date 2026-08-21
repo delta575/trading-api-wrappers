@@ -7,47 +7,20 @@ def parse_datetime(datetime_str):
         return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ")
 
 
-class Price(
-    namedtuple(
-        "price",
-        [
-            "quantity",
-            "vwap",
-            "price",
-            "fees",
-            "total",
-            "json",
-        ],
-    )
-):
-    @classmethod
-    def create_from_json(cls, price):
-        return cls(
-            quantity=float(price["quantity"]),
-            vwap=float(price["vwap"]),
-            price=float(price["price"]),
-            fees=float(price["fees"]),
-            total=float(price["total"]),
-            json=price,
-        )
-
-
 class OrderBookEntry(
     namedtuple(
         "book_entry",
         [
             "price",
             "amount",
-            "orders",
         ],
     )
 ):
     @classmethod
     def create_from_json(cls, book_entry):
         return cls(
-            price=book_entry["price"],
-            amount=book_entry["amount"],
-            orders=book_entry["orders"],
+            price=float(book_entry["price"]),
+            amount=float(book_entry["amount"]),
         )
 
 
@@ -58,7 +31,7 @@ class OrderBook(
             "bids",
             "asks",
             "timestamp",
-            "last_price",
+            "hash",
             "json",
         ],
     )
@@ -68,65 +41,15 @@ class OrderBook(
         return cls(
             bids=[
                 OrderBookEntry.create_from_json(book_entry)
-                for book_entry in order_book["bids"]
+                for book_entry in order_book.get("bids") or []
             ],
             asks=[
                 OrderBookEntry.create_from_json(book_entry)
-                for book_entry in order_book["asks"]
+                for book_entry in order_book.get("asks") or []
             ],
-            timestamp=order_book["timestamp"],
-            last_price=order_book["last_price"],
+            timestamp=order_book.get("timestamp"),
+            hash=order_book.get("hash"),
             json=order_book,
-        )
-
-
-class Trade(
-    namedtuple(
-        "trade",
-        [
-            "id",
-            "uuid",
-            "engine_id",
-            "pair",
-            "amount",
-            "price",
-            "created_at",
-        ],
-    )
-):
-    @classmethod
-    def create_from_json(cls, trade):
-        return cls(
-            id=trade["id"],
-            uuid=trade["uuid"],
-            engine_id=trade["engine_id"],
-            pair=trade["pair"],
-            amount=trade["amount"],
-            price=float(trade["price"]),
-            created_at=parse_datetime(trade["created_at"]),
-        )
-
-
-class Trades(
-    namedtuple(
-        "trades",
-        [
-            "count",
-            "next",
-            "previous",
-            "results",
-            "json",
-        ],
-    )
-):
-    @classmethod
-    def create_from_json(cls, trades):
-        return cls(
-            count=trades["count"],
-            next=trades["next"],
-            previous=trades["previous"],
-            results=[Trade.create_from_json(trade) for trade in trades["results"]],
-            json=trades,
         )
 
 

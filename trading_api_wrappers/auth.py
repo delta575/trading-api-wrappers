@@ -17,7 +17,7 @@ class AuthBase(requests.auth.AuthBase):
     def check_credentials(**credentials):
         for _name, key in credentials.items():
             if not key:
-                raise ValueError("{} Key and Secret are needed!")
+                raise ValueError(f"{_name} is required")
 
     @staticmethod
     def url_query_split(url: str):
@@ -105,13 +105,13 @@ class HMACAuth(AuthBase):
         self.secret: str = secret
         # Override defaults
         if api_key_header is not None:
-            self.api_key_header = self.api_key_header
+            self.api_key_header = api_key_header
         if nonce_header is not None:
-            self.nonce_header = self.nonce_header
+            self.nonce_header = nonce_header
         if signature_header is not None:
-            self.signature_header = self.signature_header
+            self.signature_header = signature_header
         if algorithm is not None:
-            self.algorithm = self.algorithm
+            self.algorithm = algorithm
         # Set counters
         self.last_nonce: int = 0
         self.num_401_calls: int = 0
@@ -178,7 +178,7 @@ class HMACAuth(AuthBase):
 
             # Consume content and release the original connection
             # to allow our new request to reuse the same one.
-            r.content
+            _ = r.content
             r.close()
             prep = r.request.copy()
             cookies = prep._cookies

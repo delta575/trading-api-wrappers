@@ -1,11 +1,10 @@
 import unittest
 
-from decouple import config
+from tests.helpers import env, skip_without
+from trading_api_wrappers import Kraken, errors
 
-from trading_api_wrappers import errors, Kraken
-
-API_KEY = config("KRAKEN_API_KEY")
-API_SECRET = config("KRAKEN_API_SECRET")
+API_KEY = env("KRAKEN_API_KEY")
+API_SECRET = env("KRAKEN_API_SECRET")
 
 
 class KrakenPublicTest(unittest.TestCase):
@@ -19,7 +18,20 @@ class KrakenPublicTest(unittest.TestCase):
         response = self.client.server_time()
         self.assertIn("result", response.keys())
 
+    def test_markets(self):
+        markets = self.client.markets()
+        self.assertGreater(len(markets), 0)
 
+    def test_candles(self):
+        candles = self.client.candles("XBTUSD", interval=60)
+        self.assertGreater(len(candles), 0)
+
+    def test_quotation(self):
+        quoted = self.client.quotation("XBTUSD", "buy", 0.0001, count=10)
+        self.assertGreater(quoted.base_exchanged, 0)
+
+
+@skip_without("KRAKEN_API_KEY", "KRAKEN_API_SECRET")
 class KrakenAuthTest(unittest.TestCase):
     def setUp(self):
         self.client = Kraken.Auth(API_KEY, API_SECRET)

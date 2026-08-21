@@ -4,13 +4,12 @@ import hmac
 
 from requests import PreparedRequest as P
 
-from .client_public import KrakenPublic
 from ..auth import HMACAuth
 from ..base import AuthMixin
+from .client_public import KrakenPublic
 
 
 class KrakenHMACAuth(HMACAuth):
-
     api_key_header = "API-Key"
     signature_header = "API-Sign"
     algorithm = "sha512"
@@ -48,6 +47,9 @@ class KrakenAuth(KrakenPublic, AuthMixin):
     # Get account balance.
     def balance(self):
         return self.post("private/Balance")
+
+    def balances(self):
+        return self.balance()
 
     # Get trade balance.
     def trade_balance(self, asset: str = None, asset_class: str = None):
@@ -234,6 +236,59 @@ class KrakenAuth(KrakenPublic, AuthMixin):
                 "txid": txid,
             },
         )
+
+    def new_order(
+        self,
+        pair: str,
+        direction: str,
+        volume: float,
+        order_type: str = "limit",
+        price: float = None,
+        **kwargs,
+    ):
+        return self.add_order(
+            pair=pair,
+            direction=direction,
+            order_type=order_type,
+            volume=volume,
+            price=price,
+            **kwargs,
+        )
+
+    def order_details(self, txid, include_trades: bool = None, userref: str = None):
+        ids = txid if isinstance(txid, list) else [txid]
+        return self.query_orders(ids, include_trades=include_trades, userref=userref)
+
+    def order_pages(self, **kwargs):
+        return self.closed_orders(**kwargs)
+
+    def deposits(self, asset: str, method: str = None, asset_class: str = None):
+        return self.post(
+            "private/DepositStatus",
+            data={
+                "asset": str(asset),
+                "method": str(method) if method else None,
+                "aclass": str(asset_class) if asset_class else None,
+            },
+        )
+
+    def withdrawals(self, asset: str, method: str = None, asset_class: str = None):
+        return self.post(
+            "private/WithdrawStatus",
+            data={
+                "asset": str(asset),
+                "method": str(method) if method else None,
+                "aclass": str(asset_class) if asset_class else None,
+            },
+        )
+
+    def withdrawal(self, asset: str, amount: float, key: str, asset_class: str = None):
+        return self.withdraw(asset, amount, key, asset_class=asset_class)
+
+    def simulate_withdrawal(
+        self, asset: str, amount: float, key: str, asset_class: str = None
+    ):
+        return self.withdraw_info(asset, amount, key, asset_class=asset_class)
 
     # Private user funding  ---------------------------------------------------
     # Get deposit methods.

@@ -1,6 +1,3 @@
-try:
-    import importlib.metadata as importlib_metadata
-except ModuleNotFoundError:
-    import importlib_metadata
+from importlib.metadata import version
 
-__version__ = importlib_metadata.version("trading-api-wrappers")
+__version__ = version("trading-api-wrappers")
